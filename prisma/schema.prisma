@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id       String   @id @default(uuid())
+  email    String   @unique
+  name     String?
+  phone    String?
+  authHash String
+  logins   Login[]
+  lockers  Locker[]
+
+  securityToken String? @unique
+  // recoveryKeys  String[] @default([])
+
+  createdAt DateTime @default(now())
+}
+
+model Login {
+  id        String   @id @default(uuid())
+  userId    String
+  userAgent String
+  ipAddress String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Item {
+  id       String  @id @default(cuid())
+  ownerId  String
+  lockerId String?
+
+  title    String
+  category String
+
+  ciphertext Bytes
+  iv         Bytes
+  tag        Bytes
+
+  checksum String
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  lockerItems LockerItems[]
+
+  @@index([ownerId])
+}
+
+model LockerItems {
+  lockerId String
+  itemId   String
+
+  locker Locker @relation(fields: [lockerId], references: [id])
+  item   Item   @relation(fields: [itemId], references: [id])
+
+  @@id([lockerId, itemId])
+}
+
+model Locker {
+  id      String @id @default(cuid())
+  ownerId String
+  title   String
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  lockerItems LockerItems[]
+
+  user User @relation(fields: [ownerId], references: [id])
+
+  @@index([ownerId])
+}
