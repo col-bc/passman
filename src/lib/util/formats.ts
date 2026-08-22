@@ -47,3 +47,7 @@ export function timeSinceDate(date: Date): string {
   if (interval >= 1) return `${interval} minute${interval !== 1 ? 's' : ''} ago`;
   return `${seconds} second${seconds !== 1 ? 's' : ''} ago`;
 }
+
+export function camelCaseToTitleCase(str: string): string {
+  return str.replace(/([A-Z])/g, ' $1').replace(/^./, (char) => char.toUpperCase());
+}

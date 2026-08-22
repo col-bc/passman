@@ -1,40 +1,68 @@
 'use client';
 
+import { useLocker } from '@/hooks/use-locker';
+import { useSecurityAnalytics } from '@/hooks/use-security-analytics';
 import { User } from '@/prisma/client';
 import {
   Avatar,
+  Badge,
   Box,
   Button,
+  Circle,
+  CloseButton,
   Collapsible,
+  Drawer,
+  EmptyState,
   Flex,
+  Float,
   IconButton,
   Input,
   InputGroup,
+  Link,
   Menu,
   Separator,
   Text,
 } from '@chakra-ui/react';
-import Link from 'next/link';
+import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
-import { TbLockSquareRounded, TbMenu, TbSearch, TbSettings, TbShieldLock, TbUserCircle } from 'react-icons/tb';
+import {
+  TbBell,
+  TbBellCheck,
+  TbKey,
+  TbLockSquareRounded,
+  TbMenu,
+  TbPlus,
+  TbSearch,
+  TbSettings,
+  TbShieldLock,
+  TbUserCircle,
+} from 'react-icons/tb';
 import SignOutButton from './forms/signOut';
 import Logo from './logo';
 import { ColorModeButton } from './ui/color-mode';
 import { Toaster } from './ui/toaster';
+import { Tooltip } from './ui/tooltip';
 
 export default function AppWrapper({ children, user }: { children: React.ReactNode; user: User }) {
   return (
     <Flex direction="column" h="100vh" overflow="hidden" w="full">
       {/* --- DESKTOP LAYOUT --- */}
       <Flex direction="column" display={{ base: 'none', md: 'flex' }} h="full" w="full">
-        <Box borderBottom="1px solid" borderColor="border" bg="bg.subtle" w="full" flexShrink={0} px={6} py={2}>
+        <Box borderBottom="1px solid" borderColor="border" bg="bg" w="full" flexShrink={0} px={6} py={2}>
           <Flex w="full" direction="row" gap={4} align="center">
             <Logo asLink href="/locker" />
-            <InputGroup startElement={<TbSearch />} w="full" maxW="sm" ml="auto">
+            <Box flex={1} minW={0} />
+            <Tooltip content="Create New Item" positioning={{ placement: 'bottom' }}>
+              <IconButton colorPalette="yellow" aria-label="Create New Item" variant="surface">
+                <TbPlus />
+              </IconButton>
+            </Tooltip>
+            <InputGroup startElement={<TbSearch />} w="full" maxW={{ base: 'full', md: '2xs' }}>
               <Input placeholder="Search..." />
             </InputGroup>
             <ColorModeButton />
+            <NotificationDrawer issueCount={3} />
           </Flex>
         </Box>
 
@@ -42,7 +70,7 @@ export default function AppWrapper({ children, user }: { children: React.ReactNo
           <AppBar user={user} />
 
           {/* Scrollable Main Area */}
-          <Box as="main" flex={1} bg="bg" color="fg" overflowY="auto" minH={0}>
+          <Box as="main" flex={1} overflowY="auto" minH={0}>
             {children}
           </Box>
         </Flex>
@@ -52,9 +80,10 @@ export default function AppWrapper({ children, user }: { children: React.ReactNo
       <Flex direction="column" display={{ base: 'flex', md: 'none' }} h="full" w="full">
         <Box borderBottom="1px solid" borderColor="border" bg="bg.subtle" w="full" flexShrink={0}>
           <Collapsible.Root>
-            <Flex gap={2} px={4} py={3} align="center">
+            <Flex gap={1} px={4} py={3} align="center">
               <Logo asLink href="/locker" />
               <ColorModeButton ml="auto" />
+              <NotificationDrawer issueCount={3} />
               <Collapsible.Trigger asChild>
                 <IconButton aria-label="Open navigation menu" variant="ghost">
                   <TbMenu />
@@ -64,7 +93,7 @@ export default function AppWrapper({ children, user }: { children: React.ReactNo
 
             <Collapsible.Content asChild>
               <Box py={2} borderTop="1px solid" borderColor="border">
-                <NavContent user={user} />
+                <SidebarLinks user={user} />
               </Box>
             </Collapsible.Content>
           </Collapsible.Root>
@@ -81,8 +110,11 @@ export default function AppWrapper({ children, user }: { children: React.ReactNo
   );
 }
 
-function NavContent({ user }: { user: User }) {
+const SidebarLinks: React.FC<{ user: User }> = ({ user }) => {
   const pathName = usePathname();
+  const { lockers } = useLocker();
+  const { totalIssues } = useSecurityAnalytics(lockers);
+
   return (
     <Flex direction="column" as="ul" flex={1} overflowY="auto" px={4} py={2} gap={2} w="full" h="full">
       <Button
@@ -92,7 +124,7 @@ function NavContent({ user }: { user: User }) {
         gap={2}
         asChild
       >
-        <Link href="/locker" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <Link as={NextLink} href="/locker">
           <TbLockSquareRounded />
           Lockers
         </Link>
@@ -104,9 +136,24 @@ function NavContent({ user }: { user: User }) {
         gap={2}
         asChild
       >
-        <Link href="/security-center" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <Link as={NextLink} href="/security-center">
           <TbShieldLock />
           Security Center
+          <Badge colorPalette="red" variant="subtle" rounded="full" ml="auto">
+            {totalIssues}
+          </Badge>
+        </Link>
+      </Button>
+      <Button
+        variant={pathName.startsWith('/password-generator') ? 'subtle' : 'ghost'}
+        colorPalette="gray"
+        justifyContent="flex-start"
+        gap={2}
+        asChild
+      >
+        <Link as={NextLink} href="/password-generator">
+          <TbKey />
+          Password Generator
         </Link>
       </Button>
 
@@ -153,9 +200,9 @@ function NavContent({ user }: { user: User }) {
       </Menu.Root>
     </Flex>
   );
-}
+};
 
-function AppBar({ user }: { user: User }) {
+const AppBar: React.FC<{ user: User }> = ({ user }) => {
   const [viewportWidth, setViewportWidth] = React.useState<number>(0);
 
   const handleResize = React.useCallback(() => {
@@ -163,8 +210,10 @@ function AppBar({ user }: { user: User }) {
   }, []);
 
   React.useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setViewportWidth(window.innerWidth);
+    const handleEffect = () => {
+      setViewportWidth(window.innerWidth);
+    };
+    handleEffect();
 
     window.addEventListener('resize', handleResize);
     return () => {
@@ -180,14 +229,55 @@ function AppBar({ user }: { user: User }) {
       as="nav"
       h="full"
       w={isDesktop ? '64' : 'full'}
-      bg="bg.subtle"
+      bg="bg"
       borderRight="1px solid"
       borderColor="border"
       justify="start"
     >
       <Box flex={1} overflowY="auto" w="full">
-        <NavContent user={user} />
+        <SidebarLinks user={user} />
       </Box>
     </Flex>
   );
-}
+};
+
+const NotificationDrawer: React.FC<{ issueCount: number }> = ({ issueCount }) => {
+  return (
+    <Drawer.Root>
+      <Drawer.Trigger asChild>
+        <Box position="relative">
+          <IconButton aria-label="Open notifications" variant="ghost">
+            <TbBell />
+          </IconButton>
+          <Float>
+            <Circle size="5" bg="red" color="white">
+              {issueCount}
+            </Circle>
+          </Float>
+        </Box>
+      </Drawer.Trigger>
+      <Drawer.Backdrop />
+      <Drawer.Positioner>
+        <Drawer.Content>
+          <Drawer.Header>
+            <Drawer.Title>Notifications</Drawer.Title>
+            <Drawer.CloseTrigger>
+              <CloseButton aria-label="Close notifications" />
+            </Drawer.CloseTrigger>
+          </Drawer.Header>
+          <Drawer.Body>
+            <EmptyState.Root>
+              <EmptyState.Indicator>
+                <TbBellCheck />
+              </EmptyState.Indicator>
+              <EmptyState.Title textAlign="center">All Caught Up!</EmptyState.Title>
+              <EmptyState.Description textAlign="center">
+                You have no new notifications at this time. Check back later for updates.
+              </EmptyState.Description>
+            </EmptyState.Root>
+          </Drawer.Body>
+        </Drawer.Content>
+      </Drawer.Positioner>
+    </Drawer.Root>
+  );
+};

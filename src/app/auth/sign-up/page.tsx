@@ -1,4 +1,4 @@
-import FingerprintIllustration from '@/assets/tabler-illustrations/svg/dark/fingerprint.svg';
+import Illustration from '@/assets/tabler-illustrations/svg/dark/boy-and-laptop.svg';
 import SignUpForm from '@/components/forms/signUp';
 import { Badge, Box, Container, Flex, Heading, Text } from '@chakra-ui/react';
 import { TbArrowsExchange, TbEyeOff, TbListDetails } from 'react-icons/tb';
@@ -24,14 +24,14 @@ export default function SignUpPage() {
           display={{ base: 'none', lg: 'flex' }}
           flex={1}
           direction="column"
-          gap={4}
+          gap={6}
           alignSelf="center"
           justifyContent="center"
         >
-          <Heading as="h2" size="2xl" color="fg.muted" textAlign="center" fontWeight="bold" mb={4} mt={8}>
+          <Heading as="h2" size="2xl" color="fg.muted" textAlign="center" fontWeight="bold">
             Welcome to Passman
           </Heading>
-          <Flex justifyContent="center" alignItems="center" gap={2}>
+          <Flex justifyContent="center" alignItems="center" gap={2} mb={6}>
             <Badge colorPalette="yellow" variant="subtle" rounded="full">
               <TbListDetails size={16} />
               Customizable
@@ -53,7 +53,7 @@ export default function SignUpPage() {
             maxW="xl"
             minW={0}
           >
-            <FingerprintIllustration
+            <Illustration
               viewBox="0 0 800 600"
               style={{
                 width: '100%',

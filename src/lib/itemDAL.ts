@@ -42,14 +42,12 @@ export async function createItem({
     category,
     encryptedData,
     ownerId,
-    checksum,
 }: {
     lockerId: string;
     title: string;
     category: string;
     encryptedData: EncryptedData;
     ownerId: string;
-    checksum: string;
 }): Promise<DALResult<Item>> {
     const user = await getUserById(ownerId);
     if (!user.success || !user.data) {
@@ -70,7 +68,6 @@ export async function createItem({
                 title,
                 category,
                 ownerId,
-                checksum,
                 ciphertext: Buffer.from(encodedCiphertext),
                 iv: Buffer.from(encodedIv),
                 tag: Buffer.from(encodedTag),
@@ -90,7 +87,6 @@ export async function updateItem(
         title: string;
         category: string;
         encryptedData: EncryptedData;
-        checksum: string;
     }>,
 ): Promise<DALResult<Item | null>> {
     try {

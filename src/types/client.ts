@@ -22,3 +22,43 @@ export type DecryptedLockerItem = LockerItems & {
 export type DecryptedLocker = Locker & {
   lockerItems: DecryptedLockerItem[];
 };
+
+export type PasswordOccurrence = {
+  itemId: string;
+  itemName: string;
+  lockerId: string;
+  lockerName: string;
+  label: string;
+  fieldIndex?: number;
+};
+
+export type RepeatedPassword = {
+  password: string;
+  count: number;
+  occurrences: PasswordOccurrence[];
+};
+
+export type WeakPassword = {
+  itemId: string;
+  itemName: string;
+  lockerId: string;
+  lockerName: string;
+  label: string;
+  password: string;
+  problems: number;
+  warnings: string[];
+  suggestions: string[];
+  fieldIndex: number;
+};
+
+export type BreachedPassword = {
+  itemId: string;
+  itemName: string;
+  lockerId: string;
+  lockerName: string;
+  label: string;
+  password: string;
+  breachCount: number;
+  breachSources?: string[];
+  fieldIndex: number;
+};

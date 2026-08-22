@@ -2,7 +2,7 @@
 
 import { handleSignUpUser } from '@/actions/userActions';
 import { deriveAuthHash, deriveHexKey } from '@/lib/crypto';
-import { Alert, Button, Field, Flex, Input, Link, Switch, Text } from '@chakra-ui/react';
+import { Alert, Button, Checkbox, Field, Flex, Input, Link, Text } from '@chakra-ui/react';
 import { Turnstile, TurnstileInstance } from '@marsidev/react-turnstile';
 import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -196,15 +196,18 @@ function SignUpForm() {
             size: 'flexible',
           }}
         />
-        <Switch.Root
+        <Checkbox.Root
           checked={acceptTerms}
           onCheckedChange={(v) => setAcceptTerms(!!v)}
           colorPalette="yellow"
-          mb={2}
+          mb={4}
           required
           alignItems="flex-start"
         >
-          <Switch.Label lineHeight="normal" fontSize="sm">
+          <Checkbox.Control>
+            <Checkbox.Indicator />
+          </Checkbox.Control>
+          <Checkbox.Label lineHeight="normal" fontSize="sm" fontWeight={400}>
             I accept the{' '}
             <Link as={NextLink} href="/terms" color="yellow.fg">
               Terms and Conditions
@@ -214,12 +217,9 @@ function SignUpForm() {
               Privacy Policy
             </Link>
             , and I am at least 18 years old, or of legal age in my jurisdiction to enter into a binding agreement.
-          </Switch.Label>
-          <Switch.HiddenInput />
-          <Switch.Control>
-            <Switch.Thumb />
-          </Switch.Control>
-        </Switch.Root>
+          </Checkbox.Label>
+          <Checkbox.HiddenInput />
+        </Checkbox.Root>
         <Button size="lg" type="submit" loading={isLoading} loadingText="Signing up..." colorPalette="yellow">
           Sign Up <TbArrowRight />
         </Button>

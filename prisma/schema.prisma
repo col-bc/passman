@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../src/prisma"
@@ -13,18 +8,15 @@ datasource db {
 }
 
 model User {
-  id       String   @id @default(uuid())
-  email    String   @unique
-  name     String?
-  phone    String?
-  authHash String
-  logins   Login[]
-  lockers  Locker[]
-
-  securityToken String? @unique
-  // recoveryKeys  String[] @default([])
-
-  createdAt DateTime @default(now())
+  id            String   @id @default(uuid())
+  email         String   @unique
+  name          String?
+  phone         String?
+  authHash      String
+  securityToken String?  @unique
+  createdAt     DateTime @default(now())
+  lockers       Locker[]
+  logins        Login[]
 }
 
 model Login {
@@ -32,27 +24,25 @@ model Login {
   userId    String
   userAgent String
   ipAddress String
-  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Item {
-  id       String  @id @default(cuid())
-  ownerId  String
-  lockerId String?
-
-  title    String
-  category String
-
-  ciphertext Bytes
-  iv         Bytes
-  tag        Bytes
-
-  checksum String
-
+  id          String        @id @default(cuid())
+  ownerId     String
+  lockerId    String?
+  title       String
+  category    String
+  ciphertext  Bytes
+  iv          Bytes
+  tag         Bytes
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   lockerItems LockerItems[]
+
+  isCompromised Boolean   @default(false)
+  lastScan      DateTime?
 
   @@index([ownerId])
 }
@@ -60,23 +50,21 @@ model Item {
 model LockerItems {
   lockerId String
   itemId   String
-
-  locker Locker @relation(fields: [lockerId], references: [id])
-  item   Item   @relation(fields: [itemId], references: [id])
+  item     Item   @relation(fields: [itemId], references: [id])
+  locker   Locker @relation(fields: [lockerId], references: [id])
 
   @@id([lockerId, itemId])
 }
 
 model Locker {
-  id      String @id @default(cuid())
-  ownerId String
-  title   String
-
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  lockerItems LockerItems[]
-
-  user User @relation(fields: [ownerId], references: [id])
+  id               String        @id @default(cuid())
+  ownerId          String
+  title            String
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  user             User          @relation(fields: [ownerId], references: [id])
+  lockerItems      LockerItems[]
+  enableMonitoring Boolean       @default(false)
 
   @@index([ownerId])
 }

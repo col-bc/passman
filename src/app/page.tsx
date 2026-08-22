@@ -1,11 +1,12 @@
+import { handleGetCurrentUser } from '@/actions/userActions';
 import DetectiveHackerIllustration from '@/assets/tabler-illustrations/svg/dark/device-security.svg';
 import Navbar from '@/components/navbar';
-import { getCurrentUser } from '@/lib/session';
-import { Badge, Box, Button, Card, Container, Flex, Heading, List, SimpleGrid, Text } from '@chakra-ui/react';
+import { Badge, Box, Button, Card, Container, Flex, GridItem, Heading, List, SimpleGrid, Text } from '@chakra-ui/react';
 import crypto from 'crypto';
 import Link from 'next/link';
 import {
   TbArrowRight,
+  TbBlocks,
   TbBuildingBank,
   TbCircleCheckFilled,
   TbCreditCard,
@@ -14,11 +15,13 @@ import {
   TbLock,
   TbPasswordUser,
   TbShieldCheck,
+  TbShieldLockFilled,
 } from 'react-icons/tb';
 
 export default async function HomePage() {
-  const user = await getCurrentUser();
-  const hexBackground = crypto.randomBytes(2000).toString('hex');
+  const result = await handleGetCurrentUser();
+  const hexBackground = crypto.randomBytes(6000).toString('hex');
+  const user = result.success ? result.data : null;
 
   return (
     <>
@@ -62,7 +65,7 @@ export default async function HomePage() {
                 fontSize="sm"
                 letterSpacing="wide"
               >
-                Zero-Knowledge Architecture 🔒
+                Zero-Knowledge Architecture <TbShieldLockFilled />
               </Badge>
 
               <Heading
@@ -77,12 +80,12 @@ export default async function HomePage() {
                 <Box as="span" color="yellow.emphasized">
                   mathematically
                 </Box>{' '}
-                secured.
+                protected.
               </Heading>
 
-              <Text fontSize={{ base: 'lg', md: 'xl' }} color="fg.muted" maxW="2xl" lineHeight="relaxed">
-                Passman uses client-side AES-256-GCM encryption. Your master key never leaves your device—meaning you
-                retain absolute control over your data.
+              <Text fontSize={{ base: 'lg', md: 'xl' }} color="fg" maxW="2xl" lineHeight="relaxed">
+                Passman uses military-grade client-side encryption. Your master key never leaves your device,ensuring
+                you retain absolute control over your data.
               </Text>
 
               <Flex direction={{ base: 'column', sm: 'row' }} gap={4} mt={4} w="full" justify="center">
@@ -214,7 +217,7 @@ export default async function HomePage() {
             <Heading as="h2" fontSize="4xl" fontWeight="bold" letterSpacing="tight" mb={4}>
               A Proactive Defense
             </Heading>
-            <Text color="fg.muted" fontSize="md" lineHeight="tall" mb={8}>
+            <Text color="fg" fontSize="md" lineHeight="tall" mb={8}>
               Passman continuously monitors your stored credentials for potential security risks, including weak or
               compromised passwords.
             </Text>
@@ -226,27 +229,34 @@ export default async function HomePage() {
               align="center"
               gap={6}
             >
-              <Box flex={1} maxW={{ base: 'full', lg: 'xl' }} textAlign={{ base: 'center', lg: 'left' }}>
+              <Box
+                flex={1}
+                maxW={{ base: 'full', lg: 'xl' }}
+                fontSize={{
+                  base: 'md',
+                  lg: 'lg',
+                }}
+              >
                 <List.Root gap={3} listStyleType="none" align="center">
-                  <List.Item color="fg.muted" fontSize="sm" lineHeight="tall">
+                  <List.Item color="fg.muted" lineHeight="tall" display="flex" alignItems="start">
                     <List.Indicator asChild color="yellow.emphasized" fontSize="lg">
                       <TbCircleCheckFilled className="size-8" />
                     </List.Indicator>
                     Real-time security alerts for compromised or weak credentials threats.
                   </List.Item>
-                  <List.Item color="fg.muted" fontSize="sm" lineHeight="tall">
+                  <List.Item color="fg.muted" lineHeight="tall" display="flex" alignItems="start">
                     <List.Indicator asChild color="yellow.emphasized" fontSize="md">
                       <TbCircleCheckFilled className="size-8" />
                     </List.Indicator>
                     Actionable insights and recommendations to strengthen your digital security.
                   </List.Item>
-                  <List.Item color="fg.muted" fontSize="sm" lineHeight="tall">
+                  <List.Item color="fg.muted" lineHeight="tall" display="flex" alignItems="start">
                     <List.Indicator asChild color="yellow.emphasized" fontSize="md">
                       <TbCircleCheckFilled className="size-8" />
                     </List.Indicator>
                     Comprehensive reports on your password health password strength and reuse.
                   </List.Item>
-                  <List.Item color="fg.muted" fontSize="sm" lineHeight="tall">
+                  <List.Item color="fg.muted" lineHeight="tall" display="flex" alignItems="start">
                     <List.Indicator asChild color="yellow.emphasized">
                       <TbCircleCheckFilled className="size-8" />
                     </List.Indicator>
@@ -256,7 +266,7 @@ export default async function HomePage() {
               </Box>
               <Box
                 color="yellow.solid"
-                display={{ base: 'none', lg: 'flex' }}
+                display="flex"
                 alignItems="center"
                 justifyContent="center"
                 mx="auto"
@@ -287,7 +297,7 @@ export default async function HomePage() {
             </Text>
           </Flex>
 
-          <SimpleGrid columns={{ base: 2, md: 4 }} gap={6}>
+          <SimpleGrid columns={{ base: 2, md: 5 }} gap={6}>
             <Flex
               direction="column"
               align="center"
@@ -300,8 +310,8 @@ export default async function HomePage() {
               transition="all 0.2s"
             >
               <TbPasswordUser size={40} strokeWidth={1.5} />
-              <Text fontWeight="bold" fontSize="lg">
-                Logins
+              <Text fontWeight="bold" fontSize="lg" textAlign="center">
+                Credentials
               </Text>
             </Flex>
             <Flex
@@ -316,7 +326,7 @@ export default async function HomePage() {
               transition="all 0.2s"
             >
               <TbCreditCard size={40} strokeWidth={1.5} />
-              <Text fontWeight="bold" fontSize="lg">
+              <Text fontWeight="bold" fontSize="lg" textAlign="center">
                 Credit Cards
               </Text>
             </Flex>
@@ -332,7 +342,7 @@ export default async function HomePage() {
               transition="all 0.2s"
             >
               <TbBuildingBank size={40} strokeWidth={1.5} />
-              <Text fontWeight="bold" fontSize="lg">
+              <Text fontWeight="bold" fontSize="lg" textAlign="center">
                 Bank Accounts
               </Text>
             </Flex>
@@ -348,10 +358,28 @@ export default async function HomePage() {
               transition="all 0.2s"
             >
               <TbId size={40} strokeWidth={1.5} />
-              <Text fontWeight="bold" fontSize="lg">
+              <Text fontWeight="bold" fontSize="lg" textAlign="center">
                 Identities
               </Text>
             </Flex>
+            <GridItem colSpan={{ base: 2, md: 1 }} asChild>
+              <Flex
+                direction="column"
+                align="center"
+                p={8}
+                rounded="lg"
+                borderWidth="1px"
+                gap={4}
+                bg="bg.subtle"
+                _hover={{ borderColor: 'yellow.emphasized', color: 'yellow.fg', transform: 'translateY(-2px)' }}
+                transition="all 0.2s"
+              >
+                <TbBlocks size={40} strokeWidth={1.5} />
+                <Text fontWeight="bold" fontSize="lg" textAlign="center">
+                  Build Your Own
+                </Text>
+              </Flex>
+            </GridItem>
           </SimpleGrid>
         </Container>
 

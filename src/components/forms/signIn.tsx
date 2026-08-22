@@ -1,14 +1,14 @@
 'use client';
 import { handleLoginUser } from '@/actions/userActions';
+import { PasswordInput } from '@/components/ui/password-input';
 import { useLocker } from '@/hooks/use-locker';
 import { deriveAuthHash, deriveHexKey } from '@/lib/crypto';
-import { Alert, Button, CloseButton, Field, Flex, Input } from '@chakra-ui/react';
+import { Alert, Button, CloseButton, Field, Flex, Input, Link } from '@chakra-ui/react';
 import { Turnstile, TurnstileInstance } from '@marsidev/react-turnstile';
-import Link from 'next/link';
+import NextLink from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React from 'react';
-import { TbArrowRight, TbCircleCheckFilled, TbExclamationCircle } from 'react-icons/tb';
-import { PasswordInput } from '../ui/password-input';
+import { TbArrowRight, TbCircleCheckFilled, TbExclamationCircle, TbUserPlus } from 'react-icons/tb';
 
 export default function SignInForm() {
   const { setMek } = useLocker();
@@ -104,18 +104,25 @@ export default function SignInForm() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email address"
             autoComplete="email"
+
             required
           />
         </Field.Root>
         <Field.Root required colorPalette="yellow">
-          <Field.Label>
-            Password <Field.RequiredIndicator />
-          </Field.Label>
+          <Flex justify="space-between" align="center" mb={2} w="full">
+            <Field.Label>
+              Password <Field.RequiredIndicator />
+            </Field.Label>
+            <Link as={NextLink} href="/auth/forgot-password" fontSize="xs">
+              Forgot Password?
+            </Link>
+          </Flex>
           <PasswordInput
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter your password"
             autoComplete="current-password"
+
             required
           />
         </Field.Root>
@@ -134,12 +141,11 @@ export default function SignInForm() {
         <Button size="lg" type="submit" my={2} loading={isLoading} loadingText="Signing in..." colorPalette="yellow">
           Sign In <TbArrowRight />
         </Button>
-        <Flex align="center">
+        <Flex justify="center">
           <Button variant="ghost" colorPalette="yellow" size="sm" flex={1} asChild>
-            <Link href="/auth/forgot-password">Forgot Password?</Link>
-          </Button>
-          <Button variant="ghost" colorPalette="yellow" size="sm" flex={1} asChild>
-            <Link href="/auth/sign-up">Create Account</Link>
+            <NextLink href="/auth/sign-up">
+              <TbUserPlus size={16} /> Create Account
+            </NextLink>
           </Button>
         </Flex>
       </Flex>

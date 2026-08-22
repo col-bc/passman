@@ -1,4 +1,4 @@
-import ShieldIllustration from '@/assets/tabler-illustrations/svg/dark/shield.svg';
+import Illustration from '@/assets/tabler-illustrations/svg/dark/boy-with-key.svg';
 import SignInForm from '@/components/forms/signIn';
 import { Box, Container, Flex, Heading, Text } from '@chakra-ui/react';
 
@@ -11,7 +11,7 @@ export default function AuthPage() {
             Sign In
           </Heading>
           <Text fontSize="md" color="fg.muted" mb={8}>
-            Welcome back! Please sign in to your account to access Passman
+            Welcome back! Sign in to access your secure vault
           </Text>
           <Box w="full" maxW="md" minW={0}>
             <SignInForm />
@@ -33,7 +33,7 @@ export default function AuthPage() {
             maxW="xl"
             minW={0}
           >
-            <ShieldIllustration
+            <Illustration
               viewBox="0 0 800 600"
               style={{
                 width: '100%',

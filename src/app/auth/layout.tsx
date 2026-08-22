@@ -1,6 +1,6 @@
+import { handleGetCurrentUser } from '@/actions/userActions';
 import Navbar from '@/components/navbar';
 import { LockerProvider } from '@/hooks/use-locker';
-import { getCurrentUser } from '@/lib/session';
 import { Box } from '@chakra-ui/react';
 
 export default async function AuthLayout({
@@ -8,7 +8,9 @@ export default async function AuthLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await getCurrentUser();
+  const result = await handleGetCurrentUser();
+  const user = result.success && result.data ? result.data : null;
+
   return (
     <LockerProvider userEmail={user?.email || ''}>
       <Navbar user={user} />

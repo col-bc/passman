@@ -63,6 +63,19 @@ export async function updateLockerTitle(lockerId: string, newTitle: string): Pro
   return { success: true, data: updatedLocker };
 }
 
+export async function deleteLocker(lockerId: string): Promise<DALResult<boolean>> {
+  const deletedLocker = await prisma.locker.deleteMany({
+    where: { id: lockerId },
+  });
+  if (deletedLocker.count === 0) {
+    console.error(`Failed to delete locker ${lockerId}`);
+    return { success: false, type: 'NOT_FOUND' };
+  }
+  return { success: true, data: true };
+}
+
+// Locker Item DAL Functions
+
 export async function addLockerItem(lockerId: string, itemId: string): Promise<DALResult<boolean>> {
   const createdItem = await prisma.lockerItems.create({
     data: { lockerId, itemId },
@@ -78,13 +91,12 @@ export async function createLockerItem(
   lockerId: string,
   userId: string,
   item: Omit<Item, 'id' | 'createdAt' | 'updatedAt'>,
-): Promise<DALResult<boolean>> {
+): Promise<DALResult<{ lockerId: string; itemId: string }>> {
   try {
     const createdItem = await prisma.item.create({
       data: {
         category: item.category,
         title: item.title,
-        checksum: item.checksum || '',
 
         iv: Buffer.from(item.iv),
         tag: Buffer.from(item.tag),
@@ -104,14 +116,14 @@ export async function createLockerItem(
       console.error(`Failed to create item in locker ${lockerId}`);
       return { success: false, type: 'SERVER_ERROR' };
     }
-    return { success: true, data: true };
+    return { success: true, data: { lockerId: lockerId, itemId: createdItem.id } };
   } catch (error) {
     console.error(`Error creating item in locker ${lockerId}:`, error);
     return { success: false, type: 'SERVER_ERROR' };
   }
 }
 
-export async function removeLockerItem(lockerId: string, itemId: string): Promise<DALResult<boolean>> {
+export async function deleteLockerItem(lockerId: string, itemId: string): Promise<DALResult<boolean>> {
   const deletedItem = await prisma.lockerItems.deleteMany({
     where: { lockerId, itemId },
   });
@@ -146,7 +158,7 @@ export async function updateLockerItem(
   lockerId: string,
   itemId: string,
   updates: Partial<Item>,
-): Promise<DALResult<Item | null>> {
+): Promise<DALResult<{ lockerId: string; itemId: string }>> {
   try {
     const updatedItem = await prisma.item.update({
       where: { id: itemId },
@@ -155,7 +167,7 @@ export async function updateLockerItem(
     if (!updatedItem) {
       return { success: false, type: 'NOT_FOUND' };
     }
-    return { success: true, data: updatedItem };
+    return { success: true, data: { lockerId: lockerId, itemId: updatedItem.id } };
   } catch (error) {
     console.error(`Error updating item ${itemId} in locker ${lockerId}:`, error);
     return { success: false, type: 'SERVER_ERROR' };

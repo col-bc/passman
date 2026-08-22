@@ -198,8 +198,8 @@ export type UserWhereInput = {
   authHash?: Prisma.StringFilter<"User"> | string
   securityToken?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  logins?: Prisma.LoginListRelationFilter
   lockers?: Prisma.LockerListRelationFilter
+  logins?: Prisma.LoginListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -210,8 +210,8 @@ export type UserOrderByWithRelationInput = {
   authHash?: Prisma.SortOrder
   securityToken?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  logins?: Prisma.LoginOrderByRelationAggregateInput
   lockers?: Prisma.LockerOrderByRelationAggregateInput
+  logins?: Prisma.LoginOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -225,8 +225,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   phone?: Prisma.StringNullableFilter<"User"> | string | null
   authHash?: Prisma.StringFilter<"User"> | string
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  logins?: Prisma.LoginListRelationFilter
   lockers?: Prisma.LockerListRelationFilter
+  logins?: Prisma.LoginListRelationFilter
 }, "id" | "email" | "securityToken">
 
 export type UserOrderByWithAggregationInput = {
@@ -263,8 +263,8 @@ export type UserCreateInput = {
   authHash: string
   securityToken?: string | null
   createdAt?: Date | string
-  logins?: Prisma.LoginCreateNestedManyWithoutUserInput
   lockers?: Prisma.LockerCreateNestedManyWithoutUserInput
+  logins?: Prisma.LoginCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -275,8 +275,8 @@ export type UserUncheckedCreateInput = {
   authHash: string
   securityToken?: string | null
   createdAt?: Date | string
-  logins?: Prisma.LoginUncheckedCreateNestedManyWithoutUserInput
   lockers?: Prisma.LockerUncheckedCreateNestedManyWithoutUserInput
+  logins?: Prisma.LoginUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -287,8 +287,8 @@ export type UserUpdateInput = {
   authHash?: Prisma.StringFieldUpdateOperationsInput | string
   securityToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  logins?: Prisma.LoginUpdateManyWithoutUserNestedInput
   lockers?: Prisma.LockerUpdateManyWithoutUserNestedInput
+  logins?: Prisma.LoginUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -299,8 +299,8 @@ export type UserUncheckedUpdateInput = {
   authHash?: Prisma.StringFieldUpdateOperationsInput | string
   securityToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  logins?: Prisma.LoginUncheckedUpdateManyWithoutUserNestedInput
   lockers?: Prisma.LockerUncheckedUpdateManyWithoutUserNestedInput
+  logins?: Prisma.LoginUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -534,13 +534,13 @@ export type UserUncheckedUpdateWithoutLockersInput = {
  */
 
 export type UserCountOutputType = {
-  logins: number
   lockers: number
+  logins: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  logins?: boolean | UserCountOutputTypeCountLoginsArgs
   lockers?: boolean | UserCountOutputTypeCountLockersArgs
+  logins?: boolean | UserCountOutputTypeCountLoginsArgs
 }
 
 /**
@@ -556,15 +556,15 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountLoginsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.LoginWhereInput
+export type UserCountOutputTypeCountLockersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LockerWhereInput
 }
 
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountLockersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.LockerWhereInput
+export type UserCountOutputTypeCountLoginsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LoginWhereInput
 }
 
 
@@ -576,8 +576,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   authHash?: boolean
   securityToken?: boolean
   createdAt?: boolean
-  logins?: boolean | Prisma.User$loginsArgs<ExtArgs>
   lockers?: boolean | Prisma.User$lockersArgs<ExtArgs>
+  logins?: boolean | Prisma.User$loginsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -613,8 +613,8 @@ export type UserSelectScalar = {
 
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "name" | "phone" | "authHash" | "securityToken" | "createdAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  logins?: boolean | Prisma.User$loginsArgs<ExtArgs>
   lockers?: boolean | Prisma.User$lockersArgs<ExtArgs>
+  logins?: boolean | Prisma.User$loginsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -623,8 +623,8 @@ export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
-    logins: Prisma.$LoginPayload<ExtArgs>[]
     lockers: Prisma.$LockerPayload<ExtArgs>[]
+    logins: Prisma.$LoginPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1028,8 +1028,8 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  logins<T extends Prisma.User$loginsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$loginsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LoginPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   lockers<T extends Prisma.User$lockersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$lockersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LockerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  logins<T extends Prisma.User$loginsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$loginsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LoginPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1457,30 +1457,6 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * User.logins
- */
-export type User$loginsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Login
-   */
-  select?: Prisma.LoginSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Login
-   */
-  omit?: Prisma.LoginOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.LoginInclude<ExtArgs> | null
-  where?: Prisma.LoginWhereInput
-  orderBy?: Prisma.LoginOrderByWithRelationInput | Prisma.LoginOrderByWithRelationInput[]
-  cursor?: Prisma.LoginWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.LoginScalarFieldEnum | Prisma.LoginScalarFieldEnum[]
-}
-
-/**
  * User.lockers
  */
 export type User$lockersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1502,6 +1478,30 @@ export type User$lockersArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   distinct?: Prisma.LockerScalarFieldEnum | Prisma.LockerScalarFieldEnum[]
+}
+
+/**
+ * User.logins
+ */
+export type User$loginsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Login
+   */
+  select?: Prisma.LoginSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Login
+   */
+  omit?: Prisma.LoginOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LoginInclude<ExtArgs> | null
+  where?: Prisma.LoginWhereInput
+  orderBy?: Prisma.LoginOrderByWithRelationInput | Prisma.LoginOrderByWithRelationInput[]
+  cursor?: Prisma.LoginWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LoginScalarFieldEnum | Prisma.LoginScalarFieldEnum[]
 }
 
 /**

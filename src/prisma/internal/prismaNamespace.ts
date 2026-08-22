@@ -860,9 +860,10 @@ export const ItemScalarFieldEnum = {
   ciphertext: 'ciphertext',
   iv: 'iv',
   tag: 'tag',
-  checksum: 'checksum',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  isCompromised: 'isCompromised',
+  lastScan: 'lastScan'
 } as const
 
 export type ItemScalarFieldEnum = (typeof ItemScalarFieldEnum)[keyof typeof ItemScalarFieldEnum]
@@ -881,7 +882,8 @@ export const LockerScalarFieldEnum = {
   ownerId: 'ownerId',
   title: 'title',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  enableMonitoring: 'enableMonitoring'
 } as const
 
 export type LockerScalarFieldEnum = (typeof LockerScalarFieldEnum)[keyof typeof LockerScalarFieldEnum]
@@ -927,6 +929,13 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'Bytes'
  */
 export type BytesFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Bytes'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 

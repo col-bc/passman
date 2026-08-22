@@ -2,6 +2,7 @@
 
 import { verifyPassword } from '@/lib/util/password';
 import { User } from '@/prisma/client';
+import { DALResult } from '@/types/server';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import 'server-only';
@@ -10,20 +11,35 @@ import { getUserByEmail } from './userDAL';
 
 const SESSION_SECRET_KEY = process.env.SESSION_SECRET_KEY;
 
-export async function getCurrentUser(): Promise<User | null> {
+export async function getCurrentUser(): Promise<DALResult<User | null>> {
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get('session')?.value;
   if (!sessionToken) {
-    return null;
+    return {
+      success: false,
+      type: 'UNAUTHORIZED',
+    };
   }
   const userId = await decodeSessionToken(sessionToken);
   if (!userId) {
-    return null;
+    return {
+      success: false,
+      type: 'UNAUTHORIZED',
+    };
   }
   const user = await prisma.user.findUnique({
     where: { id: userId },
   });
-  return user;
+  if (!user) {
+    return {
+      success: false,
+      type: 'NOT_FOUND',
+    };
+  }
+  return {
+    success: true,
+    data: user,
+  };
 }
 
 export async function setSessionToken(userId: string): Promise<void> {
@@ -73,7 +89,7 @@ const decodeSessionToken = async (token: string): Promise<string | null> => {
     };
     return decoded.userId;
   } catch (error) {
-    console.error('Error decoding session token:', error);
+    console.warn('Error decoding session token:', error);
     return null;
   }
 };

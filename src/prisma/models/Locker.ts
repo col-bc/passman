@@ -30,6 +30,7 @@ export type LockerMinAggregateOutputType = {
   title: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  enableMonitoring: boolean | null
 }
 
 export type LockerMaxAggregateOutputType = {
@@ -38,6 +39,7 @@ export type LockerMaxAggregateOutputType = {
   title: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  enableMonitoring: boolean | null
 }
 
 export type LockerCountAggregateOutputType = {
@@ -46,6 +48,7 @@ export type LockerCountAggregateOutputType = {
   title: number
   createdAt: number
   updatedAt: number
+  enableMonitoring: number
   _all: number
 }
 
@@ -56,6 +59,7 @@ export type LockerMinAggregateInputType = {
   title?: true
   createdAt?: true
   updatedAt?: true
+  enableMonitoring?: true
 }
 
 export type LockerMaxAggregateInputType = {
@@ -64,6 +68,7 @@ export type LockerMaxAggregateInputType = {
   title?: true
   createdAt?: true
   updatedAt?: true
+  enableMonitoring?: true
 }
 
 export type LockerCountAggregateInputType = {
@@ -72,6 +77,7 @@ export type LockerCountAggregateInputType = {
   title?: true
   createdAt?: true
   updatedAt?: true
+  enableMonitoring?: true
   _all?: true
 }
 
@@ -153,6 +159,7 @@ export type LockerGroupByOutputType = {
   title: string
   createdAt: Date
   updatedAt: Date
+  enableMonitoring: boolean
   _count: LockerCountAggregateOutputType | null
   _min: LockerMinAggregateOutputType | null
   _max: LockerMaxAggregateOutputType | null
@@ -182,8 +189,9 @@ export type LockerWhereInput = {
   title?: Prisma.StringFilter<"Locker"> | string
   createdAt?: Prisma.DateTimeFilter<"Locker"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Locker"> | Date | string
-  lockerItems?: Prisma.LockerItemsListRelationFilter
+  enableMonitoring?: Prisma.BoolFilter<"Locker"> | boolean
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  lockerItems?: Prisma.LockerItemsListRelationFilter
 }
 
 export type LockerOrderByWithRelationInput = {
@@ -192,8 +200,9 @@ export type LockerOrderByWithRelationInput = {
   title?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  lockerItems?: Prisma.LockerItemsOrderByRelationAggregateInput
+  enableMonitoring?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
+  lockerItems?: Prisma.LockerItemsOrderByRelationAggregateInput
 }
 
 export type LockerWhereUniqueInput = Prisma.AtLeast<{
@@ -205,8 +214,9 @@ export type LockerWhereUniqueInput = Prisma.AtLeast<{
   title?: Prisma.StringFilter<"Locker"> | string
   createdAt?: Prisma.DateTimeFilter<"Locker"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Locker"> | Date | string
-  lockerItems?: Prisma.LockerItemsListRelationFilter
+  enableMonitoring?: Prisma.BoolFilter<"Locker"> | boolean
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  lockerItems?: Prisma.LockerItemsListRelationFilter
 }, "id">
 
 export type LockerOrderByWithAggregationInput = {
@@ -215,6 +225,7 @@ export type LockerOrderByWithAggregationInput = {
   title?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  enableMonitoring?: Prisma.SortOrder
   _count?: Prisma.LockerCountOrderByAggregateInput
   _max?: Prisma.LockerMaxOrderByAggregateInput
   _min?: Prisma.LockerMinOrderByAggregateInput
@@ -229,6 +240,7 @@ export type LockerScalarWhereWithAggregatesInput = {
   title?: Prisma.StringWithAggregatesFilter<"Locker"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Locker"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Locker"> | Date | string
+  enableMonitoring?: Prisma.BoolWithAggregatesFilter<"Locker"> | boolean
 }
 
 export type LockerCreateInput = {
@@ -236,8 +248,9 @@ export type LockerCreateInput = {
   title: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  lockerItems?: Prisma.LockerItemsCreateNestedManyWithoutLockerInput
+  enableMonitoring?: boolean
   user: Prisma.UserCreateNestedOneWithoutLockersInput
+  lockerItems?: Prisma.LockerItemsCreateNestedManyWithoutLockerInput
 }
 
 export type LockerUncheckedCreateInput = {
@@ -246,6 +259,7 @@ export type LockerUncheckedCreateInput = {
   title: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  enableMonitoring?: boolean
   lockerItems?: Prisma.LockerItemsUncheckedCreateNestedManyWithoutLockerInput
 }
 
@@ -254,8 +268,9 @@ export type LockerUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lockerItems?: Prisma.LockerItemsUpdateManyWithoutLockerNestedInput
+  enableMonitoring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   user?: Prisma.UserUpdateOneRequiredWithoutLockersNestedInput
+  lockerItems?: Prisma.LockerItemsUpdateManyWithoutLockerNestedInput
 }
 
 export type LockerUncheckedUpdateInput = {
@@ -264,6 +279,7 @@ export type LockerUncheckedUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  enableMonitoring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lockerItems?: Prisma.LockerItemsUncheckedUpdateManyWithoutLockerNestedInput
 }
 
@@ -273,6 +289,7 @@ export type LockerCreateManyInput = {
   title: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  enableMonitoring?: boolean
 }
 
 export type LockerUpdateManyMutationInput = {
@@ -280,6 +297,7 @@ export type LockerUpdateManyMutationInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  enableMonitoring?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type LockerUncheckedUpdateManyInput = {
@@ -288,6 +306,7 @@ export type LockerUncheckedUpdateManyInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  enableMonitoring?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type LockerListRelationFilter = {
@@ -311,6 +330,7 @@ export type LockerCountOrderByAggregateInput = {
   title?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  enableMonitoring?: Prisma.SortOrder
 }
 
 export type LockerMaxOrderByAggregateInput = {
@@ -319,6 +339,7 @@ export type LockerMaxOrderByAggregateInput = {
   title?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  enableMonitoring?: Prisma.SortOrder
 }
 
 export type LockerMinOrderByAggregateInput = {
@@ -327,6 +348,7 @@ export type LockerMinOrderByAggregateInput = {
   title?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  enableMonitoring?: Prisma.SortOrder
 }
 
 export type LockerCreateNestedManyWithoutUserInput = {
@@ -390,6 +412,7 @@ export type LockerCreateWithoutUserInput = {
   title: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  enableMonitoring?: boolean
   lockerItems?: Prisma.LockerItemsCreateNestedManyWithoutLockerInput
 }
 
@@ -398,6 +421,7 @@ export type LockerUncheckedCreateWithoutUserInput = {
   title: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  enableMonitoring?: boolean
   lockerItems?: Prisma.LockerItemsUncheckedCreateNestedManyWithoutLockerInput
 }
 
@@ -435,6 +459,7 @@ export type LockerScalarWhereInput = {
   title?: Prisma.StringFilter<"Locker"> | string
   createdAt?: Prisma.DateTimeFilter<"Locker"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Locker"> | Date | string
+  enableMonitoring?: Prisma.BoolFilter<"Locker"> | boolean
 }
 
 export type LockerCreateWithoutLockerItemsInput = {
@@ -442,6 +467,7 @@ export type LockerCreateWithoutLockerItemsInput = {
   title: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  enableMonitoring?: boolean
   user: Prisma.UserCreateNestedOneWithoutLockersInput
 }
 
@@ -451,6 +477,7 @@ export type LockerUncheckedCreateWithoutLockerItemsInput = {
   title: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  enableMonitoring?: boolean
 }
 
 export type LockerCreateOrConnectWithoutLockerItemsInput = {
@@ -474,6 +501,7 @@ export type LockerUpdateWithoutLockerItemsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  enableMonitoring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   user?: Prisma.UserUpdateOneRequiredWithoutLockersNestedInput
 }
 
@@ -483,6 +511,7 @@ export type LockerUncheckedUpdateWithoutLockerItemsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  enableMonitoring?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type LockerCreateManyUserInput = {
@@ -490,6 +519,7 @@ export type LockerCreateManyUserInput = {
   title: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  enableMonitoring?: boolean
 }
 
 export type LockerUpdateWithoutUserInput = {
@@ -497,6 +527,7 @@ export type LockerUpdateWithoutUserInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  enableMonitoring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lockerItems?: Prisma.LockerItemsUpdateManyWithoutLockerNestedInput
 }
 
@@ -505,6 +536,7 @@ export type LockerUncheckedUpdateWithoutUserInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  enableMonitoring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lockerItems?: Prisma.LockerItemsUncheckedUpdateManyWithoutLockerNestedInput
 }
 
@@ -513,6 +545,7 @@ export type LockerUncheckedUpdateManyWithoutUserInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  enableMonitoring?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -552,8 +585,9 @@ export type LockerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   title?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  lockerItems?: boolean | Prisma.Locker$lockerItemsArgs<ExtArgs>
+  enableMonitoring?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  lockerItems?: boolean | Prisma.Locker$lockerItemsArgs<ExtArgs>
   _count?: boolean | Prisma.LockerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["locker"]>
 
@@ -563,6 +597,7 @@ export type LockerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   title?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  enableMonitoring?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["locker"]>
 
@@ -572,6 +607,7 @@ export type LockerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   title?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  enableMonitoring?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["locker"]>
 
@@ -581,12 +617,13 @@ export type LockerSelectScalar = {
   title?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  enableMonitoring?: boolean
 }
 
-export type LockerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerId" | "title" | "createdAt" | "updatedAt", ExtArgs["result"]["locker"]>
+export type LockerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerId" | "title" | "createdAt" | "updatedAt" | "enableMonitoring", ExtArgs["result"]["locker"]>
 export type LockerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  lockerItems?: boolean | Prisma.Locker$lockerItemsArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  lockerItems?: boolean | Prisma.Locker$lockerItemsArgs<ExtArgs>
   _count?: boolean | Prisma.LockerCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type LockerIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -599,8 +636,8 @@ export type LockerIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
 export type $LockerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Locker"
   objects: {
-    lockerItems: Prisma.$LockerItemsPayload<ExtArgs>[]
     user: Prisma.$UserPayload<ExtArgs>
+    lockerItems: Prisma.$LockerItemsPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -608,6 +645,7 @@ export type $LockerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     title: string
     createdAt: Date
     updatedAt: Date
+    enableMonitoring: boolean
   }, ExtArgs["result"]["locker"]>
   composites: {}
 }
@@ -1002,8 +1040,8 @@ readonly fields: LockerFieldRefs;
  */
 export interface Prisma__LockerClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  lockerItems<T extends Prisma.Locker$lockerItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Locker$lockerItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LockerItemsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  lockerItems<T extends Prisma.Locker$lockerItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Locker$lockerItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LockerItemsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1038,6 +1076,7 @@ export interface LockerFieldRefs {
   readonly title: Prisma.FieldRef<"Locker", 'String'>
   readonly createdAt: Prisma.FieldRef<"Locker", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Locker", 'DateTime'>
+  readonly enableMonitoring: Prisma.FieldRef<"Locker", 'Boolean'>
 }
     
 

@@ -33,9 +33,10 @@ export type ItemMinAggregateOutputType = {
   ciphertext: runtime.Bytes | null
   iv: runtime.Bytes | null
   tag: runtime.Bytes | null
-  checksum: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  isCompromised: boolean | null
+  lastScan: Date | null
 }
 
 export type ItemMaxAggregateOutputType = {
@@ -47,9 +48,10 @@ export type ItemMaxAggregateOutputType = {
   ciphertext: runtime.Bytes | null
   iv: runtime.Bytes | null
   tag: runtime.Bytes | null
-  checksum: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  isCompromised: boolean | null
+  lastScan: Date | null
 }
 
 export type ItemCountAggregateOutputType = {
@@ -61,9 +63,10 @@ export type ItemCountAggregateOutputType = {
   ciphertext: number
   iv: number
   tag: number
-  checksum: number
   createdAt: number
   updatedAt: number
+  isCompromised: number
+  lastScan: number
   _all: number
 }
 
@@ -77,9 +80,10 @@ export type ItemMinAggregateInputType = {
   ciphertext?: true
   iv?: true
   tag?: true
-  checksum?: true
   createdAt?: true
   updatedAt?: true
+  isCompromised?: true
+  lastScan?: true
 }
 
 export type ItemMaxAggregateInputType = {
@@ -91,9 +95,10 @@ export type ItemMaxAggregateInputType = {
   ciphertext?: true
   iv?: true
   tag?: true
-  checksum?: true
   createdAt?: true
   updatedAt?: true
+  isCompromised?: true
+  lastScan?: true
 }
 
 export type ItemCountAggregateInputType = {
@@ -105,9 +110,10 @@ export type ItemCountAggregateInputType = {
   ciphertext?: true
   iv?: true
   tag?: true
-  checksum?: true
   createdAt?: true
   updatedAt?: true
+  isCompromised?: true
+  lastScan?: true
   _all?: true
 }
 
@@ -192,9 +198,10 @@ export type ItemGroupByOutputType = {
   ciphertext: runtime.Bytes
   iv: runtime.Bytes
   tag: runtime.Bytes
-  checksum: string
   createdAt: Date
   updatedAt: Date
+  isCompromised: boolean
+  lastScan: Date | null
   _count: ItemCountAggregateOutputType | null
   _min: ItemMinAggregateOutputType | null
   _max: ItemMaxAggregateOutputType | null
@@ -227,9 +234,10 @@ export type ItemWhereInput = {
   ciphertext?: Prisma.BytesFilter<"Item"> | runtime.Bytes
   iv?: Prisma.BytesFilter<"Item"> | runtime.Bytes
   tag?: Prisma.BytesFilter<"Item"> | runtime.Bytes
-  checksum?: Prisma.StringFilter<"Item"> | string
   createdAt?: Prisma.DateTimeFilter<"Item"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Item"> | Date | string
+  isCompromised?: Prisma.BoolFilter<"Item"> | boolean
+  lastScan?: Prisma.DateTimeNullableFilter<"Item"> | Date | string | null
   lockerItems?: Prisma.LockerItemsListRelationFilter
 }
 
@@ -242,9 +250,10 @@ export type ItemOrderByWithRelationInput = {
   ciphertext?: Prisma.SortOrder
   iv?: Prisma.SortOrder
   tag?: Prisma.SortOrder
-  checksum?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isCompromised?: Prisma.SortOrder
+  lastScan?: Prisma.SortOrderInput | Prisma.SortOrder
   lockerItems?: Prisma.LockerItemsOrderByRelationAggregateInput
 }
 
@@ -260,9 +269,10 @@ export type ItemWhereUniqueInput = Prisma.AtLeast<{
   ciphertext?: Prisma.BytesFilter<"Item"> | runtime.Bytes
   iv?: Prisma.BytesFilter<"Item"> | runtime.Bytes
   tag?: Prisma.BytesFilter<"Item"> | runtime.Bytes
-  checksum?: Prisma.StringFilter<"Item"> | string
   createdAt?: Prisma.DateTimeFilter<"Item"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Item"> | Date | string
+  isCompromised?: Prisma.BoolFilter<"Item"> | boolean
+  lastScan?: Prisma.DateTimeNullableFilter<"Item"> | Date | string | null
   lockerItems?: Prisma.LockerItemsListRelationFilter
 }, "id">
 
@@ -275,9 +285,10 @@ export type ItemOrderByWithAggregationInput = {
   ciphertext?: Prisma.SortOrder
   iv?: Prisma.SortOrder
   tag?: Prisma.SortOrder
-  checksum?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isCompromised?: Prisma.SortOrder
+  lastScan?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ItemCountOrderByAggregateInput
   _max?: Prisma.ItemMaxOrderByAggregateInput
   _min?: Prisma.ItemMinOrderByAggregateInput
@@ -295,9 +306,10 @@ export type ItemScalarWhereWithAggregatesInput = {
   ciphertext?: Prisma.BytesWithAggregatesFilter<"Item"> | runtime.Bytes
   iv?: Prisma.BytesWithAggregatesFilter<"Item"> | runtime.Bytes
   tag?: Prisma.BytesWithAggregatesFilter<"Item"> | runtime.Bytes
-  checksum?: Prisma.StringWithAggregatesFilter<"Item"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Item"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Item"> | Date | string
+  isCompromised?: Prisma.BoolWithAggregatesFilter<"Item"> | boolean
+  lastScan?: Prisma.DateTimeNullableWithAggregatesFilter<"Item"> | Date | string | null
 }
 
 export type ItemCreateInput = {
@@ -309,9 +321,10 @@ export type ItemCreateInput = {
   ciphertext: runtime.Bytes
   iv: runtime.Bytes
   tag: runtime.Bytes
-  checksum: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  isCompromised?: boolean
+  lastScan?: Date | string | null
   lockerItems?: Prisma.LockerItemsCreateNestedManyWithoutItemInput
 }
 
@@ -324,9 +337,10 @@ export type ItemUncheckedCreateInput = {
   ciphertext: runtime.Bytes
   iv: runtime.Bytes
   tag: runtime.Bytes
-  checksum: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  isCompromised?: boolean
+  lastScan?: Date | string | null
   lockerItems?: Prisma.LockerItemsUncheckedCreateNestedManyWithoutItemInput
 }
 
@@ -339,9 +353,10 @@ export type ItemUpdateInput = {
   ciphertext?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
   iv?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
   tag?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
-  checksum?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isCompromised?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastScan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lockerItems?: Prisma.LockerItemsUpdateManyWithoutItemNestedInput
 }
 
@@ -354,9 +369,10 @@ export type ItemUncheckedUpdateInput = {
   ciphertext?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
   iv?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
   tag?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
-  checksum?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isCompromised?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastScan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lockerItems?: Prisma.LockerItemsUncheckedUpdateManyWithoutItemNestedInput
 }
 
@@ -369,9 +385,10 @@ export type ItemCreateManyInput = {
   ciphertext: runtime.Bytes
   iv: runtime.Bytes
   tag: runtime.Bytes
-  checksum: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  isCompromised?: boolean
+  lastScan?: Date | string | null
 }
 
 export type ItemUpdateManyMutationInput = {
@@ -383,9 +400,10 @@ export type ItemUpdateManyMutationInput = {
   ciphertext?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
   iv?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
   tag?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
-  checksum?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isCompromised?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastScan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ItemUncheckedUpdateManyInput = {
@@ -397,9 +415,10 @@ export type ItemUncheckedUpdateManyInput = {
   ciphertext?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
   iv?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
   tag?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
-  checksum?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isCompromised?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastScan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ItemCountOrderByAggregateInput = {
@@ -411,9 +430,10 @@ export type ItemCountOrderByAggregateInput = {
   ciphertext?: Prisma.SortOrder
   iv?: Prisma.SortOrder
   tag?: Prisma.SortOrder
-  checksum?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isCompromised?: Prisma.SortOrder
+  lastScan?: Prisma.SortOrder
 }
 
 export type ItemMaxOrderByAggregateInput = {
@@ -425,9 +445,10 @@ export type ItemMaxOrderByAggregateInput = {
   ciphertext?: Prisma.SortOrder
   iv?: Prisma.SortOrder
   tag?: Prisma.SortOrder
-  checksum?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isCompromised?: Prisma.SortOrder
+  lastScan?: Prisma.SortOrder
 }
 
 export type ItemMinOrderByAggregateInput = {
@@ -439,9 +460,10 @@ export type ItemMinOrderByAggregateInput = {
   ciphertext?: Prisma.SortOrder
   iv?: Prisma.SortOrder
   tag?: Prisma.SortOrder
-  checksum?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isCompromised?: Prisma.SortOrder
+  lastScan?: Prisma.SortOrder
 }
 
 export type ItemScalarRelationFilter = {
@@ -451,6 +473,14 @@ export type ItemScalarRelationFilter = {
 
 export type BytesFieldUpdateOperationsInput = {
   set?: runtime.Bytes
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type ItemCreateNestedOneWithoutLockerItemsInput = {
@@ -476,9 +506,10 @@ export type ItemCreateWithoutLockerItemsInput = {
   ciphertext: runtime.Bytes
   iv: runtime.Bytes
   tag: runtime.Bytes
-  checksum: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  isCompromised?: boolean
+  lastScan?: Date | string | null
 }
 
 export type ItemUncheckedCreateWithoutLockerItemsInput = {
@@ -490,9 +521,10 @@ export type ItemUncheckedCreateWithoutLockerItemsInput = {
   ciphertext: runtime.Bytes
   iv: runtime.Bytes
   tag: runtime.Bytes
-  checksum: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  isCompromised?: boolean
+  lastScan?: Date | string | null
 }
 
 export type ItemCreateOrConnectWithoutLockerItemsInput = {
@@ -520,9 +552,10 @@ export type ItemUpdateWithoutLockerItemsInput = {
   ciphertext?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
   iv?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
   tag?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
-  checksum?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isCompromised?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastScan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ItemUncheckedUpdateWithoutLockerItemsInput = {
@@ -534,9 +567,10 @@ export type ItemUncheckedUpdateWithoutLockerItemsInput = {
   ciphertext?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
   iv?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
   tag?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
-  checksum?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isCompromised?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastScan?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -579,9 +613,10 @@ export type ItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   ciphertext?: boolean
   iv?: boolean
   tag?: boolean
-  checksum?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isCompromised?: boolean
+  lastScan?: boolean
   lockerItems?: boolean | Prisma.Item$lockerItemsArgs<ExtArgs>
   _count?: boolean | Prisma.ItemCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["item"]>
@@ -595,9 +630,10 @@ export type ItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   ciphertext?: boolean
   iv?: boolean
   tag?: boolean
-  checksum?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isCompromised?: boolean
+  lastScan?: boolean
 }, ExtArgs["result"]["item"]>
 
 export type ItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -609,9 +645,10 @@ export type ItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   ciphertext?: boolean
   iv?: boolean
   tag?: boolean
-  checksum?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isCompromised?: boolean
+  lastScan?: boolean
 }, ExtArgs["result"]["item"]>
 
 export type ItemSelectScalar = {
@@ -623,12 +660,13 @@ export type ItemSelectScalar = {
   ciphertext?: boolean
   iv?: boolean
   tag?: boolean
-  checksum?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isCompromised?: boolean
+  lastScan?: boolean
 }
 
-export type ItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerId" | "lockerId" | "title" | "category" | "ciphertext" | "iv" | "tag" | "checksum" | "createdAt" | "updatedAt", ExtArgs["result"]["item"]>
+export type ItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerId" | "lockerId" | "title" | "category" | "ciphertext" | "iv" | "tag" | "createdAt" | "updatedAt" | "isCompromised" | "lastScan", ExtArgs["result"]["item"]>
 export type ItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   lockerItems?: boolean | Prisma.Item$lockerItemsArgs<ExtArgs>
   _count?: boolean | Prisma.ItemCountOutputTypeDefaultArgs<ExtArgs>
@@ -650,9 +688,10 @@ export type $ItemPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     ciphertext: runtime.Bytes
     iv: runtime.Bytes
     tag: runtime.Bytes
-    checksum: string
     createdAt: Date
     updatedAt: Date
+    isCompromised: boolean
+    lastScan: Date | null
   }, ExtArgs["result"]["item"]>
   composites: {}
 }
@@ -1085,9 +1124,10 @@ export interface ItemFieldRefs {
   readonly ciphertext: Prisma.FieldRef<"Item", 'Bytes'>
   readonly iv: Prisma.FieldRef<"Item", 'Bytes'>
   readonly tag: Prisma.FieldRef<"Item", 'Bytes'>
-  readonly checksum: Prisma.FieldRef<"Item", 'String'>
   readonly createdAt: Prisma.FieldRef<"Item", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Item", 'DateTime'>
+  readonly isCompromised: Prisma.FieldRef<"Item", 'Boolean'>
+  readonly lastScan: Prisma.FieldRef<"Item", 'DateTime'>
 }
     
 

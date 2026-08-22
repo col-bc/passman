@@ -1,8 +1,9 @@
 'use server';
 
-import { loginUser } from '@/lib/session';
+import { getCurrentUser, loginUser } from '@/lib/session';
 import { createUser } from '@/lib/userDAL';
 import { verifyTurnstileToken } from '@/lib/util/turnstile';
+import { User } from '@/prisma/client';
 import { ActionState } from '@/types/server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -82,11 +83,27 @@ export async function handleLoginUser({
   redirect('/locker');
 }
 
-export async function handleSignOutUser(formData: FormData): Promise<void> {
+export async function handleSignOutUser(): Promise<void> {
   const cookieStore = await cookies();
   // Clear the session cookie by setting it to an empty value and expiring it immediately
   cookieStore.set('session', '', { path: '/', expires: new Date(0) });
   cookieStore.delete('session');
 
   redirect('/auth/sign-in');
+}
+
+export async function handleGetCurrentUser(): Promise<ActionState<User | null>> {
+  const user = await getCurrentUser();
+  if (!user.success) {
+    return {
+      success: false,
+      type: user.type || 'SERVER_ERROR',
+      error: 'No current user found. Please sign in.',
+    };
+  } else {
+    return {
+      success: true,
+      data: user.data,
+    };
+  }
 }

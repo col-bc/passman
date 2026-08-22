@@ -6,13 +6,13 @@ import SignOutButton from './forms/signOut';
 import Logo from './logo';
 import { ColorModeButton } from './ui/color-mode';
 
-function Navbar({ user }: { user: User | null }) {
+function Navbar({ href = '/locker', user }: { href?: string; user: User | null }) {
   return (
-    <Box as="nav" color="fg" bg="bg.panel" borderBottomWidth={1} borderBottomColor="border">
+    <Box as="nav" color="fg" bg="bg.panel" borderBottomWidth={1} borderBottomColor="border.muted">
       <Collapsible.Root>
-        <Container maxW="5xl" py={4} px={8}>
+        <Container maxW="5xl" py={2} px={8}>
           <Flex align="center">
-            <Logo asLink href="/locker" />
+            <Logo asLink href={href} />
             <Box flex={1} mx={4} display={{ base: 'none', md: 'flex' }} gap={2}>
               <Button variant="ghost" colorScheme="whiteAlpha" size="sm" asChild>
                 <Link href="/contact">About</Link>

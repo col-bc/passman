@@ -158,15 +158,15 @@ export type LockerItemsWhereInput = {
   NOT?: Prisma.LockerItemsWhereInput | Prisma.LockerItemsWhereInput[]
   lockerId?: Prisma.StringFilter<"LockerItems"> | string
   itemId?: Prisma.StringFilter<"LockerItems"> | string
-  locker?: Prisma.XOR<Prisma.LockerScalarRelationFilter, Prisma.LockerWhereInput>
   item?: Prisma.XOR<Prisma.ItemScalarRelationFilter, Prisma.ItemWhereInput>
+  locker?: Prisma.XOR<Prisma.LockerScalarRelationFilter, Prisma.LockerWhereInput>
 }
 
 export type LockerItemsOrderByWithRelationInput = {
   lockerId?: Prisma.SortOrder
   itemId?: Prisma.SortOrder
-  locker?: Prisma.LockerOrderByWithRelationInput
   item?: Prisma.ItemOrderByWithRelationInput
+  locker?: Prisma.LockerOrderByWithRelationInput
 }
 
 export type LockerItemsWhereUniqueInput = Prisma.AtLeast<{
@@ -176,8 +176,8 @@ export type LockerItemsWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.LockerItemsWhereInput | Prisma.LockerItemsWhereInput[]
   lockerId?: Prisma.StringFilter<"LockerItems"> | string
   itemId?: Prisma.StringFilter<"LockerItems"> | string
-  locker?: Prisma.XOR<Prisma.LockerScalarRelationFilter, Prisma.LockerWhereInput>
   item?: Prisma.XOR<Prisma.ItemScalarRelationFilter, Prisma.ItemWhereInput>
+  locker?: Prisma.XOR<Prisma.LockerScalarRelationFilter, Prisma.LockerWhereInput>
 }, "lockerId_itemId">
 
 export type LockerItemsOrderByWithAggregationInput = {
@@ -197,8 +197,8 @@ export type LockerItemsScalarWhereWithAggregatesInput = {
 }
 
 export type LockerItemsCreateInput = {
-  locker: Prisma.LockerCreateNestedOneWithoutLockerItemsInput
   item: Prisma.ItemCreateNestedOneWithoutLockerItemsInput
+  locker: Prisma.LockerCreateNestedOneWithoutLockerItemsInput
 }
 
 export type LockerItemsUncheckedCreateInput = {
@@ -207,8 +207,8 @@ export type LockerItemsUncheckedCreateInput = {
 }
 
 export type LockerItemsUpdateInput = {
-  locker?: Prisma.LockerUpdateOneRequiredWithoutLockerItemsNestedInput
   item?: Prisma.ItemUpdateOneRequiredWithoutLockerItemsNestedInput
+  locker?: Prisma.LockerUpdateOneRequiredWithoutLockerItemsNestedInput
 }
 
 export type LockerItemsUncheckedUpdateInput = {
@@ -455,22 +455,22 @@ export type LockerItemsUncheckedUpdateManyWithoutLockerInput = {
 export type LockerItemsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   lockerId?: boolean
   itemId?: boolean
-  locker?: boolean | Prisma.LockerDefaultArgs<ExtArgs>
   item?: boolean | Prisma.ItemDefaultArgs<ExtArgs>
+  locker?: boolean | Prisma.LockerDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["lockerItems"]>
 
 export type LockerItemsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   lockerId?: boolean
   itemId?: boolean
-  locker?: boolean | Prisma.LockerDefaultArgs<ExtArgs>
   item?: boolean | Prisma.ItemDefaultArgs<ExtArgs>
+  locker?: boolean | Prisma.LockerDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["lockerItems"]>
 
 export type LockerItemsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   lockerId?: boolean
   itemId?: boolean
-  locker?: boolean | Prisma.LockerDefaultArgs<ExtArgs>
   item?: boolean | Prisma.ItemDefaultArgs<ExtArgs>
+  locker?: boolean | Prisma.LockerDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["lockerItems"]>
 
 export type LockerItemsSelectScalar = {
@@ -480,23 +480,23 @@ export type LockerItemsSelectScalar = {
 
 export type LockerItemsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"lockerId" | "itemId", ExtArgs["result"]["lockerItems"]>
 export type LockerItemsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  locker?: boolean | Prisma.LockerDefaultArgs<ExtArgs>
   item?: boolean | Prisma.ItemDefaultArgs<ExtArgs>
+  locker?: boolean | Prisma.LockerDefaultArgs<ExtArgs>
 }
 export type LockerItemsIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  locker?: boolean | Prisma.LockerDefaultArgs<ExtArgs>
   item?: boolean | Prisma.ItemDefaultArgs<ExtArgs>
+  locker?: boolean | Prisma.LockerDefaultArgs<ExtArgs>
 }
 export type LockerItemsIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  locker?: boolean | Prisma.LockerDefaultArgs<ExtArgs>
   item?: boolean | Prisma.ItemDefaultArgs<ExtArgs>
+  locker?: boolean | Prisma.LockerDefaultArgs<ExtArgs>
 }
 
 export type $LockerItemsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "LockerItems"
   objects: {
-    locker: Prisma.$LockerPayload<ExtArgs>
     item: Prisma.$ItemPayload<ExtArgs>
+    locker: Prisma.$LockerPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     lockerId: string
@@ -895,8 +895,8 @@ readonly fields: LockerItemsFieldRefs;
  */
 export interface Prisma__LockerItemsClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  locker<T extends Prisma.LockerDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LockerDefaultArgs<ExtArgs>>): Prisma.Prisma__LockerClient<runtime.Types.Result.GetResult<Prisma.$LockerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   item<T extends Prisma.ItemDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ItemDefaultArgs<ExtArgs>>): Prisma.Prisma__ItemClient<runtime.Types.Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  locker<T extends Prisma.LockerDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LockerDefaultArgs<ExtArgs>>): Prisma.Prisma__LockerClient<runtime.Types.Result.GetResult<Prisma.$LockerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

@@ -1,11 +1,10 @@
 import { handleGetLockerById, handleGetLockerItem } from '@/actions/lockerActions';
-import LockerError from '@/components/presentation/lockerError';
-import LockerItemWrapper from '@/components/presentation/lockerWrapper';
-import { getCurrentUser } from '@/lib/session';
+import { handleGetCurrentUser } from '@/actions/userActions';
+import LockerError from '@/components/presentation/locker/lockerError';
+import LockerItemWrapper from '@/components/presentation/locker/lockerWrapper';
 import { EncryptedLocker } from '@/types/server';
-import { Avatar, Box, Breadcrumb, Card, Code, Container, Flex, Heading } from '@chakra-ui/react';
+import { Breadcrumb, Container } from '@chakra-ui/react';
 import { unauthorized } from 'next/navigation';
-import { TbBuildingBank, TbCreditCard, TbCube, TbFileTypography, TbHash, TbId, TbPasswordUser } from 'react-icons/tb';
 
 type Props = {
   params: Promise<{
@@ -15,7 +14,7 @@ type Props = {
 };
 
 export default async function LockerItemDetailPage({ params }: Props) {
-  const user = await getCurrentUser();
+  const user = await handleGetCurrentUser();
   if (!user) {
     unauthorized();
   }
@@ -41,26 +40,9 @@ export default async function LockerItemDetailPage({ params }: Props) {
 
   const item = encryptedItem.data;
 
-  const templateIcon = (category: string) => {
-    switch (category) {
-      case 'login':
-        return <TbPasswordUser className="size-10" />;
-      case 'secureNote':
-        return <TbFileTypography className="size-10" />;
-      case 'bankAccount':
-        return <TbBuildingBank className="size-10" />;
-      case 'creditCard':
-        return <TbCreditCard className="size-10" />;
-      case 'identity':
-        return <TbId className="size-10" />;
-      default:
-        return <TbCube className="size-10" />;
-    }
-  };
-
   return (
     <>
-      <Breadcrumb.Root variant="underline" borderBottom="1px solid" borderColor="border">
+      <Breadcrumb.Root variant="underline" borderBottom="1px solid" borderColor="border" bg="bg.subtle" shadow="xs">
         <Container maxW="5xl" px={6} py={3}>
           <Breadcrumb.List>
             <Breadcrumb.Item>
@@ -80,29 +62,12 @@ export default async function LockerItemDetailPage({ params }: Props) {
         </Container>
       </Breadcrumb.Root>
       <Container maxW="xl" p={6}>
-        <Flex direction="column" as="section" gap={8}>
-          <Box>
-            <Heading as="h1" mb={2} size="3xl" fontFamily="heading" fontWeight="bolder">
-              <Flex align="center" gap={2}>
-                <Avatar.Root variant="subtle" colorPalette="yellow">
-                  <Avatar.Fallback>{templateIcon(item.category)}</Avatar.Fallback>
-                </Avatar.Root>
-                {item.title}
-              </Flex>
-            </Heading>
-            <Code display="inline-flex" alignItems="center" gap={2}>
-              <TbHash />
-              {item.id}
-            </Code>
-          </Box>
-          <Card.Root variant="outline" w="full" mx="auto" mb={8} p={8}>
-            <LockerItemWrapper
-              lockerId={lockerId}
-              itemId={itemId}
-              encryptedLockers={[encryptedLocker.data] as EncryptedLocker[]}
-            />
-          </Card.Root>
-        </Flex>
+        <LockerItemWrapper
+          lockerId={lockerId}
+          itemId={itemId}
+          encryptedLockers={[encryptedLocker.data] as EncryptedLocker[]}
+          lockerName={encryptedLocker.data.title}
+        />
       </Container>
     </>
   );

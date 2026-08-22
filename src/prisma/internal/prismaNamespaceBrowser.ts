@@ -104,9 +104,10 @@ export const ItemScalarFieldEnum = {
   ciphertext: 'ciphertext',
   iv: 'iv',
   tag: 'tag',
-  checksum: 'checksum',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  isCompromised: 'isCompromised',
+  lastScan: 'lastScan'
 } as const
 
 export type ItemScalarFieldEnum = (typeof ItemScalarFieldEnum)[keyof typeof ItemScalarFieldEnum]
@@ -125,7 +126,8 @@ export const LockerScalarFieldEnum = {
   ownerId: 'ownerId',
   title: 'title',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  enableMonitoring: 'enableMonitoring'
 } as const
 
 export type LockerScalarFieldEnum = (typeof LockerScalarFieldEnum)[keyof typeof LockerScalarFieldEnum]

@@ -1,14 +1,12 @@
 import { handleGetLockers } from '@/actions/lockerActions';
-import LockerList from '@/components/presentation/lockerList';
-import { getCurrentUser } from '@/lib/session';
-import { Breadcrumb, Button, Container, Flex, Heading } from '@chakra-ui/react';
-import Link from 'next/link';
+import { handleGetCurrentUser } from '@/actions/userActions';
+import LockerList from '@/components/presentation/locker/lockerList';
+import { Breadcrumb, Container } from '@chakra-ui/react';
 import { unauthorized } from 'next/navigation';
-import { TbPlus } from 'react-icons/tb';
 
 export default async function LockerPage() {
-  const user = await getCurrentUser();
-  if (!user) {
+  const user = await handleGetCurrentUser();
+  if (!user.success || !user.data) {
     unauthorized();
   }
   const lockers = await handleGetLockers();
@@ -24,7 +22,7 @@ export default async function LockerPage() {
 
   return (
     <>
-      <Breadcrumb.Root variant="underline" borderBottom="1px solid" borderColor="border">
+      <Breadcrumb.Root variant="underline" borderBottom="1px solid" borderColor="border" bg="bg.subtle" shadow="xs">
         <Container maxW="5xl" px={6} py={3}>
           <Breadcrumb.List>
             <Breadcrumb.Item>
@@ -34,22 +32,7 @@ export default async function LockerPage() {
         </Container>
       </Breadcrumb.Root>
       <Container maxW="5xl" p={6}>
-        <Flex direction="column">
-          <Flex direction="row" align="center" justify="space-between" mb={8}>
-            <Heading as="h1" size="3xl" mb={8} fontFamily="heading" fontWeight="bolder">
-              Your Lockers
-            </Heading>
-
-            <Link href="/locker/new" style={{ textDecoration: 'none' }}>
-              <Button colorScheme="blue" size="md" colorPalette="yellow">
-                <TbPlus />
-                Create New Locker
-              </Button>
-            </Link>
-          </Flex>
-        </Flex>
-
-        <LockerList encryptedLockers={lockers.data} user={user} />
+        <LockerList encryptedLockers={lockers.data} user={user.data} />
       </Container>
     </>
   );

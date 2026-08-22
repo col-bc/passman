@@ -1,6 +1,6 @@
 import { handleGetLockers } from '@/actions/lockerActions';
-import LockerDetails from '@/components/presentation/lockerItemDetails';
-import { getCurrentUser } from '@/lib/session';
+import { handleGetCurrentUser } from '@/actions/userActions';
+import LockerItemList from '@/components/presentation/locker/lockerItemList';
 import { Breadcrumb, Container } from '@chakra-ui/react';
 import { unauthorized } from 'next/navigation';
 
@@ -9,8 +9,8 @@ type Props = {
 };
 
 export default async function LockerPage({ params }: Props) {
-  const user = await getCurrentUser();
-  if (!user) {
+  const user = await handleGetCurrentUser();
+  if (!user.success || !user.data) {
     unauthorized();
   }
 
@@ -29,7 +29,7 @@ export default async function LockerPage({ params }: Props) {
 
   return (
     <>
-      <Breadcrumb.Root variant="underline" borderBottom="1px solid" borderColor="border">
+      <Breadcrumb.Root variant="underline" borderBottom="1px solid" borderColor="border" bg="bg.subtle" shadow="xs">
         <Container maxW="5xl" px={6} py={3}>
           <Breadcrumb.List>
             <Breadcrumb.Item>
@@ -43,7 +43,7 @@ export default async function LockerPage({ params }: Props) {
         </Container>
       </Breadcrumb.Root>
       <Container maxW="5xl" p={6}>
-        <LockerDetails lockerId={lockerId} encryptedLockers={lockersResponse.data} />
+        <LockerItemList lockerId={lockerId} encryptedLockers={lockersResponse.data} />
       </Container>
     </>
   );
