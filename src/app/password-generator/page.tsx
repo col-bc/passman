@@ -1,8 +1,8 @@
-import { handleGetCurrentUser } from '@/actions/userActions';
 import AppWrapper from '@/components/appWrapper';
 import LockerError from '@/components/presentation/locker/lockerError';
 import PasswordGenerator from '@/components/util/passwordGenerator';
 import { LockerProvider } from '@/hooks/use-locker';
+import { handleGetCurrentUser } from '@/lib/user/userActions';
 import { Breadcrumb, Container, Heading } from '@chakra-ui/react';
 import { unauthorized } from 'next/navigation';
 

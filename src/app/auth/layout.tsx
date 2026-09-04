@@ -1,6 +1,6 @@
-import { handleGetCurrentUser } from '@/actions/userActions';
 import Navbar from '@/components/navbar';
 import { LockerProvider } from '@/hooks/use-locker';
+import { handleGetCurrentUser } from '@/lib/user/userActions';
 import { Box } from '@chakra-ui/react';
 
 export default async function AuthLayout({

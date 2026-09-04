@@ -1,7 +1,7 @@
 'use client';
 
-import { handleSignUpUser } from '@/actions/userActions';
 import { deriveAuthHash, deriveHexKey } from '@/lib/crypto';
+import { handleSignUpUser } from '@/lib/user/userActions';
 import { Alert, Button, Checkbox, Field, Flex, Input, Link, Text } from '@chakra-ui/react';
 import { Turnstile, TurnstileInstance } from '@marsidev/react-turnstile';
 import NextLink from 'next/link';
@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 import { TbArrowRight, TbExclamationCircleFilled } from 'react-icons/tb';
 import zxcvbn from 'zxcvbn';
-import { PasswordInput, PasswordStrengthMeter } from '../ui/password-input';
+import { PasswordInput, PasswordStrengthMeter } from '../../ui/password-input';
 
 const formatPhone = (phone: string) => {
   // Remove all non-digit characters

@@ -7,8 +7,8 @@ import { TbArrowBack, TbExclamationCircle, TbHome } from 'react-icons/tb';
 export default function LockerError({ text, type }: { text: string; type: string }) {
   const router = useRouter();
   return (
-    <Container maxW="xl" p={6}>
-      <Flex direction="column" as="section" gap={8}>
+    <Container maxW="xl" p={6} h="100vh" display="flex" alignItems="center" justifyContent="center">
+      <Flex direction="column" as="section" gap={8} rounded="md" shadow="md" p={8} bg="bg.panel">
         <Flex w={16} h={16} align="center" justify="center" rounded="lg" bg="red.subtle" color="red.fg" fontSize="5xl">
           <TbExclamationCircle />
         </Flex>
@@ -16,7 +16,7 @@ export default function LockerError({ text, type }: { text: string; type: string
           <Heading as="h1" size="3xl" fontFamily="heading" fontWeight="bolder" mb={2}>
             Something Went Wrong
           </Heading>
-          <Code colorPalette="gray" variant="surface" size="lg">
+          <Code colorPalette="red" variant="subtle" size="lg">
             {type}
           </Code>
         </Box>

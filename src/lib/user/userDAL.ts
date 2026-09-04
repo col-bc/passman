@@ -2,8 +2,8 @@ import { User } from '@/prisma/client';
 import { DALResult } from '@/types/server';
 import crypto from 'node:crypto';
 import 'server-only';
-import { prisma } from './prisma';
-import { hashPassword } from './util/password';
+import { prisma } from '../prisma';
+import { hashPassword } from '../util/password';
 
 export async function getUserById(userId: string): Promise<DALResult<User | null>> {
   const user = await prisma.user.findUnique({
@@ -149,5 +149,26 @@ export async function deleteUser(userId: string): Promise<DALResult<{ success: b
   return {
     success: true,
     data: { success: true, message: 'User deleted successfully' },
+  };
+}
+
+export async function sendChangePasswordEmail(
+  email: string,
+): Promise<DALResult<{ success: boolean; message: string }>> {
+  const tokenResult = await generateAndStoreSecurityToken(email);
+  if (!tokenResult.success || !tokenResult.data?.token) {
+    return { success: false, type: 'VALIDATION' };
+  }
+
+  const token = tokenResult.data.token;
+  const resetLink = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/reset-password?email=${encodeURIComponent(
+    email,
+  )}&token=${encodeURIComponent(token)}`;
+
+  console.log(`[userDAL] Password reset link for ${email}: ${resetLink}`);
+
+  return {
+    success: true,
+    data: { success: true, message: 'Password reset email sent successfully' },
   };
 }

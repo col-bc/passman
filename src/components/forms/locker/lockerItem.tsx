@@ -1,6 +1,5 @@
 'use client';
 
-import { handleCreateLockerItem, handleUpdateLockerItem } from '@/actions/lockerActions';
 import DeleteLockerItemDialog from '@/components/presentation/locker/deleteLockerItemDialog';
 import LockerItemRead from '@/components/presentation/locker/lockerItemRead';
 import { PasswordInput, PasswordStrengthMeter } from '@/components/ui/password-input';
@@ -9,6 +8,7 @@ import { Tooltip } from '@/components/ui/tooltip';
 import { PasswordGeneratorDialog } from '@/components/util/passwordGenerator';
 import { useLocker } from '@/hooks/use-locker';
 import { encryptPayload } from '@/lib/crypto';
+import { handleCreateLockerItem, handleUpdateLockerItem } from '@/lib/locker/lockerActions';
 import formatDate from '@/lib/util/formats';
 import {
   BankAccountTemplate,
@@ -309,7 +309,7 @@ function LockerItemForm({
             {!!lockerItem?.id && (
               <Flex align="center" gap={2}>
                 {mode === 'read' && (
-                  <Button variant="surface" size="xs" colorPalette="yellow" onClick={() => setMode('edit')}>
+                  <Button variant="outline" size="xs" colorPalette="yellow" onClick={() => setMode('edit')}>
                     <TbPencil />
                     Edit
                   </Button>
@@ -868,8 +868,9 @@ const PasswordField: React.FC<{
         <PasswordInput
           flex={1}
           size="sm"
+          placeholder="Enter password"
           value={content.value}
-          onChange={(e) => onChange(e.toString())}
+          onChange={(e) => onChange(e.target.value)}
           roundedRight={0}
           onFocus={() => setShow(true)}
         />

@@ -1,6 +1,6 @@
 'use client';
 
-import SignOutButton from '@/components/forms/signOut';
+import SignOutButton from '@/components/forms/auth/signOut';
 import { PasswordInput } from '@/components/ui/password-input';
 import { decryptPayload, deriveHexKey } from '@/lib/crypto';
 import { DecryptedLocker, DecryptedLockerItem } from '@/types/client';
@@ -152,11 +152,12 @@ export function LockerProvider({ children, userEmail }: { children: React.ReactN
         open={dialogOpen}
         onOpenChange={(e) => setDialogOpen(e.open)}
         onExitComplete={() => setUnlocking(false)}
+        closeOnInteractOutside={false}
         placement="center"
       >
-        <Dialog.Backdrop backdropFilter="blur(8px)" />
+        <Dialog.Backdrop backdropFilter="blur(10px)" />
         <Dialog.Positioner>
-          <Dialog.Content>
+          <Dialog.Content maxW="lg" w="full" bg="bg.panel">
             <Dialog.Header>
               <Dialog.Title>Vault Locked</Dialog.Title>
             </Dialog.Header>

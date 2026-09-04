@@ -1,7 +1,7 @@
 // src/app/locker/[lockerId]/item/new/page.tsx
-import { handleGetLockerById } from '@/actions/lockerActions';
-import { handleGetCurrentUser } from '@/actions/userActions';
 import LockerItemForm from '@/components/forms/locker/lockerItem';
+import { handleGetLockerById } from '@/lib/locker/lockerActions';
+import { handleGetCurrentUser } from '@/lib/user/userActions';
 import { Breadcrumb, Container } from '@chakra-ui/react';
 import { unauthorized } from 'next/navigation';
 

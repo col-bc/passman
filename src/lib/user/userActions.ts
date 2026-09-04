@@ -1,7 +1,7 @@
 'use server';
 
 import { getCurrentUser, loginUser } from '@/lib/session';
-import { createUser } from '@/lib/userDAL';
+import { createUser, sendChangePasswordEmail } from '@/lib/user/userDAL';
 import { verifyTurnstileToken } from '@/lib/util/turnstile';
 import { User } from '@/prisma/client';
 import { ActionState } from '@/types/server';
@@ -98,7 +98,7 @@ export async function handleGetCurrentUser(): Promise<ActionState<User | null>> 
     return {
       success: false,
       type: user.type || 'SERVER_ERROR',
-      error: 'No current user found. Please sign in.',
+      error: 'The user could not be retrieved. Please try again later.',
     };
   } else {
     return {
@@ -106,4 +106,28 @@ export async function handleGetCurrentUser(): Promise<ActionState<User | null>> 
       data: user.data,
     };
   }
+}
+
+export async function handleStartChangePassword(email: string, turnstileToken: string): Promise<ActionState<void>> {
+  const tsStatus = await verifyTurnstileToken(turnstileToken);
+  if (!tsStatus) {
+    return {
+      success: false,
+      error: 'Turnstile verification failed.',
+      type: 'VALIDATION',
+    };
+  }
+
+  const status = await sendChangePasswordEmail(email);
+  if (!status.success) {
+    return {
+      success: false,
+      error: 'Failed to send password reset email. Please try again later.',
+      type: status.type || 'SERVER_ERROR',
+    };
+  }
+  return {
+    success: true,
+    data: undefined,
+  };
 }

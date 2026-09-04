@@ -1,4 +1,4 @@
-import { handleGetCurrentUser } from '@/actions/userActions';
+import { handleGetCurrentUser } from '@/lib/user/userActions';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 

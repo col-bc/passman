@@ -1,7 +1,7 @@
-import { handleGetCurrentUser } from '@/actions/userActions';
 import AppWrapper from '@/components/appWrapper';
 import LockerError from '@/components/presentation/locker/lockerError';
 import { LockerProvider } from '@/hooks/use-locker';
+import { handleGetCurrentUser } from '@/lib/user/userActions';
 import { unauthorized } from 'next/navigation';
 
 export default async function SecurityCenterLayout({ children }: { children: React.ReactNode }) {

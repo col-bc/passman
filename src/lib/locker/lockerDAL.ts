@@ -1,7 +1,7 @@
 import { Item, Locker } from '@/prisma/client';
 import { DALResult, EncryptedLocker } from '@/types/server';
 import 'server-only';
-import { prisma } from './prisma';
+import { prisma } from '../prisma';
 
 export async function getLockerById(lockerId: string): Promise<DALResult<EncryptedLocker | null>> {
   try {
@@ -52,11 +52,15 @@ export async function createLocker(ownerId: string, title: string): Promise<DALR
   return { success: true, data: locker };
 }
 
-export async function updateLockerTitle(lockerId: string, newTitle: string): Promise<DALResult<Locker | null>> {
+export async function updateLocker(
+  lockerId: string,
+  data: { newTitle?: string; newIcon?: string; newEnableMonitoring?: boolean },
+): Promise<DALResult<Locker | null>> {
   const updatedLocker = await prisma.locker.update({
     where: { id: lockerId },
-    data: { title: newTitle },
+    data: { title: data.newTitle, icon: data.newIcon, enableMonitoring: data.newEnableMonitoring },
   });
+  console.log(`Updated locker with ID ${lockerId}:`, updatedLocker);
   if (!updatedLocker) {
     return { success: false, type: 'NOT_FOUND' };
   }

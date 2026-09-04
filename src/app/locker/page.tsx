@@ -1,6 +1,6 @@
-import { handleGetLockers } from '@/actions/lockerActions';
-import { handleGetCurrentUser } from '@/actions/userActions';
 import LockerList from '@/components/presentation/locker/lockerList';
+import { handleGetLockers } from '@/lib/locker/lockerActions';
+import { handleGetCurrentUser } from '@/lib/user/userActions';
 import { Breadcrumb, Container } from '@chakra-ui/react';
 import { unauthorized } from 'next/navigation';
 

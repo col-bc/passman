@@ -1,5 +1,5 @@
-import { handleGetLockerById } from '@/actions/lockerActions';
 import LockerError from '@/components/presentation/locker/lockerError';
+import { handleGetLockerById } from '@/lib/locker/lockerActions';
 import { Box, Breadcrumb, Code, Container, Flex, Heading } from '@chakra-ui/react';
 import { TbHash } from 'react-icons/tb';
 

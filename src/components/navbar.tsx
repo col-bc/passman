@@ -2,13 +2,13 @@ import { User } from '@/prisma/client';
 import { Box, Button, ClientOnly, Collapsible, Container, Flex, Menu, Separator, Skeleton } from '@chakra-ui/react';
 import Link from 'next/link';
 import { TbLockSquareRounded, TbLogin, TbMenu, TbUser, TbUserPlus } from 'react-icons/tb';
-import SignOutButton from './forms/signOut';
+import SignOutButton from './forms/auth/signOut';
 import Logo from './logo';
 import { ColorModeButton } from './ui/color-mode';
 
 function Navbar({ href = '/locker', user }: { href?: string; user: User | null }) {
   return (
-    <Box as="nav" color="fg" bg="bg.panel" borderBottomWidth={1} borderBottomColor="border.muted">
+    <Box as="nav" color="fg" bg="bg.subtle" borderBottomWidth={1} borderBottomColor="border.muted">
       <Collapsible.Root>
         <Container maxW="5xl" py={2} px={8}>
           <Flex align="center">
@@ -26,8 +26,8 @@ function Navbar({ href = '/locker', user }: { href?: string; user: User | null }
                 <ColorModeButton />
               </ClientOnly>
               <Menu.Root>
-                <Menu.Trigger asChild>
-                  <Button variant="outline" colorPalette="yellow" size="sm">
+                <Menu.Trigger as="div">
+                  <Button colorPalette="yellow" size="sm">
                     <TbUser size={20} />
                     {user ? user.name : 'Accounts'}
                   </Button>

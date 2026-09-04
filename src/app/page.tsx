@@ -1,6 +1,6 @@
-import { handleGetCurrentUser } from '@/actions/userActions';
 import DetectiveHackerIllustration from '@/assets/tabler-illustrations/svg/dark/device-security.svg';
 import Navbar from '@/components/navbar';
+import { handleGetCurrentUser } from '@/lib/user/userActions';
 import { Badge, Box, Button, Card, Container, Flex, GridItem, Heading, List, SimpleGrid, Text } from '@chakra-ui/react';
 import crypto from 'crypto';
 import Link from 'next/link';

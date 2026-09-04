@@ -1,9 +1,9 @@
 'use client';
-import { handleLoginUser } from '@/actions/userActions';
 import { PasswordInput } from '@/components/ui/password-input';
 import { useLocker } from '@/hooks/use-locker';
 import { deriveAuthHash, deriveHexKey } from '@/lib/crypto';
-import { Alert, Button, CloseButton, Field, Flex, Input, Link } from '@chakra-ui/react';
+import { handleLoginUser } from '@/lib/user/userActions';
+import { Alert, Button, CloseButton, Field, Flex, Input, Link, Spinner } from '@chakra-ui/react';
 import { Turnstile, TurnstileInstance } from '@marsidev/react-turnstile';
 import NextLink from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -17,6 +17,7 @@ export default function SignInForm() {
 
   const turnstileRef = React.useRef<TurnstileInstance | null>(null);
 
+  const [tsToken, setTsToken] = React.useState<string | null>(null);
   const [email, setEmail] = React.useState<string>('');
   const [password, setPassword] = React.useState<string>('');
   const [error, setError] = React.useState<string | null>(null);
@@ -41,12 +42,12 @@ export default function SignInForm() {
       return;
     }
 
-    const turnstileToken = await turnstileRef.current?.getResponse();
-    if (!turnstileToken) {
-      setError('Turnstile verification failed. Please try again.');
+    if (!tsToken) {
+      setError('Please complete the challenge to verify you are human.');
       setIsLoading(false);
       return;
     }
+    const turnstileToken = tsToken;
 
     const mek = await deriveHexKey(password, email);
     const authHash = await deriveAuthHash(password, email);
@@ -82,6 +83,7 @@ export default function SignInForm() {
             <CloseButton onClick={() => clearSearchParams()} />
           </Alert.Root>
         )}
+
         {error && (
           <Alert.Root status="error">
             <Alert.Indicator>
@@ -94,6 +96,7 @@ export default function SignInForm() {
             <CloseButton onClick={() => setError(null)} />
           </Alert.Root>
         )}
+
         <Field.Root required colorPalette="yellow">
           <Field.Label>
             Email Address <Field.RequiredIndicator />
@@ -104,16 +107,17 @@ export default function SignInForm() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email address"
             autoComplete="email"
-
+            tabIndex={1}
             required
           />
         </Field.Root>
+
         <Field.Root required colorPalette="yellow">
           <Flex justify="space-between" align="center" mb={2} w="full">
             <Field.Label>
               Password <Field.RequiredIndicator />
             </Field.Label>
-            <Link as={NextLink} href="/auth/forgot-password" fontSize="xs">
+            <Link as={NextLink} href="/auth/forgot-password" fontSize="xs" tabIndex={5}>
               Forgot Password?
             </Link>
           </Flex>
@@ -122,7 +126,7 @@ export default function SignInForm() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter your password"
             autoComplete="current-password"
-
+            tabIndex={2}
             required
           />
         </Field.Root>
@@ -136,13 +140,34 @@ export default function SignInForm() {
             feedbackEnabled: true,
             size: 'flexible',
           }}
+          onSuccess={(token) => setTsToken(token)}
+          onError={(err) => {
+            console.error('Turnstile error:', err);
+            setError('Turnstile verification failed. Please try again.');
+            turnstileRef.current?.reset();
+          }}
         />
 
-        <Button size="lg" type="submit" my={2} loading={isLoading} loadingText="Signing in..." colorPalette="yellow">
-          Sign In <TbArrowRight />
+        <Button
+          size="lg"
+          type="submit"
+          mt={2}
+          loading={isLoading}
+          disabled={!tsToken}
+          loadingText="Signing in..."
+          colorPalette="yellow"
+          tabIndex={3}
+        >
+          {tsToken ? (
+            <>
+              Sign In <TbArrowRight />
+            </>
+          ) : (
+            <Spinner size="sm" />
+          )}
         </Button>
         <Flex justify="center">
-          <Button variant="ghost" colorPalette="yellow" size="sm" flex={1} asChild>
+          <Button variant="ghost" colorPalette="yellow" size="sm" flex={1} tabIndex={4} asChild>
             <NextLink href="/auth/sign-up">
               <TbUserPlus size={16} /> Create Account
             </NextLink>

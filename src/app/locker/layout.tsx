@@ -1,7 +1,7 @@
-import { handleGetCurrentUser } from '@/actions/userActions';
 import AppWrapper from '@/components/appWrapper';
 import LockerError from '@/components/presentation/locker/lockerError';
 import { LockerProvider } from '@/hooks/use-locker';
+import { handleGetCurrentUser } from '@/lib/user/userActions';
 import { unauthorized } from 'next/navigation';
 
 export default async function AppRootLayout({ children }: { children: React.ReactNode }) {
@@ -11,8 +11,7 @@ export default async function AppRootLayout({ children }: { children: React.Reac
       console.warn('User not authenticated, redirecting to sign-in page.');
       unauthorized();
     }
-    console.error('Failed to get current user:', result.error);
-    return;
+    return <LockerError type={result.type} text={result.error} />;
   } else if (!result.data) {
     return <LockerError type="NOT_FOUND" text="No current user found." />;
   }

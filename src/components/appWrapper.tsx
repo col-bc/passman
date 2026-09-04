@@ -18,6 +18,7 @@ import {
   IconButton,
   Input,
   InputGroup,
+  InputGroupProps,
   Link,
   Menu,
   Separator,
@@ -38,7 +39,7 @@ import {
   TbShieldLock,
   TbUserCircle,
 } from 'react-icons/tb';
-import SignOutButton from './forms/signOut';
+import SignOutButton from './forms/auth/signOut';
 import Logo from './logo';
 import { ColorModeButton } from './ui/color-mode';
 import { Toaster } from './ui/toaster';
@@ -58,9 +59,7 @@ export default function AppWrapper({ children, user }: { children: React.ReactNo
                 <TbPlus />
               </IconButton>
             </Tooltip>
-            <InputGroup startElement={<TbSearch />} w="full" maxW={{ base: 'full', md: '2xs' }}>
-              <Input placeholder="Search..." />
-            </InputGroup>
+            <SearchBar query="" onQueryChange={() => {}} />
             <ColorModeButton />
             <NotificationDrawer issueCount={3} />
           </Flex>
@@ -157,6 +156,7 @@ const SidebarLinks: React.FC<{ user: User }> = ({ user }) => {
         </Link>
       </Button>
 
+      <SearchBar query="" onQueryChange={() => {}} display={{ base: 'block', md: 'none' }} />
       <Separator orientation="horizontal" mt="auto" />
       <Menu.Root positioning={{ placement: 'top-end' }}>
         <Menu.Trigger asChild>
@@ -249,7 +249,7 @@ const NotificationDrawer: React.FC<{ issueCount: number }> = ({ issueCount }) =>
           <IconButton aria-label="Open notifications" variant="ghost">
             <TbBell />
           </IconButton>
-          <Float>
+          <Float zIndex={999}>
             <Circle size="5" bg="red" color="white">
               {issueCount}
             </Circle>
@@ -279,5 +279,21 @@ const NotificationDrawer: React.FC<{ issueCount: number }> = ({ issueCount }) =>
         </Drawer.Content>
       </Drawer.Positioner>
     </Drawer.Root>
+  );
+};
+
+const SearchBar: React.FC<
+  { query: string; onQueryChange: (query: string) => void } & Omit<InputGroupProps, 'children'>
+> = ({ query, onQueryChange, ...props }) => {
+  return (
+    <InputGroup
+      startElement={<TbSearch />}
+      w="full"
+      maxW={{ base: 'full', md: '2xs' }}
+      colorPalette="yellow"
+      {...props}
+    >
+      <Input placeholder="Search..." variant="subtle" value={query} onChange={(e) => onQueryChange(e.target.value)} />
+    </InputGroup>
   );
 };

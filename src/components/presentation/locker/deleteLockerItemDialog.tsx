@@ -1,7 +1,7 @@
 'use client';
 
-import { handleDeleteLockerItem } from '@/actions/lockerActions';
 import { toaster } from '@/components/ui/toaster';
+import { handleDeleteLockerItem } from '@/lib/locker/lockerActions';
 import { Button, CloseButton, Dialog, Flex } from '@chakra-ui/react';
 import { redirect } from 'next/navigation';
 import { TbTrash, TbX } from 'react-icons/tb';

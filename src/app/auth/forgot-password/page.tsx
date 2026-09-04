@@ -1,20 +1,20 @@
-import Illustration from '@/assets/tabler-illustrations/svg/dark/boy-with-key.svg';
-import SignInForm from '@/components/forms/auth/signIn';
+import Illustration from '@/assets/tabler-illustrations/svg/dark/computer-fix.svg';
+import ForgotPasswordForm from '@/components/forms/auth/forgotPassword';
 import { Box, Container, Flex, Heading, Text } from '@chakra-ui/react';
 
-export default function AuthPage() {
+export default function ForgotPasswordPage() {
   return (
     <Container maxW="5xl" py={10} px={8}>
       <Flex gap={4}>
         <Box flex={1}>
           <Heading as="h1" size="4xl" fontWeight="black" mb={4}>
-            Sign In
+            Forgot Password
           </Heading>
           <Text fontSize="md" color="fg.muted" mb={8}>
-            Welcome back! Sign in to access your secure vault
+            Enter your email address to reset your password.
           </Text>
           <Box w="full" maxW="md" minW={0}>
-            <SignInForm />
+            <ForgotPasswordForm />
           </Box>
         </Box>
         <Flex

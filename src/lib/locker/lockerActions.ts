@@ -14,9 +14,9 @@ import {
   getLockerById,
   getLockerItem,
   getLockersByOwnerId,
+  updateLocker,
   updateLockerItem,
-  updateLockerTitle,
-} from '@/lib/lockerDAL';
+} from '@/lib/locker/lockerDAL';
 import { getCurrentUser } from '@/lib/session';
 import { Item as EncryptedLockerItem } from '@/prisma/client';
 import { ActionState, EncryptedLocker } from '@/types/server';
@@ -110,15 +110,18 @@ export async function handleGetLockerById(lockerId: string): Promise<ActionState
  * @param newTitle The new title for the locker.
  * @returns {Promise<ActionState<EncryptedLocker>>} The action state containing the updated encrypted locker.
  */
-export async function handleRenameLocker(lockerId: string, newTitle: string): Promise<ActionState<EncryptedLocker>> {
+export async function handleUpdateLocker(
+  lockerId: string,
+  data: { newTitle?: string; newIcon?: string; enableMonitoring?: boolean },
+): Promise<ActionState<EncryptedLocker>> {
   const currentUser = await getUser();
   if (!currentUser) {
     return { success: false, error: 'User not authenticated', type: 'UNAUTHORIZED' };
   }
 
-  const result = await updateLockerTitle(lockerId, newTitle);
+  const result = await updateLocker(lockerId, data);
   if (!result.success) {
-    return { success: false, error: 'Failed to rename locker', type: 'SERVER_ERROR' };
+    return { success: false, error: 'Failed to update locker', type: 'SERVER_ERROR' };
   }
   revalidatePath(`/locker/${lockerId}`);
   revalidatePath('/locker');

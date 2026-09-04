@@ -1,5 +1,5 @@
 import Illustration from '@/assets/tabler-illustrations/svg/dark/boy-and-laptop.svg';
-import SignUpForm from '@/components/forms/signUp';
+import SignUpForm from '@/components/forms/auth/signUp';
 import { Badge, Box, Container, Flex, Heading, Text } from '@chakra-ui/react';
 import { TbArrowsExchange, TbEyeOff, TbListDetails } from 'react-icons/tb';
 

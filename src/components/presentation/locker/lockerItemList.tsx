@@ -1,8 +1,10 @@
 'use client';
 
-import RenameLockerForm from '@/components/forms/locker/renameLockerDialog';
+import { LockerFormDialog } from '@/components/forms/locker/lockerForm';
+import { SecurityMonitoringDialog } from '@/components/forms/locker/securityScanDialog';
 import { useLocker } from '@/hooks/use-locker';
-import { camelCaseToTitleCase, timeSinceDate } from '@/lib/util/formats';
+import { useSecurityAnalytics } from '@/hooks/use-security-analytics';
+import { camelCaseToTitleCase } from '@/lib/util/formats';
 import { templateIcon } from '@/lib/util/itemTemplates';
 import { DecryptedLockerItem } from '@/types/client';
 import { EncryptedLocker } from '@/types/server';
@@ -25,13 +27,13 @@ import {
   Menu,
   SimpleGrid,
   Stat,
-  Text,
   VStack,
 } from '@chakra-ui/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import {
+  TbAlertTriangle,
   TbArrowBarUp,
   TbDotsVertical,
   TbDownload,
@@ -49,7 +51,6 @@ import {
   TbTrash,
   TbUpload,
 } from 'react-icons/tb';
-import SecurityScanDialog from '../securityScanDialog';
 import DeleteLockerDialog from './deleteLockerDialog';
 import DeleteLockerItemDialog from './deleteLockerItemDialog';
 
@@ -62,6 +63,7 @@ export default function LockerItemList({
 }) {
   const { lockers, currentLocker, setCurrentLocker, handleUnlock, mek } = useLocker();
   const router = useRouter();
+  const { lockerItemHasIssues } = useSecurityAnalytics(lockers);
 
   const [enableBulk, setEnableBulk] = React.useState(false);
   const [selectedItems, setSelectedItems] = React.useState<Set<string>>(new Set());
@@ -140,6 +142,8 @@ export default function LockerItemList({
   if (!currentLocker) {
     return <div>Loading locker details...</div>;
   }
+
+  const monitoringEnabled = currentLocker.enableMonitoring;
 
   return (
     <Flex direction="column" as="section" gap={10}>
@@ -238,7 +242,7 @@ export default function LockerItemList({
 
             <Stat.Root borderWidth="1px" p="4" rounded="sm">
               <HStack justify="space-between">
-                <Stat.Label>Security Scanning</Stat.Label>
+                <Stat.Label>Security Monitoring</Stat.Label>
                 <Icon color="fg.muted" fontSize="xl">
                   <TbShieldFilled />
                 </Icon>
@@ -309,10 +313,9 @@ export default function LockerItemList({
                 key={`locker-item-${lockerItem.itemId}-${index}`}
                 bg="bg.panel"
                 shadow="sm"
-                p={4}
                 _hover={{
                   zIndex: 11,
-                  scale: 1.01,
+                  scale: 1.025,
                   shadow: 'md',
                 }}
                 transition="all 0.2s ease-in-out"
@@ -321,19 +324,19 @@ export default function LockerItemList({
                 rounded="sm"
                 gap={2}
               >
-                <Checkbox.Root
-                  colorPalette="yellow"
-                  defaultChecked={false}
-                  display={enableBulk ? 'inline-block' : 'none'}
-                  onCheckedChange={() => toggleSelectItem(lockerItem.itemId)}
-                  checked={selectedItems.has(lockerItem.itemId)}
-                >
-                  <Checkbox.HiddenInput />
-                  <Checkbox.Label srOnly>Bulk select</Checkbox.Label>
-                  <Checkbox.Control />
-                </Checkbox.Root>
-                <LinkBox w="full" asChild>
-                  <Flex direction="row" align="center" width="full" gap={4}>
+                <LinkBox w="full" p={4}>
+                  <Checkbox.Root
+                    colorPalette="yellow"
+                    defaultChecked={false}
+                    display={enableBulk ? 'inline-block' : 'none'}
+                    onCheckedChange={() => toggleSelectItem(lockerItem.itemId)}
+                    checked={selectedItems.has(lockerItem.itemId)}
+                  >
+                    <Checkbox.HiddenInput />
+                    <Checkbox.Label srOnly>Bulk select</Checkbox.Label>
+                    <Checkbox.Control />
+                  </Checkbox.Root>
+                  <Flex direction="row" align="center" width="full" gap={2}>
                     <Avatar.Root size="lg" rounded="sm" bg="yellow.subtle" color="yellow.fg">
                       <Avatar.Fallback fontSize="2xl">{templateIcon(lockerItem.item.category)}</Avatar.Fallback>
                     </Avatar.Root>
@@ -352,9 +355,11 @@ export default function LockerItemList({
                       />
                     </LinkOverlay>
 
-                    <Text fontSize="xs" color="fg.muted">
-                      Updated {timeSinceDate(lockerItem.item.updatedAt)}
-                    </Text>
+                    {monitoringEnabled && lockerItemHasIssues(lockerItem) && (
+                      <Badge variant="surface" colorPalette="red" size="lg">
+                        <TbAlertTriangle />
+                      </Badge>
+                    )}
 
                     <Menu.Root>
                       <Menu.Trigger asChild>
@@ -408,14 +413,9 @@ export default function LockerItemList({
         </List.Root>
       )}
 
-      <RenameLockerForm
-        defaultTitle={currentLocker.title}
-        lockerId={currentLocker.id}
-        setOpen={setShowRenameDialog}
-        open={showRenameDialog}
-      />
-      <SecurityScanDialog
-        lockerId={currentLocker.id}
+      <LockerFormDialog open={showRenameDialog} setOpen={(open) => setShowRenameDialog(open)} locker={currentLocker} />
+      <SecurityMonitoringDialog
+        locker={currentLocker}
         open={showSecurityScanDialog}
         onOpenChange={(details) => setShowSecurityScanDialog(!!details.open)}
       />

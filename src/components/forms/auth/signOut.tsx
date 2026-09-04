@@ -1,4 +1,4 @@
-import { handleSignOutUser } from '@/actions/userActions';
+import { handleSignOutUser } from '@/lib/user/userActions';
 import { Button, ButtonProps } from '@chakra-ui/react';
 import React from 'react';
 import { TbLogout } from 'react-icons/tb';

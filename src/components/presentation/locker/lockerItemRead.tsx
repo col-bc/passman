@@ -1,3 +1,4 @@
+import ScreenValue from '@/components/ui/screenValue';
 import { toaster } from '@/components/ui/toaster';
 import { camelCaseToTitleCase } from '@/lib/util/formats';
 import { DecryptedLockerItem, ItemContent } from '@/types/client';
@@ -121,7 +122,7 @@ export default function LockerItemRead({
                     cursor="pointer"
                     onClick={() => copyToClipboard(value.value)}
                   >
-                    {value.type === 'password' ? '••••••••' : value.value}
+                    {value.type === 'password' ? <ScreenValue>{value.value}</ScreenValue> : value.value}
                   </Box>
                 </DataList.ItemValue>
               </DataList.Item>

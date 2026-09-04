@@ -1,8 +1,9 @@
 'use client';
 
-import CreateLockerDialog from '@/components/forms/locker/createLocker';
+import { LockerFormDialog } from '@/components/forms/locker/lockerForm';
 import { useLocker } from '@/hooks/use-locker';
 import { timeSinceDate } from '@/lib/util/formats';
+import { templateIcon } from '@/lib/util/itemTemplates';
 import { User } from '@/prisma/client';
 import { DecryptedLocker } from '@/types/client';
 import { EncryptedLocker } from '@/types/server';
@@ -12,22 +13,24 @@ import {
   Button,
   Card,
   Flex,
+  GridItem,
   Heading,
   HStack,
   Icon,
   IconButton,
+  Link,
   LinkBox,
   LinkOverlay,
-  List,
   Menu,
   SimpleGrid,
   Stat,
   Text,
 } from '@chakra-ui/react';
-import Link from 'next/link';
+import NextLink from 'next/link';
 import React from 'react';
 import {
   TbArrowBarUp,
+  TbArrowRight,
   TbDotsVertical,
   TbGaugeFilled,
   TbLayoutListFilled,
@@ -40,7 +43,8 @@ import {
 } from 'react-icons/tb';
 import DeleteLockerDialog from './deleteLockerDialog';
 
-export default function LockerList({ encryptedLockers, user }: { encryptedLockers: EncryptedLocker[]; user: User }) {
+export default function LockerList({ encryptedLockers }: { encryptedLockers: EncryptedLocker[]; user?: User }) {
+  const [showCreateLockerDialog, setShowCreateLockerDialog] = React.useState(false);
   const { handleUnlock, lockers, mek } = useLocker();
 
   React.useEffect(() => {
@@ -65,19 +69,18 @@ export default function LockerList({ encryptedLockers, user }: { encryptedLocker
     <Flex direction="column" as="section" gap={10}>
       <Card.Root variant="elevated" border="none" shadow="sm" rounded="md">
         <Card.Header>
-          <Flex direction="row" gap={4}>
+          <Flex direction={{ base: 'column', md: 'row' }} gap={4}>
             <Heading as="h1" fontSize="3xl" fontWeight="extrabold" letterSpacing="tight" whiteSpace="nowrap" flex={1}>
               Your Lockers
             </Heading>
 
-            <CreateLockerDialog>
-              <Button colorPalette="yellow" ml="auto">
-                <TbPlus />
-                Create New Locker
-              </Button>
-            </CreateLockerDialog>
+            <Button colorPalette="yellow" ml={{ base: 0, md: 'auto' }} onClick={() => setShowCreateLockerDialog(true)}>
+              <TbPlus />
+              Create New Locker
+            </Button>
           </Flex>
         </Card.Header>
+
         <Card.Body>
           <SimpleGrid columns={{ base: 2, lg: 4 }} gap={6}>
             <Stat.Root borderWidth="1px" p="4" rounded="sm">
@@ -87,7 +90,7 @@ export default function LockerList({ encryptedLockers, user }: { encryptedLocker
                   <TbStack3Filled />
                 </Icon>
               </HStack>
-              <Stat.ValueText>{aggregateStats.itemCount}</Stat.ValueText>
+              <Stat.ValueText fontFamily="mono">{aggregateStats.itemCount}</Stat.ValueText>
             </Stat.Root>
 
             <Stat.Root borderWidth="1px" p="4" rounded="sm">
@@ -97,7 +100,7 @@ export default function LockerList({ encryptedLockers, user }: { encryptedLocker
                   <TbLayoutListFilled />
                 </Icon>
               </HStack>
-              <Stat.ValueText>{aggregateStats.fieldCount}</Stat.ValueText>
+              <Stat.ValueText fontFamily="mono">{aggregateStats.fieldCount}</Stat.ValueText>
             </Stat.Root>
             <Stat.Root borderWidth="1px" p="4" rounded="sm">
               <HStack justify="space-between">
@@ -106,7 +109,7 @@ export default function LockerList({ encryptedLockers, user }: { encryptedLocker
                   <TbGaugeFilled />
                 </Icon>
               </HStack>
-              <Stat.ValueText>??</Stat.ValueText>
+              <Stat.ValueText fontFamily="mono">??</Stat.ValueText>
             </Stat.Root>
 
             <Stat.Root borderWidth="1px" p="4" rounded="sm">
@@ -116,73 +119,121 @@ export default function LockerList({ encryptedLockers, user }: { encryptedLocker
                   <TbShieldFilled />
                 </Icon>
               </HStack>
-              <Stat.ValueText></Stat.ValueText>
+              <Stat.ValueText fontFamily="mono"></Stat.ValueText>
             </Stat.Root>
           </SimpleGrid>
         </Card.Body>
       </Card.Root>
 
-      <List.Root listStyleType="none" gap={4}>
+      <LockerFormDialog locker={null} open={showCreateLockerDialog} setOpen={setShowCreateLockerDialog} />
+
+      <SimpleGrid columns={{ base: 1, lg: 2 }} gap={6}>
         {lockers
           .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
           .map((decryptedLocker) => (
-            <ListItem key={decryptedLocker.id} locker={decryptedLocker} />
+            <LockerItem key={decryptedLocker.id} locker={decryptedLocker} />
           ))}
-      </List.Root>
+      </SimpleGrid>
     </Flex>
   );
 }
 
-function ListItem({ locker }: { locker: DecryptedLocker }) {
+function LockerItem({ locker }: { locker: DecryptedLocker }) {
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
+  const counts = React.useMemo(() => {
+    const credentialCount = locker.lockerItems.reduce((acc, lockerItem) => {
+      if (lockerItem.item.category === 'credentials') {
+        acc += 1;
+      }
+      return acc;
+    }, 0);
+    const bankAccountCount = locker.lockerItems.reduce((acc, lockerItem) => {
+      if (lockerItem.item.category === 'bankAccount') {
+        acc += 1;
+      }
+      return acc;
+    }, 0);
+    const secureNoteCount = locker.lockerItems.reduce((acc, lockerItem) => {
+      if (lockerItem.item.category === 'secureNote') {
+        acc += 1;
+      }
+      return acc;
+    }, 0);
+    const creditCardCount = locker.lockerItems.reduce((acc, lockerItem) => {
+      if (lockerItem.item.category === 'creditCard') {
+        acc += 1;
+      }
+      return acc;
+    }, 0);
+    const identityCount = locker.lockerItems.reduce((acc, lockerItem) => {
+      if (lockerItem.item.category === 'identity') {
+        acc += 1;
+      }
+      return acc;
+    }, 0);
+    const customCount = locker.lockerItems.reduce((acc, lockerItem) => {
+      if (lockerItem.item.category === 'custom') {
+        acc += 1;
+      }
+      return acc;
+    }, 0);
+
+    const isEmpty =
+      credentialCount === 0 &&
+      bankAccountCount === 0 &&
+      secureNoteCount === 0 &&
+      creditCardCount === 0 &&
+      identityCount === 0 &&
+      customCount === 0;
+
+    const totalCount =
+      credentialCount + bankAccountCount + secureNoteCount + creditCardCount + identityCount + customCount;
+
+    return {
+      credentialCount,
+      bankAccountCount,
+      secureNoteCount,
+      creditCardCount,
+      identityCount,
+      customCount,
+      isEmpty,
+      totalCount,
+    };
+  }, [locker.lockerItems]);
 
   return (
     <>
-      <List.Item
+      <GridItem
         as="div"
         key={`locker-${locker.id}`}
         bg="bg.panel"
         shadow="sm"
         _hover={{
           zIndex: 11,
-          bg: 'bg.muted/50',
-          scale: 1.01,
+          scale: 1.025,
           shadow: 'md',
         }}
         transition="all 0.2s ease-in-out"
         rounded="sm"
-        display="flex"
-        alignItems="center"
         gap={4}
       >
-        <LinkBox w="full" asChild p={4}>
-          <Flex direction="row" align="center" width="full" gap={4}>
-            <Avatar.Root size="md" rounded="sm" bg="yellow.muted" color="yellow.fg">
-              <Avatar.Fallback>{locker.title?.[0] ?? locker.id?.[0]}</Avatar.Fallback>
-            </Avatar.Root>
-
-            <Flex direction="column" align="start" justify="start" flex={1}>
-              <Heading fontSize="lg" fontWeight="medium" lineHeight="short" letterSpacing="tighter" flex={1}>
-                {locker.title}
-              </Heading>
-              <Text fontSize="xs" color="fg.muted">
-                {timeSinceDate(new Date(locker.updatedAt))}
-              </Text>
-            </Flex>
-
-            <LinkOverlay asChild>
-              <Link href={`/locker/${locker.id}`} style={{ textDecoration: 'none' }} />
-            </LinkOverlay>
-
-            <Text fontSize="sm" color="fg.muted"></Text>
-            <Badge colorPalette="yellow" variant="subtle">
-              {locker.lockerItems?.length}
-              {locker.lockerItems?.length === 1 ? ' ITEM' : ' ITEMS'}
-            </Badge>
-
-            <Menu.Root>
-              <Menu.Trigger asChild>
+        <LinkBox w="full" p={4}>
+          <Flex direction="column" align="start" justify="start" flex={1} gap={4}>
+            <Flex direction="row" align="flex-start" width="full" gap={4}>
+              <Avatar.Root size="md" rounded="sm" bg="yellow.muted" color="yellow.fg">
+                <Avatar.Fallback>{locker.title?.[0] ?? locker.id?.[0]}</Avatar.Fallback>
+              </Avatar.Root>
+              <Flex direction="column" align="start" justify="start" flex={1}>
+                <Heading fontSize="lg" fontWeight="medium" lineHeight="short" letterSpacing="tighter" flex={1}>
+                  {locker.title}
+                </Heading>
+                <Text fontSize="xs" color="fg.muted">
+                  {timeSinceDate(new Date(locker.updatedAt))}
+                </Text>
+              </Flex>
+              <Menu.Root>
                 <IconButton
+                  as={Menu.Trigger}
                   aria-label="Locker item options"
                   variant="ghost"
                   size="sm"
@@ -190,37 +241,81 @@ function ListItem({ locker }: { locker: DecryptedLocker }) {
                 >
                   <TbDotsVertical />
                 </IconButton>
-              </Menu.Trigger>
-              <Menu.Positioner zIndex={999}>
-                <Menu.Content w={48}>
-                  <Menu.Item value="edit">
-                    <TbPencil />
-                    Edit
-                  </Menu.Item>
-                  <Menu.Item value="share">
-                    <TbShare />
-                    Share
-                  </Menu.Item>
-                  <Menu.Item value="move">
-                    <TbArrowBarUp />
-                    Move Lockers
-                  </Menu.Item>
-                  <Menu.Separator />
-                  <Menu.Item
-                    value="delete"
-                    color="red.fg"
-                    _hover={{ bg: 'red.subtle' }}
-                    onClick={() => setShowDeleteDialog(true)}
-                  >
-                    <TbTrash />
-                    Delete
-                  </Menu.Item>
-                </Menu.Content>
-              </Menu.Positioner>
-            </Menu.Root>
+                <Menu.Positioner zIndex={999}>
+                  <Menu.Content w={48}>
+                    <Menu.Item value="edit">
+                      <TbPencil />
+                      Edit
+                    </Menu.Item>
+                    <Menu.Item value="share">
+                      <TbShare />
+                      Share
+                    </Menu.Item>
+                    <Menu.Item value="move">
+                      <TbArrowBarUp />
+                      Move Lockers
+                    </Menu.Item>
+                    <Menu.Separator />
+                    <Menu.Item
+                      value="delete"
+                      color="red.fg"
+                      _hover={{ bg: 'red.subtle' }}
+                      onClick={() => setShowDeleteDialog(true)}
+                    >
+                      <TbTrash />
+                      Delete
+                    </Menu.Item>
+                  </Menu.Content>
+                </Menu.Positioner>
+              </Menu.Root>
+            </Flex>
+
+            <Flex direction="row" align="center" justify="start" flex={1} flexWrap="wrap" gap={2}>
+              {counts.isEmpty && (
+                <Text fontSize="sm" color="fg.muted">
+                  This locker is empty
+                </Text>
+              )}
+              {counts.credentialCount > 0 && (
+                <Badge size="sm">
+                  {templateIcon('credentials')} {counts.credentialCount} Credentials
+                </Badge>
+              )}
+              {counts.bankAccountCount > 0 && (
+                <Badge size="sm">
+                  {templateIcon('bankAccount')} {counts.bankAccountCount} Bank Accounts
+                </Badge>
+              )}
+              {counts.secureNoteCount > 0 && (
+                <Badge size="sm">
+                  {templateIcon('secureNote')} {counts.secureNoteCount} Secure Notes
+                </Badge>
+              )}
+              {counts.creditCardCount > 0 && (
+                <Badge size="sm">
+                  {templateIcon('creditCard')} {counts.creditCardCount} Credit Cards
+                </Badge>
+              )}
+              {counts.identityCount > 0 && (
+                <Badge size="sm">
+                  {templateIcon('identity')} {counts.identityCount} Identities
+                </Badge>
+              )}
+              {counts.customCount > 0 && (
+                <Badge size="sm">
+                  {templateIcon('custom')} {counts.customCount} Custom Items
+                </Badge>
+              )}
+            </Flex>
+            <LinkOverlay asChild>
+              <Link as={NextLink} href={`/locker/${locker.id}`} colorPalette="yellow">
+                Open Locker <TbArrowRight />
+              </Link>
+            </LinkOverlay>
           </Flex>
         </LinkBox>
-      </List.Item>
+      </GridItem>
+
       <DeleteLockerDialog
         lockerId={locker.id!}
         open={showDeleteDialog}

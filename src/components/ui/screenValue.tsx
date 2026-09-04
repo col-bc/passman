@@ -6,9 +6,12 @@ interface ScreenValueProps extends TextProps {
   showDefault?: boolean;
 }
 
+const CHAR_LIMIT = 20;
+
 export default function ScreenValue({ showDefault = false, ...props }: ScreenValueProps) {
   const [show, setShow] = React.useState(showDefault);
-  const screenedValue = Array.from({ length: props.children?.toString().length || 0 }, () => '•').join('');
+  const valueLength = props.children?.toString().length ?? 0;
+  const screenedValue = Array.from({ length: valueLength > CHAR_LIMIT ? CHAR_LIMIT : valueLength }, () => '•').join('');
 
   return (
     <ClientOnly
@@ -30,7 +33,10 @@ export default function ScreenValue({ showDefault = false, ...props }: ScreenVal
         {show ? props.children : screenedValue}
         <IconButton
           size="xs"
-          onClick={() => setShow(!show)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setShow(!show);
+          }}
           aria-label={show ? 'Hide value' : 'Show value'}
           variant="ghost"
           h="auto"

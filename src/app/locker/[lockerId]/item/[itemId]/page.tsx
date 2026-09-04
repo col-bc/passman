@@ -1,7 +1,7 @@
-import { handleGetLockerById, handleGetLockerItem } from '@/actions/lockerActions';
-import { handleGetCurrentUser } from '@/actions/userActions';
 import LockerError from '@/components/presentation/locker/lockerError';
 import LockerItemWrapper from '@/components/presentation/locker/lockerWrapper';
+import { handleGetLockerById, handleGetLockerItem } from '@/lib/locker/lockerActions';
+import { handleGetCurrentUser } from '@/lib/user/userActions';
 import { EncryptedLocker } from '@/types/server';
 import { Breadcrumb, Container } from '@chakra-ui/react';
 import { unauthorized } from 'next/navigation';

@@ -1,7 +1,7 @@
-import { handleGetLockers } from '@/actions/lockerActions';
-import { handleGetCurrentUser } from '@/actions/userActions';
 import LockerError from '@/components/presentation/locker/lockerError';
 import SecurityCenterDash from '@/components/presentation/securityCenter/securityCenterDash';
+import { handleGetLockers } from '@/lib/locker/lockerActions';
+import { handleGetCurrentUser } from '@/lib/user/userActions';
 import { Breadcrumb, Container, Flex, Heading, Text } from '@chakra-ui/react';
 
 export default async function SecurityCenterPage() {

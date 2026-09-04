@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import 'server-only';
 import { prisma } from './prisma';
-import { getUserByEmail } from './userDAL';
+import { getUserByEmail } from './user/userDAL';
 
 const SESSION_SECRET_KEY = process.env.SESSION_SECRET_KEY;
 
