@@ -25,7 +25,7 @@ To run this application locally, ensure you have Node.js installed and a relatio
 
 **1. Clone and Install**
 \`\`\`bash
-git clone https://github.com/yourusername/passman.git
+git clone https://github.com/col-bc/passman.git
 cd passman
 npm install
 \`\`\`
