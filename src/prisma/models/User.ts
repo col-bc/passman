@@ -31,6 +31,11 @@ export type UserMinAggregateOutputType = {
   phone: string | null
   authHash: string | null
   securityToken: string | null
+  enable2FA: boolean | null
+  twoFactorSecret: string | null
+  recoveryCodes: string | null
+  publicKey: string | null
+  encryptedPrivateKey: string | null
   createdAt: Date | null
 }
 
@@ -41,6 +46,11 @@ export type UserMaxAggregateOutputType = {
   phone: string | null
   authHash: string | null
   securityToken: string | null
+  enable2FA: boolean | null
+  twoFactorSecret: string | null
+  recoveryCodes: string | null
+  publicKey: string | null
+  encryptedPrivateKey: string | null
   createdAt: Date | null
 }
 
@@ -51,6 +61,11 @@ export type UserCountAggregateOutputType = {
   phone: number
   authHash: number
   securityToken: number
+  enable2FA: number
+  twoFactorSecret: number
+  recoveryCodes: number
+  publicKey: number
+  encryptedPrivateKey: number
   createdAt: number
   _all: number
 }
@@ -63,6 +78,11 @@ export type UserMinAggregateInputType = {
   phone?: true
   authHash?: true
   securityToken?: true
+  enable2FA?: true
+  twoFactorSecret?: true
+  recoveryCodes?: true
+  publicKey?: true
+  encryptedPrivateKey?: true
   createdAt?: true
 }
 
@@ -73,6 +93,11 @@ export type UserMaxAggregateInputType = {
   phone?: true
   authHash?: true
   securityToken?: true
+  enable2FA?: true
+  twoFactorSecret?: true
+  recoveryCodes?: true
+  publicKey?: true
+  encryptedPrivateKey?: true
   createdAt?: true
 }
 
@@ -83,6 +108,11 @@ export type UserCountAggregateInputType = {
   phone?: true
   authHash?: true
   securityToken?: true
+  enable2FA?: true
+  twoFactorSecret?: true
+  recoveryCodes?: true
+  publicKey?: true
+  encryptedPrivateKey?: true
   createdAt?: true
   _all?: true
 }
@@ -166,6 +196,11 @@ export type UserGroupByOutputType = {
   phone: string | null
   authHash: string
   securityToken: string | null
+  enable2FA: boolean
+  twoFactorSecret: string | null
+  recoveryCodes: string
+  publicKey: string
+  encryptedPrivateKey: string
   createdAt: Date
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
@@ -197,9 +232,15 @@ export type UserWhereInput = {
   phone?: Prisma.StringNullableFilter<"User"> | string | null
   authHash?: Prisma.StringFilter<"User"> | string
   securityToken?: Prisma.StringNullableFilter<"User"> | string | null
+  enable2FA?: Prisma.BoolFilter<"User"> | boolean
+  twoFactorSecret?: Prisma.StringNullableFilter<"User"> | string | null
+  recoveryCodes?: Prisma.StringFilter<"User"> | string
+  publicKey?: Prisma.StringFilter<"User"> | string
+  encryptedPrivateKey?: Prisma.StringFilter<"User"> | string
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  lockers?: Prisma.LockerListRelationFilter
+  vaults?: Prisma.VaultListRelationFilter
   logins?: Prisma.LoginListRelationFilter
+  itemAccess?: Prisma.ItemAccessListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -209,9 +250,15 @@ export type UserOrderByWithRelationInput = {
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   authHash?: Prisma.SortOrder
   securityToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  enable2FA?: Prisma.SortOrder
+  twoFactorSecret?: Prisma.SortOrderInput | Prisma.SortOrder
+  recoveryCodes?: Prisma.SortOrder
+  publicKey?: Prisma.SortOrder
+  encryptedPrivateKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  lockers?: Prisma.LockerOrderByRelationAggregateInput
+  vaults?: Prisma.VaultOrderByRelationAggregateInput
   logins?: Prisma.LoginOrderByRelationAggregateInput
+  itemAccess?: Prisma.ItemAccessOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -224,9 +271,15 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringNullableFilter<"User"> | string | null
   phone?: Prisma.StringNullableFilter<"User"> | string | null
   authHash?: Prisma.StringFilter<"User"> | string
+  enable2FA?: Prisma.BoolFilter<"User"> | boolean
+  twoFactorSecret?: Prisma.StringNullableFilter<"User"> | string | null
+  recoveryCodes?: Prisma.StringFilter<"User"> | string
+  publicKey?: Prisma.StringFilter<"User"> | string
+  encryptedPrivateKey?: Prisma.StringFilter<"User"> | string
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  lockers?: Prisma.LockerListRelationFilter
+  vaults?: Prisma.VaultListRelationFilter
   logins?: Prisma.LoginListRelationFilter
+  itemAccess?: Prisma.ItemAccessListRelationFilter
 }, "id" | "email" | "securityToken">
 
 export type UserOrderByWithAggregationInput = {
@@ -236,6 +289,11 @@ export type UserOrderByWithAggregationInput = {
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   authHash?: Prisma.SortOrder
   securityToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  enable2FA?: Prisma.SortOrder
+  twoFactorSecret?: Prisma.SortOrderInput | Prisma.SortOrder
+  recoveryCodes?: Prisma.SortOrder
+  publicKey?: Prisma.SortOrder
+  encryptedPrivateKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -252,6 +310,11 @@ export type UserScalarWhereWithAggregatesInput = {
   phone?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   authHash?: Prisma.StringWithAggregatesFilter<"User"> | string
   securityToken?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  enable2FA?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  twoFactorSecret?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  recoveryCodes?: Prisma.StringWithAggregatesFilter<"User"> | string
+  publicKey?: Prisma.StringWithAggregatesFilter<"User"> | string
+  encryptedPrivateKey?: Prisma.StringWithAggregatesFilter<"User"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
 
@@ -262,9 +325,15 @@ export type UserCreateInput = {
   phone?: string | null
   authHash: string
   securityToken?: string | null
+  enable2FA?: boolean
+  twoFactorSecret?: string | null
+  recoveryCodes?: string
+  publicKey: string
+  encryptedPrivateKey: string
   createdAt?: Date | string
-  lockers?: Prisma.LockerCreateNestedManyWithoutUserInput
+  vaults?: Prisma.VaultCreateNestedManyWithoutUserInput
   logins?: Prisma.LoginCreateNestedManyWithoutUserInput
+  itemAccess?: Prisma.ItemAccessCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -274,9 +343,15 @@ export type UserUncheckedCreateInput = {
   phone?: string | null
   authHash: string
   securityToken?: string | null
+  enable2FA?: boolean
+  twoFactorSecret?: string | null
+  recoveryCodes?: string
+  publicKey: string
+  encryptedPrivateKey: string
   createdAt?: Date | string
-  lockers?: Prisma.LockerUncheckedCreateNestedManyWithoutUserInput
+  vaults?: Prisma.VaultUncheckedCreateNestedManyWithoutUserInput
   logins?: Prisma.LoginUncheckedCreateNestedManyWithoutUserInput
+  itemAccess?: Prisma.ItemAccessUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -286,9 +361,15 @@ export type UserUpdateInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authHash?: Prisma.StringFieldUpdateOperationsInput | string
   securityToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enable2FA?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryCodes?: Prisma.StringFieldUpdateOperationsInput | string
+  publicKey?: Prisma.StringFieldUpdateOperationsInput | string
+  encryptedPrivateKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lockers?: Prisma.LockerUpdateManyWithoutUserNestedInput
+  vaults?: Prisma.VaultUpdateManyWithoutUserNestedInput
   logins?: Prisma.LoginUpdateManyWithoutUserNestedInput
+  itemAccess?: Prisma.ItemAccessUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -298,9 +379,15 @@ export type UserUncheckedUpdateInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authHash?: Prisma.StringFieldUpdateOperationsInput | string
   securityToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enable2FA?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryCodes?: Prisma.StringFieldUpdateOperationsInput | string
+  publicKey?: Prisma.StringFieldUpdateOperationsInput | string
+  encryptedPrivateKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lockers?: Prisma.LockerUncheckedUpdateManyWithoutUserNestedInput
+  vaults?: Prisma.VaultUncheckedUpdateManyWithoutUserNestedInput
   logins?: Prisma.LoginUncheckedUpdateManyWithoutUserNestedInput
+  itemAccess?: Prisma.ItemAccessUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -310,6 +397,11 @@ export type UserCreateManyInput = {
   phone?: string | null
   authHash: string
   securityToken?: string | null
+  enable2FA?: boolean
+  twoFactorSecret?: string | null
+  recoveryCodes?: string
+  publicKey: string
+  encryptedPrivateKey: string
   createdAt?: Date | string
 }
 
@@ -320,6 +412,11 @@ export type UserUpdateManyMutationInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authHash?: Prisma.StringFieldUpdateOperationsInput | string
   securityToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enable2FA?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryCodes?: Prisma.StringFieldUpdateOperationsInput | string
+  publicKey?: Prisma.StringFieldUpdateOperationsInput | string
+  encryptedPrivateKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -330,6 +427,11 @@ export type UserUncheckedUpdateManyInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authHash?: Prisma.StringFieldUpdateOperationsInput | string
   securityToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enable2FA?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryCodes?: Prisma.StringFieldUpdateOperationsInput | string
+  publicKey?: Prisma.StringFieldUpdateOperationsInput | string
+  encryptedPrivateKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -340,6 +442,11 @@ export type UserCountOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   authHash?: Prisma.SortOrder
   securityToken?: Prisma.SortOrder
+  enable2FA?: Prisma.SortOrder
+  twoFactorSecret?: Prisma.SortOrder
+  recoveryCodes?: Prisma.SortOrder
+  publicKey?: Prisma.SortOrder
+  encryptedPrivateKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -350,6 +457,11 @@ export type UserMaxOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   authHash?: Prisma.SortOrder
   securityToken?: Prisma.SortOrder
+  enable2FA?: Prisma.SortOrder
+  twoFactorSecret?: Prisma.SortOrder
+  recoveryCodes?: Prisma.SortOrder
+  publicKey?: Prisma.SortOrder
+  encryptedPrivateKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -360,6 +472,11 @@ export type UserMinOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   authHash?: Prisma.SortOrder
   securityToken?: Prisma.SortOrder
+  enable2FA?: Prisma.SortOrder
+  twoFactorSecret?: Prisma.SortOrder
+  recoveryCodes?: Prisma.SortOrder
+  publicKey?: Prisma.SortOrder
+  encryptedPrivateKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -374,6 +491,10 @@ export type StringFieldUpdateOperationsInput = {
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -394,18 +515,32 @@ export type UserUpdateOneRequiredWithoutLoginsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutLoginsInput, Prisma.UserUpdateWithoutLoginsInput>, Prisma.UserUncheckedUpdateWithoutLoginsInput>
 }
 
-export type UserCreateNestedOneWithoutLockersInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutLockersInput, Prisma.UserUncheckedCreateWithoutLockersInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLockersInput
+export type UserCreateNestedOneWithoutItemAccessInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutItemAccessInput, Prisma.UserUncheckedCreateWithoutItemAccessInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutItemAccessInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutLockersNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutLockersInput, Prisma.UserUncheckedCreateWithoutLockersInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLockersInput
-  upsert?: Prisma.UserUpsertWithoutLockersInput
+export type UserUpdateOneRequiredWithoutItemAccessNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutItemAccessInput, Prisma.UserUncheckedCreateWithoutItemAccessInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutItemAccessInput
+  upsert?: Prisma.UserUpsertWithoutItemAccessInput
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutLockersInput, Prisma.UserUpdateWithoutLockersInput>, Prisma.UserUncheckedUpdateWithoutLockersInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutItemAccessInput, Prisma.UserUpdateWithoutItemAccessInput>, Prisma.UserUncheckedUpdateWithoutItemAccessInput>
+}
+
+export type UserCreateNestedOneWithoutVaultsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVaultsInput, Prisma.UserUncheckedCreateWithoutVaultsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVaultsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutVaultsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVaultsInput, Prisma.UserUncheckedCreateWithoutVaultsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVaultsInput
+  upsert?: Prisma.UserUpsertWithoutVaultsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutVaultsInput, Prisma.UserUpdateWithoutVaultsInput>, Prisma.UserUncheckedUpdateWithoutVaultsInput>
 }
 
 export type UserCreateWithoutLoginsInput = {
@@ -415,8 +550,14 @@ export type UserCreateWithoutLoginsInput = {
   phone?: string | null
   authHash: string
   securityToken?: string | null
+  enable2FA?: boolean
+  twoFactorSecret?: string | null
+  recoveryCodes?: string
+  publicKey: string
+  encryptedPrivateKey: string
   createdAt?: Date | string
-  lockers?: Prisma.LockerCreateNestedManyWithoutUserInput
+  vaults?: Prisma.VaultCreateNestedManyWithoutUserInput
+  itemAccess?: Prisma.ItemAccessCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLoginsInput = {
@@ -426,8 +567,14 @@ export type UserUncheckedCreateWithoutLoginsInput = {
   phone?: string | null
   authHash: string
   securityToken?: string | null
+  enable2FA?: boolean
+  twoFactorSecret?: string | null
+  recoveryCodes?: string
+  publicKey: string
+  encryptedPrivateKey: string
   createdAt?: Date | string
-  lockers?: Prisma.LockerUncheckedCreateNestedManyWithoutUserInput
+  vaults?: Prisma.VaultUncheckedCreateNestedManyWithoutUserInput
+  itemAccess?: Prisma.ItemAccessUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLoginsInput = {
@@ -453,8 +600,14 @@ export type UserUpdateWithoutLoginsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authHash?: Prisma.StringFieldUpdateOperationsInput | string
   securityToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enable2FA?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryCodes?: Prisma.StringFieldUpdateOperationsInput | string
+  publicKey?: Prisma.StringFieldUpdateOperationsInput | string
+  encryptedPrivateKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lockers?: Prisma.LockerUpdateManyWithoutUserNestedInput
+  vaults?: Prisma.VaultUpdateManyWithoutUserNestedInput
+  itemAccess?: Prisma.ItemAccessUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLoginsInput = {
@@ -464,68 +617,182 @@ export type UserUncheckedUpdateWithoutLoginsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authHash?: Prisma.StringFieldUpdateOperationsInput | string
   securityToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enable2FA?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryCodes?: Prisma.StringFieldUpdateOperationsInput | string
+  publicKey?: Prisma.StringFieldUpdateOperationsInput | string
+  encryptedPrivateKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lockers?: Prisma.LockerUncheckedUpdateManyWithoutUserNestedInput
+  vaults?: Prisma.VaultUncheckedUpdateManyWithoutUserNestedInput
+  itemAccess?: Prisma.ItemAccessUncheckedUpdateManyWithoutUserNestedInput
 }
 
-export type UserCreateWithoutLockersInput = {
+export type UserCreateWithoutItemAccessInput = {
   id?: string
   email: string
   name?: string | null
   phone?: string | null
   authHash: string
   securityToken?: string | null
+  enable2FA?: boolean
+  twoFactorSecret?: string | null
+  recoveryCodes?: string
+  publicKey: string
+  encryptedPrivateKey: string
   createdAt?: Date | string
+  vaults?: Prisma.VaultCreateNestedManyWithoutUserInput
   logins?: Prisma.LoginCreateNestedManyWithoutUserInput
 }
 
-export type UserUncheckedCreateWithoutLockersInput = {
+export type UserUncheckedCreateWithoutItemAccessInput = {
   id?: string
   email: string
   name?: string | null
   phone?: string | null
   authHash: string
   securityToken?: string | null
+  enable2FA?: boolean
+  twoFactorSecret?: string | null
+  recoveryCodes?: string
+  publicKey: string
+  encryptedPrivateKey: string
   createdAt?: Date | string
+  vaults?: Prisma.VaultUncheckedCreateNestedManyWithoutUserInput
   logins?: Prisma.LoginUncheckedCreateNestedManyWithoutUserInput
 }
 
-export type UserCreateOrConnectWithoutLockersInput = {
+export type UserCreateOrConnectWithoutItemAccessInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutLockersInput, Prisma.UserUncheckedCreateWithoutLockersInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutItemAccessInput, Prisma.UserUncheckedCreateWithoutItemAccessInput>
 }
 
-export type UserUpsertWithoutLockersInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutLockersInput, Prisma.UserUncheckedUpdateWithoutLockersInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutLockersInput, Prisma.UserUncheckedCreateWithoutLockersInput>
+export type UserUpsertWithoutItemAccessInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutItemAccessInput, Prisma.UserUncheckedUpdateWithoutItemAccessInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutItemAccessInput, Prisma.UserUncheckedCreateWithoutItemAccessInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutLockersInput = {
+export type UserUpdateToOneWithWhereWithoutItemAccessInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutLockersInput, Prisma.UserUncheckedUpdateWithoutLockersInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutItemAccessInput, Prisma.UserUncheckedUpdateWithoutItemAccessInput>
 }
 
-export type UserUpdateWithoutLockersInput = {
+export type UserUpdateWithoutItemAccessInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authHash?: Prisma.StringFieldUpdateOperationsInput | string
   securityToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enable2FA?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryCodes?: Prisma.StringFieldUpdateOperationsInput | string
+  publicKey?: Prisma.StringFieldUpdateOperationsInput | string
+  encryptedPrivateKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vaults?: Prisma.VaultUpdateManyWithoutUserNestedInput
   logins?: Prisma.LoginUpdateManyWithoutUserNestedInput
 }
 
-export type UserUncheckedUpdateWithoutLockersInput = {
+export type UserUncheckedUpdateWithoutItemAccessInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authHash?: Prisma.StringFieldUpdateOperationsInput | string
   securityToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enable2FA?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryCodes?: Prisma.StringFieldUpdateOperationsInput | string
+  publicKey?: Prisma.StringFieldUpdateOperationsInput | string
+  encryptedPrivateKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vaults?: Prisma.VaultUncheckedUpdateManyWithoutUserNestedInput
+  logins?: Prisma.LoginUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutVaultsInput = {
+  id?: string
+  email: string
+  name?: string | null
+  phone?: string | null
+  authHash: string
+  securityToken?: string | null
+  enable2FA?: boolean
+  twoFactorSecret?: string | null
+  recoveryCodes?: string
+  publicKey: string
+  encryptedPrivateKey: string
+  createdAt?: Date | string
+  logins?: Prisma.LoginCreateNestedManyWithoutUserInput
+  itemAccess?: Prisma.ItemAccessCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutVaultsInput = {
+  id?: string
+  email: string
+  name?: string | null
+  phone?: string | null
+  authHash: string
+  securityToken?: string | null
+  enable2FA?: boolean
+  twoFactorSecret?: string | null
+  recoveryCodes?: string
+  publicKey: string
+  encryptedPrivateKey: string
+  createdAt?: Date | string
+  logins?: Prisma.LoginUncheckedCreateNestedManyWithoutUserInput
+  itemAccess?: Prisma.ItemAccessUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutVaultsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutVaultsInput, Prisma.UserUncheckedCreateWithoutVaultsInput>
+}
+
+export type UserUpsertWithoutVaultsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutVaultsInput, Prisma.UserUncheckedUpdateWithoutVaultsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutVaultsInput, Prisma.UserUncheckedCreateWithoutVaultsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutVaultsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutVaultsInput, Prisma.UserUncheckedUpdateWithoutVaultsInput>
+}
+
+export type UserUpdateWithoutVaultsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  authHash?: Prisma.StringFieldUpdateOperationsInput | string
+  securityToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enable2FA?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryCodes?: Prisma.StringFieldUpdateOperationsInput | string
+  publicKey?: Prisma.StringFieldUpdateOperationsInput | string
+  encryptedPrivateKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  logins?: Prisma.LoginUpdateManyWithoutUserNestedInput
+  itemAccess?: Prisma.ItemAccessUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutVaultsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  authHash?: Prisma.StringFieldUpdateOperationsInput | string
+  securityToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enable2FA?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryCodes?: Prisma.StringFieldUpdateOperationsInput | string
+  publicKey?: Prisma.StringFieldUpdateOperationsInput | string
+  encryptedPrivateKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   logins?: Prisma.LoginUncheckedUpdateManyWithoutUserNestedInput
+  itemAccess?: Prisma.ItemAccessUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -534,13 +801,15 @@ export type UserUncheckedUpdateWithoutLockersInput = {
  */
 
 export type UserCountOutputType = {
-  lockers: number
+  vaults: number
   logins: number
+  itemAccess: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  lockers?: boolean | UserCountOutputTypeCountLockersArgs
+  vaults?: boolean | UserCountOutputTypeCountVaultsArgs
   logins?: boolean | UserCountOutputTypeCountLoginsArgs
+  itemAccess?: boolean | UserCountOutputTypeCountItemAccessArgs
 }
 
 /**
@@ -556,8 +825,8 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountLockersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.LockerWhereInput
+export type UserCountOutputTypeCountVaultsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VaultWhereInput
 }
 
 /**
@@ -565,6 +834,13 @@ export type UserCountOutputTypeCountLockersArgs<ExtArgs extends runtime.Types.Ex
  */
 export type UserCountOutputTypeCountLoginsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.LoginWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountItemAccessArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ItemAccessWhereInput
 }
 
 
@@ -575,9 +851,15 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   phone?: boolean
   authHash?: boolean
   securityToken?: boolean
+  enable2FA?: boolean
+  twoFactorSecret?: boolean
+  recoveryCodes?: boolean
+  publicKey?: boolean
+  encryptedPrivateKey?: boolean
   createdAt?: boolean
-  lockers?: boolean | Prisma.User$lockersArgs<ExtArgs>
+  vaults?: boolean | Prisma.User$vaultsArgs<ExtArgs>
   logins?: boolean | Prisma.User$loginsArgs<ExtArgs>
+  itemAccess?: boolean | Prisma.User$itemAccessArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -588,6 +870,11 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   phone?: boolean
   authHash?: boolean
   securityToken?: boolean
+  enable2FA?: boolean
+  twoFactorSecret?: boolean
+  recoveryCodes?: boolean
+  publicKey?: boolean
+  encryptedPrivateKey?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["user"]>
 
@@ -598,6 +885,11 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   phone?: boolean
   authHash?: boolean
   securityToken?: boolean
+  enable2FA?: boolean
+  twoFactorSecret?: boolean
+  recoveryCodes?: boolean
+  publicKey?: boolean
+  encryptedPrivateKey?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["user"]>
 
@@ -608,13 +900,19 @@ export type UserSelectScalar = {
   phone?: boolean
   authHash?: boolean
   securityToken?: boolean
+  enable2FA?: boolean
+  twoFactorSecret?: boolean
+  recoveryCodes?: boolean
+  publicKey?: boolean
+  encryptedPrivateKey?: boolean
   createdAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "name" | "phone" | "authHash" | "securityToken" | "createdAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "name" | "phone" | "authHash" | "securityToken" | "enable2FA" | "twoFactorSecret" | "recoveryCodes" | "publicKey" | "encryptedPrivateKey" | "createdAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  lockers?: boolean | Prisma.User$lockersArgs<ExtArgs>
+  vaults?: boolean | Prisma.User$vaultsArgs<ExtArgs>
   logins?: boolean | Prisma.User$loginsArgs<ExtArgs>
+  itemAccess?: boolean | Prisma.User$itemAccessArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -623,8 +921,9 @@ export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
-    lockers: Prisma.$LockerPayload<ExtArgs>[]
+    vaults: Prisma.$VaultPayload<ExtArgs>[]
     logins: Prisma.$LoginPayload<ExtArgs>[]
+    itemAccess: Prisma.$ItemAccessPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -633,6 +932,11 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     phone: string | null
     authHash: string
     securityToken: string | null
+    enable2FA: boolean
+    twoFactorSecret: string | null
+    recoveryCodes: string
+    publicKey: string
+    encryptedPrivateKey: string
     createdAt: Date
   }, ExtArgs["result"]["user"]>
   composites: {}
@@ -1028,8 +1332,9 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  lockers<T extends Prisma.User$lockersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$lockersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LockerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  vaults<T extends Prisma.User$vaultsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vaultsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VaultPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   logins<T extends Prisma.User$loginsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$loginsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LoginPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  itemAccess<T extends Prisma.User$itemAccessArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$itemAccessArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ItemAccessPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1065,6 +1370,11 @@ export interface UserFieldRefs {
   readonly phone: Prisma.FieldRef<"User", 'String'>
   readonly authHash: Prisma.FieldRef<"User", 'String'>
   readonly securityToken: Prisma.FieldRef<"User", 'String'>
+  readonly enable2FA: Prisma.FieldRef<"User", 'Boolean'>
+  readonly twoFactorSecret: Prisma.FieldRef<"User", 'String'>
+  readonly recoveryCodes: Prisma.FieldRef<"User", 'String'>
+  readonly publicKey: Prisma.FieldRef<"User", 'String'>
+  readonly encryptedPrivateKey: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
 }
     
@@ -1457,27 +1767,27 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * User.lockers
+ * User.vaults
  */
-export type User$lockersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$vaultsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Locker
+   * Select specific fields to fetch from the Vault
    */
-  select?: Prisma.LockerSelect<ExtArgs> | null
+  select?: Prisma.VaultSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Locker
+   * Omit specific fields from the Vault
    */
-  omit?: Prisma.LockerOmit<ExtArgs> | null
+  omit?: Prisma.VaultOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.LockerInclude<ExtArgs> | null
-  where?: Prisma.LockerWhereInput
-  orderBy?: Prisma.LockerOrderByWithRelationInput | Prisma.LockerOrderByWithRelationInput[]
-  cursor?: Prisma.LockerWhereUniqueInput
+  include?: Prisma.VaultInclude<ExtArgs> | null
+  where?: Prisma.VaultWhereInput
+  orderBy?: Prisma.VaultOrderByWithRelationInput | Prisma.VaultOrderByWithRelationInput[]
+  cursor?: Prisma.VaultWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.LockerScalarFieldEnum | Prisma.LockerScalarFieldEnum[]
+  distinct?: Prisma.VaultScalarFieldEnum | Prisma.VaultScalarFieldEnum[]
 }
 
 /**
@@ -1502,6 +1812,30 @@ export type User$loginsArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   distinct?: Prisma.LoginScalarFieldEnum | Prisma.LoginScalarFieldEnum[]
+}
+
+/**
+ * User.itemAccess
+ */
+export type User$itemAccessArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ItemAccess
+   */
+  select?: Prisma.ItemAccessSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ItemAccess
+   */
+  omit?: Prisma.ItemAccessOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ItemAccessInclude<ExtArgs> | null
+  where?: Prisma.ItemAccessWhereInput
+  orderBy?: Prisma.ItemAccessOrderByWithRelationInput | Prisma.ItemAccessOrderByWithRelationInput[]
+  cursor?: Prisma.ItemAccessWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ItemAccessScalarFieldEnum | Prisma.ItemAccessScalarFieldEnum[]
 }
 
 /**

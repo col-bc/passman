@@ -1,8 +1,8 @@
 'use client';
 
-import { deriveAuthHash, deriveHexKey } from '@/lib/crypto';
+import { deriveAuthHash, deriveHexKey, generateUserKeyPair } from '@/lib/crypto';
 import { handleSignUpUser } from '@/lib/user/userActions';
-import { Alert, Button, Checkbox, Field, Flex, Input, Link, Text } from '@chakra-ui/react';
+import { Alert, Button, Card, Checkbox, Field, Flex, Input, Link, Spinner, Text, VStack } from '@chakra-ui/react';
 import { Turnstile, TurnstileInstance } from '@marsidev/react-turnstile';
 import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -28,6 +28,7 @@ function SignUpForm() {
   const router = useRouter();
 
   const turnstileRef = React.useRef<TurnstileInstance | null>(null);
+  const [tsToken, setTsToken] = React.useState<string | null>(null);
 
   const [name, setName] = React.useState<string>('');
   const [email, setEmail] = React.useState<string>('');
@@ -70,8 +71,7 @@ function SignUpForm() {
       return;
     }
 
-    const token = turnstileRef.current?.getResponse();
-    if (!token) {
+    if (!tsToken) {
       setError('Please complete the CAPTCHA challenge.');
       turnstileRef.current?.reset();
       setIsLoading(false);
@@ -80,12 +80,21 @@ function SignUpForm() {
 
     try {
       const mek = await deriveHexKey(password, email);
+      const { publicKey, encryptedPrivateKey } = await generateUserKeyPair(mek);
       const authHash = await deriveAuthHash(password, email);
 
       const result = await handleSignUpUser({
         email,
-        authHash,
-        turnstileToken: token,
+        crypto: {
+          authHash,
+          publicKey,
+          encryptedPrivateKey,
+        },
+        data: {
+          name,
+          turnstileToken: tsToken,
+          phone,
+        },
       });
 
       if (!result.success) {
@@ -112,121 +121,147 @@ function SignUpForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <Flex direction="column" gap={4}>
-        {error && (
-          <Alert.Root status="error">
-            <Alert.Indicator>
-              <TbExclamationCircleFilled size={16} />
-            </Alert.Indicator>
-            <Alert.Content>
-              <Alert.Title>{error}</Alert.Title>
-            </Alert.Content>
-          </Alert.Root>
-        )}
+      <Card.Body>
+        <Flex direction="column" gap={4}>
+          {error && (
+            <Alert.Root status="error">
+              <Alert.Indicator>
+                <TbExclamationCircleFilled size={16} />
+              </Alert.Indicator>
+              <Alert.Content>
+                <Alert.Title>{error}</Alert.Title>
+              </Alert.Content>
+            </Alert.Root>
+          )}
 
-        <Field.Root required colorPalette="yellow">
-          <Field.Label>Your Name</Field.Label>
-          <Input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="What should we call you (optional)?"
-            autoComplete="name"
+          <Field.Root required colorPalette="yellow">
+            <Field.Label>
+              Your Name <Field.RequiredIndicator />
+            </Field.Label>
+            <Input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="What should we call you?"
+              autoComplete="name"
+            />
+          </Field.Root>
+          <Field.Root required colorPalette="yellow">
+            <Field.Label>
+              Email Address <Field.RequiredIndicator />
+            </Field.Label>
+            <Input
+              type="email"
+              value={email}
+              required
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              autoComplete="email"
+            />
+          </Field.Root>
+          <Field.Root colorPalette="yellow">
+            <Field.Label>Phone Number</Field.Label>
+            <Input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(formatPhone(e.target.value))}
+              placeholder="What is your phone number (optional)"
+              autoComplete="tel"
+            />
+            <Field.HelperText>Your phone number can be used for account recovery.</Field.HelperText>
+          </Field.Root>
+          <Field.Root required colorPalette="yellow">
+            <Field.Label>
+              Password <Field.RequiredIndicator />
+            </Field.Label>
+            <PasswordInput
+              value={password}
+              onChange={handlePasswordChange}
+              required
+              placeholder="Choose a strong master password"
+              autoComplete="new-password"
+            />
+            <Field.HelperText mt={2}>
+              <PasswordStrengthMeter value={passwordStrength} />
+              {passwordFeedback && (
+                <Alert.Root mt={2} size="sm" status="warning" variant="subtle">
+                  <Alert.Indicator>
+                    <TbExclamationCircleFilled size={16} />
+                  </Alert.Indicator>
+                  <Alert.Title>{passwordFeedback}</Alert.Title>
+                </Alert.Root>
+              )}
+              <Text fontSize="xs" color="fg.muted" mt={2}>
+                Your master password should be strong and unique. Avoid using common words or easily guessable
+                information. The strength of your password is crucial for the security of your account and the sensitive
+                information you will store in Passman.
+              </Text>
+            </Field.HelperText>
+          </Field.Root>
+          <Turnstile
+            ref={turnstileRef}
+            siteKey="0x4AAAAAAD9otpku29Q-MK7g"
+            options={{
+              appearance: 'interaction-only',
+              theme: 'auto',
+              feedbackEnabled: true,
+              size: 'flexible',
+            }}
+            onSuccess={(token) => setTsToken(token)}
           />
-        </Field.Root>
-        <Field.Root required colorPalette="yellow">
-          <Field.Label>
-            Email Address <Field.RequiredIndicator />
-          </Field.Label>
-          <Input
-            type="email"
-            value={email}
+          <Checkbox.Root
+            checked={acceptTerms}
+            onCheckedChange={(v) => setAcceptTerms(Boolean(v?.checked?.valueOf() ?? false))}
+            colorPalette="yellow"
+            mb={4}
             required
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="What is your email address"
-            autoComplete="email"
-          />
-        </Field.Root>
-        <Field.Root required colorPalette="yellow">
-          <Field.Label>Phone Number</Field.Label>
-          <Input
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(formatPhone(e.target.value))}
-            placeholder="What is your phone number (optional)"
-            autoComplete="tel"
-          />
-          <Field.HelperText mt={1}>This is optional, but can be used for account recovery.</Field.HelperText>
-        </Field.Root>
-        <Field.Root required colorPalette="yellow">
-          <Field.Label>
-            Password <Field.RequiredIndicator />
-          </Field.Label>
-          <PasswordInput
-            value={password}
-            onChange={handlePasswordChange}
-            required
-            placeholder="Choose a strong master password"
-            autoComplete="new-password"
-          />
-          <Field.HelperText mt={2}>
-            <PasswordStrengthMeter value={passwordStrength} />
-            {passwordFeedback && (
-              <Alert.Root mt={2} size="sm" status="warning" variant="subtle">
-                <Alert.Indicator>
-                  <TbExclamationCircleFilled size={16} />
-                </Alert.Indicator>
-                <Alert.Title>{passwordFeedback}</Alert.Title>
-              </Alert.Root>
+            alignItems="flex-start"
+          >
+            <Checkbox.Control>
+              <Checkbox.Indicator />
+            </Checkbox.Control>
+            <Checkbox.Label lineHeight="normal" fontSize="sm" fontWeight="normal">
+              I agree that I have read and agree to be bound to the{' '}
+              <Link as={NextLink} href="/terms" color="yellow.fg">
+                Terms and Conditions
+              </Link>
+              ,{' '}
+              <Link as={NextLink} href="/privacy" color="yellow.fg">
+                Privacy Policy
+              </Link>
+              , and, I represent that I am at least 18 years old, or of legal age in my jurisdiction to enter into a
+              binding agreement.
+            </Checkbox.Label>
+            <Checkbox.HiddenInput />
+          </Checkbox.Root>
+        </Flex>
+      </Card.Body>
+      <Card.Footer>
+        <VStack gap={4} w="full">
+          <Button
+            size="lg"
+            type="submit"
+            loading={isLoading}
+            loadingText="Signing up..."
+            colorPalette="yellow"
+            w="full"
+            disabled={!tsToken}
+          >
+            {!tsToken ? (
+              <>
+                <Spinner /> Verifying Session
+              </>
+            ) : (
+              <>
+                Sign Up <TbArrowRight />
+              </>
             )}
-            <Text fontSize="xs" color="fg.muted" mt={2}>
-              Your master password should be strong and unique. Avoid using common words or easily guessable
-              information. The strength of your password is crucial for the security of your account and the sensitive
-              information you will store in Passman.
-            </Text>
-          </Field.HelperText>
-        </Field.Root>
-        <Turnstile
-          ref={turnstileRef}
-          siteKey="0x4AAAAAAD9otpku29Q-MK7g"
-          options={{
-            appearance: 'interaction-only',
-            theme: 'auto',
-            feedbackEnabled: true,
-            size: 'flexible',
-          }}
-        />
-        <Checkbox.Root
-          checked={acceptTerms}
-          onCheckedChange={(v) => setAcceptTerms(!!v)}
-          colorPalette="yellow"
-          mb={4}
-          required
-          alignItems="flex-start"
-        >
-          <Checkbox.Control>
-            <Checkbox.Indicator />
-          </Checkbox.Control>
-          <Checkbox.Label lineHeight="normal" fontSize="sm" fontWeight={400}>
-            I accept the{' '}
-            <Link as={NextLink} href="/terms" color="yellow.fg">
-              Terms and Conditions
-            </Link>
-            and{' '}
-            <Link as={NextLink} href="/privacy" color="yellow.fg">
-              Privacy Policy
-            </Link>
-            , and I am at least 18 years old, or of legal age in my jurisdiction to enter into a binding agreement.
-          </Checkbox.Label>
-          <Checkbox.HiddenInput />
-        </Checkbox.Root>
-        <Button size="lg" type="submit" loading={isLoading} loadingText="Signing up..." colorPalette="yellow">
-          Sign Up <TbArrowRight />
-        </Button>
-        <Button variant="ghost" colorPalette="yellow" asChild>
-          <NextLink href="/auth/sign-in">Already have an account? Sign In</NextLink>
-        </Button>
-      </Flex>
+          </Button>
+          <Link as={NextLink} href="/auth/sign-in" colorPalette="yellow">
+            Already have an account? Sign In
+          </Link>
+        </VStack>
+      </Card.Footer>
     </form>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
-import { useLocker } from '@/hooks/use-locker';
 import { useSecurityAnalytics } from '@/hooks/use-security-analytics';
+import { useLocker } from '@/hooks/use-vaults';
 import { User } from '@/prisma/client';
 import { EncryptedLocker } from '@/types/server';
 import { Box, Flex, Heading } from '@chakra-ui/react';

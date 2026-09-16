@@ -26,12 +26,10 @@ function Navbar({ href = '/locker', user }: { href?: string; user: User | null }
                 <ColorModeButton />
               </ClientOnly>
               <Menu.Root>
-                <Menu.Trigger as="div">
-                  <Button colorPalette="yellow" size="sm">
-                    <TbUser size={20} />
-                    {user ? user.name : 'Accounts'}
-                  </Button>
-                </Menu.Trigger>
+                <Button as={Menu.Trigger} colorPalette="yellow" variant="surface" size="sm">
+                  <TbUser size={20} />
+                  {user ? user.name : 'Accounts'}
+                </Button>
                 <Menu.Positioner>
                   <Menu.Content w={48}>
                     {!user && (
@@ -82,7 +80,6 @@ function Navbar({ href = '/locker', user }: { href?: string; user: User | null }
                       md: 'none',
                     }}
                     variant="plain"
-                    colorPalette="yellow"
                     size="sm"
                   >
                     <TbMenu size={20} />

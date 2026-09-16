@@ -10,7 +10,8 @@
  */
 export type * from './models/User'
 export type * from './models/Login'
-export type * from './models/Item'
-export type * from './models/LockerItems'
-export type * from './models/Locker'
+export type * from './models/ItemAccess'
+export type * from './models/SecureItem'
+export type * from './models/VaultSecureItems'
+export type * from './models/Vault'
 export type * from './commonInputTypes'

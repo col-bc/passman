@@ -1,4 +1,4 @@
-import { Item, Locker, LockerItems } from '@/prisma/client';
+import { SecureItem, Vault, VaultSecureItems } from '@/prisma/client';
 
 export type ItemContent = {
   type: string;
@@ -10,24 +10,29 @@ export type ItemContent = {
   order?: number;
 };
 
-export type DecryptedItem = Item & {
-  decryptedData?: string;
+export type EncryptedVaultItemDTO = Omit<SecureItem, 'accessors' | 'vaultItems'> & {
+  // Flattened from the ItemAccess table specifically for the requesting user
+  encryptedRecordKey: string;
+  isOwner: boolean;
 };
 
-export type DecryptedLockerItem = LockerItems & {
-  id: string;
+export type DecryptedItem = Omit<EncryptedVaultItemDTO, 'ciphertext' | 'iv' | 'tag' | 'encryptedRecordKey'> & {
+  decryptedData: ItemContent[];
+};
+
+export type DecryptedVaultItem = VaultSecureItems & {
   item: DecryptedItem;
 };
 
-export type DecryptedLocker = Locker & {
-  lockerItems: DecryptedLockerItem[];
+export type DecryptedVault = Vault & {
+  vaultItems: DecryptedVaultItem[];
 };
 
 export type PasswordOccurrence = {
   itemId: string;
   itemName: string;
-  lockerId: string;
-  lockerName: string;
+  vaultId: string;
+  vaultName: string;
   label: string;
   fieldIndex?: number;
 };
@@ -41,8 +46,8 @@ export type RepeatedPassword = {
 export type WeakPassword = {
   itemId: string;
   itemName: string;
-  lockerId: string;
-  lockerName: string;
+  vaultId: string;
+  vaultName: string;
   label: string;
   password: string;
   problems: number;
@@ -54,8 +59,8 @@ export type WeakPassword = {
 export type BreachedPassword = {
   itemId: string;
   itemName: string;
-  lockerId: string;
-  lockerName: string;
+  vaultId: string;
+  vaultName: string;
   label: string;
   password: string;
   breachCount: number;

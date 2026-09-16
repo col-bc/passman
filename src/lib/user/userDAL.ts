@@ -4,6 +4,7 @@ import crypto from 'node:crypto';
 import 'server-only';
 import { prisma } from '../prisma';
 import { hashPassword } from '../util/password';
+import { generateRecoveryCodes, verifyTotp } from '../util/twoFactor';
 
 export async function getUserById(userId: string): Promise<DALResult<User | null>> {
   const user = await prisma.user.findUnique({
@@ -27,11 +28,11 @@ export async function getUserByEmail(email: string): Promise<DALResult<User | nu
   }
 }
 
-const initializeUserLockers = (userId: string) => {
+const createDefaultVault = (userId: string) => {
   // Create a default locker for the user
-  return prisma.locker.create({
+  return prisma.vault.create({
     data: {
-      title: 'Default Locker',
+      title: 'Default Vault',
       ownerId: userId,
     },
   });
@@ -39,7 +40,15 @@ const initializeUserLockers = (userId: string) => {
 
 export async function createUser(
   email: string,
-  authHash: string,
+  crypto: {
+    authHash: string;
+    publicKey: string;
+    encryptedPrivateKey: string;
+  },
+  data: {
+    name: string;
+    phone: string;
+  },
 ): Promise<DALResult<{ success: boolean; message: string }>> {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return { success: false, type: 'VALIDATION' };
@@ -50,12 +59,16 @@ export async function createUser(
     return { success: false, type: 'CONFLICT' };
   }
 
-  const passwordToken = await hashPassword(authHash, email);
+  const passwordToken = await hashPassword(crypto.authHash, email);
 
   const newUser = await prisma.user.create({
     data: {
       authHash: passwordToken,
       email,
+      publicKey: crypto.publicKey,
+      encryptedPrivateKey: crypto.encryptedPrivateKey,
+      name: data.name,
+      phone: data.phone,
     },
   });
 
@@ -63,7 +76,7 @@ export async function createUser(
     return { success: false, type: 'SERVER_ERROR' };
   }
 
-  await initializeUserLockers(newUser.id);
+  await createDefaultVault(newUser.id);
 
   return {
     success: true,
@@ -117,10 +130,10 @@ export async function generateAndStoreSecurityToken(
 }
 
 export async function updateUser(
-  email: string,
-  updates: Partial<User>,
+  id: string,
+  updates: { name?: string; phone?: string },
 ): Promise<DALResult<{ success: boolean; message: string }>> {
-  const user = await getUserByEmail(email);
+  const user = await getUserById(id);
   if (!user.success || !user.data) {
     return { success: false, type: 'NOT_FOUND' };
   }
@@ -170,5 +183,37 @@ export async function sendChangePasswordEmail(
   return {
     success: true,
     data: { success: true, message: 'Password reset email sent successfully' },
+  };
+}
+
+export async function enableTwoFactor(
+  userId: string,
+  secret: string,
+  otpCode: string,
+): Promise<DALResult<{ success: boolean; message: string }>> {
+  const user = await getUserById(userId);
+  if (!user.success || !user.data) {
+    return { success: false, type: 'NOT_FOUND' };
+  }
+
+  const verify = await verifyTotp({ secret, token: otpCode });
+  console.log(`[userDAL] TOTP verification result for user ${userId}: ${verify}`);
+  if (!verify) {
+    return {
+      success: false,
+      type: 'VALIDATION',
+    };
+  }
+
+  const recoveryCodes = await generateRecoveryCodes();
+
+  await prisma.user.update({
+    where: { id: user.data.id },
+    data: { enable2FA: true, twoFactorSecret: secret, recoveryCodes: recoveryCodes.join(',') },
+  });
+
+  return {
+    success: true,
+    data: { success: true, message: 'Two-factor authentication enabled successfully' },
   };
 }

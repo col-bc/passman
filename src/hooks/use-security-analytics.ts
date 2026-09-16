@@ -1,17 +1,17 @@
 import { checkForBreaches, findRepeatedPasswords, findWeakPasswords } from '@/lib/securityCenter';
-import { BreachedPassword, DecryptedLocker, DecryptedLockerItem } from '@/types/client';
+import { BreachedPassword, DecryptedVault } from '@/types/client';
 import React from 'react';
 
-export function useSecurityAnalytics(lockers: DecryptedLocker[]) {
-  const repeatedPasswords = React.useMemo(() => findRepeatedPasswords(lockers), [lockers]);
-  const weakPasswords = React.useMemo(() => findWeakPasswords(lockers), [lockers]);
+export function useSecurityAnalytics(vaults: DecryptedVault[]) {
+  const repeatedPasswords = React.useMemo(() => findRepeatedPasswords(vaults), [vaults]);
+  const weakPasswords = React.useMemo(() => findWeakPasswords(vaults), [vaults]);
 
   const [breaches, setBreaches] = React.useState<BreachedPassword[]>([]);
 
   React.useEffect(() => {
     let cancelled = false;
 
-    checkForBreaches(lockers)
+    checkForBreaches(vaults)
       .then((breached) => {
         if (!cancelled) setBreaches(breached);
       })
@@ -23,10 +23,10 @@ export function useSecurityAnalytics(lockers: DecryptedLocker[]) {
     return () => {
       cancelled = true;
     };
-  }, [lockers]);
+  }, [vaults]);
 
-  const lockerItemHasIssues = React.useCallback(
-    (lockerItem: DecryptedLockerItem) => {
+  const hasSecurityIssues = React.useCallback(
+    (lockerItem: DecryptedVault['vaultItems'][number]) => {
       return (
         repeatedPasswords.some((item) =>
           item.occurrences.some((occurrence) => occurrence.itemId === lockerItem.itemId),
@@ -40,5 +40,5 @@ export function useSecurityAnalytics(lockers: DecryptedLocker[]) {
 
   const totalIssues = repeatedPasswords.length + weakPasswords.length + breaches.length;
 
-  return { repeatedPasswords, weakPasswords, breaches, totalIssues, lockerItemHasIssues };
+  return { repeatedPasswords, weakPasswords, breaches, totalIssues, lockerItemHasIssues: hasSecurityIssues };
 }

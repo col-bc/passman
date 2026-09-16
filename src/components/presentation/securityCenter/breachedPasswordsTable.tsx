@@ -1,7 +1,7 @@
 'use client';
 
 import ScreenValue from '@/components/ui/screenValue';
-import { useLocker } from '@/hooks/use-locker';
+import { useLocker } from '@/hooks/use-vaults';
 import { BreachedPassword } from '@/types/client';
 import { Badge, Button, EmptyState, Flex, Link, Table, Text } from '@chakra-ui/react';
 import NextLink from 'next/link';
@@ -54,7 +54,7 @@ export default function BreachedPasswordsTable({ breachedPasswords }: { breached
                 </Table.Cell>
                 <Table.Cell>
                   <Badge colorPalette="red" variant="subtle" rounded="full">
-                    {bp.breachCount > 1 ? `${bp.breachCount} Breaches` : '1 Breach'}
+                    {bp.breachCount > 1 ? `${bp.breachCount.toLocaleString()} Breaches` : '1 Breach'}
                   </Badge>
                 </Table.Cell>
                 <Table.Cell>
@@ -85,7 +85,7 @@ function BreachedPasswordDialogContent({ breachedPasswords }: { breachedPassword
   return (
     <Flex direction="column" gap={2}>
       <Text whiteSpace="break-spaces">
-        The account associated with this password has been found in {breachedPasswords.breachCount}{' '}
+        The account associated with this password has been found in {breachedPasswords.breachCount.toLocaleString()}{' '}
         {breachedPasswords.breachCount === 1 ? 'data breach' : 'data breaches'}. It is strongly recommended to change
         this password immediately to protect your account and personal information.
       </Text>

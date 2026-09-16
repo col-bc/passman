@@ -20,7 +20,7 @@ export default async function SecurityCenterPage() {
   return (
     <>
       <Breadcrumb.Root variant="underline" borderBottom="1px solid" borderColor="border" bg="bg.subtle" shadow="xs">
-        <Container maxW="5xl" px={6} py={3}>
+        <Container maxW="5xl" px={[4, 6]} py={3}>
           <Breadcrumb.List>
             <Breadcrumb.Item>
               <Breadcrumb.CurrentLink>Security Center</Breadcrumb.CurrentLink>
@@ -28,7 +28,7 @@ export default async function SecurityCenterPage() {
           </Breadcrumb.List>
         </Container>
       </Breadcrumb.Root>
-      <Container maxW="5xl" p={6}>
+      <Container maxW="5xl" px={[4, 6]} py={6}>
         <Flex direction="column">
           <Flex direction="column" gap={4} mb={8}>
             <Heading as="h1" fontSize="3xl" fontWeight="extrabold" letterSpacing="tight" whiteSpace="nowrap" flex={1}>

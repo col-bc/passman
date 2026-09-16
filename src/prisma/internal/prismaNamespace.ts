@@ -80,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 7.9.0
- * Query Engine version: e922089b7d7502aff4249d5da3420f6fa55fc6ad
+ * Prisma Client JS version: 7.10.0
+ * Query Engine version: 0edf323efd1d98336f3f0a68684b56f689b900d3
  */
 export const prismaVersion: PrismaVersion = {
-  client: "7.9.0",
-  engine: "e922089b7d7502aff4249d5da3420f6fa55fc6ad"
+  client: "7.10.0",
+  engine: "0edf323efd1d98336f3f0a68684b56f689b900d3"
 }
 
 /**
@@ -399,9 +399,10 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   User: 'User',
   Login: 'Login',
-  Item: 'Item',
-  LockerItems: 'LockerItems',
-  Locker: 'Locker'
+  ItemAccess: 'ItemAccess',
+  SecureItem: 'SecureItem',
+  VaultSecureItems: 'VaultSecureItems',
+  Vault: 'Vault'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -417,7 +418,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "login" | "item" | "lockerItems" | "locker"
+    modelProps: "user" | "login" | "itemAccess" | "secureItem" | "vaultSecureItems" | "vault"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -569,225 +570,299 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    Item: {
-      payload: Prisma.$ItemPayload<ExtArgs>
-      fields: Prisma.ItemFieldRefs
+    ItemAccess: {
+      payload: Prisma.$ItemAccessPayload<ExtArgs>
+      fields: Prisma.ItemAccessFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.ItemFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload> | null
+          args: Prisma.ItemAccessFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemAccessPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.ItemFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload>
+          args: Prisma.ItemAccessFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemAccessPayload>
         }
         findFirst: {
-          args: Prisma.ItemFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload> | null
+          args: Prisma.ItemAccessFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemAccessPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.ItemFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload>
+          args: Prisma.ItemAccessFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemAccessPayload>
         }
         findMany: {
-          args: Prisma.ItemFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload>[]
+          args: Prisma.ItemAccessFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemAccessPayload>[]
         }
         create: {
-          args: Prisma.ItemCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload>
+          args: Prisma.ItemAccessCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemAccessPayload>
         }
         createMany: {
-          args: Prisma.ItemCreateManyArgs<ExtArgs>
+          args: Prisma.ItemAccessCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.ItemCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload>[]
+          args: Prisma.ItemAccessCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemAccessPayload>[]
         }
         delete: {
-          args: Prisma.ItemDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload>
+          args: Prisma.ItemAccessDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemAccessPayload>
         }
         update: {
-          args: Prisma.ItemUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload>
+          args: Prisma.ItemAccessUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemAccessPayload>
         }
         deleteMany: {
-          args: Prisma.ItemDeleteManyArgs<ExtArgs>
+          args: Prisma.ItemAccessDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.ItemUpdateManyArgs<ExtArgs>
+          args: Prisma.ItemAccessUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.ItemUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload>[]
+          args: Prisma.ItemAccessUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemAccessPayload>[]
         }
         upsert: {
-          args: Prisma.ItemUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload>
+          args: Prisma.ItemAccessUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemAccessPayload>
         }
         aggregate: {
-          args: Prisma.ItemAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateItem>
+          args: Prisma.ItemAccessAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateItemAccess>
         }
         groupBy: {
-          args: Prisma.ItemGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.ItemGroupByOutputType>[]
+          args: Prisma.ItemAccessGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ItemAccessGroupByOutputType>[]
         }
         count: {
-          args: Prisma.ItemCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.ItemCountAggregateOutputType> | number
+          args: Prisma.ItemAccessCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ItemAccessCountAggregateOutputType> | number
         }
       }
     }
-    LockerItems: {
-      payload: Prisma.$LockerItemsPayload<ExtArgs>
-      fields: Prisma.LockerItemsFieldRefs
+    SecureItem: {
+      payload: Prisma.$SecureItemPayload<ExtArgs>
+      fields: Prisma.SecureItemFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.LockerItemsFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerItemsPayload> | null
+          args: Prisma.SecureItemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecureItemPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.LockerItemsFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerItemsPayload>
+          args: Prisma.SecureItemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecureItemPayload>
         }
         findFirst: {
-          args: Prisma.LockerItemsFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerItemsPayload> | null
+          args: Prisma.SecureItemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecureItemPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.LockerItemsFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerItemsPayload>
+          args: Prisma.SecureItemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecureItemPayload>
         }
         findMany: {
-          args: Prisma.LockerItemsFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerItemsPayload>[]
+          args: Prisma.SecureItemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecureItemPayload>[]
         }
         create: {
-          args: Prisma.LockerItemsCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerItemsPayload>
+          args: Prisma.SecureItemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecureItemPayload>
         }
         createMany: {
-          args: Prisma.LockerItemsCreateManyArgs<ExtArgs>
+          args: Prisma.SecureItemCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.LockerItemsCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerItemsPayload>[]
+          args: Prisma.SecureItemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecureItemPayload>[]
         }
         delete: {
-          args: Prisma.LockerItemsDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerItemsPayload>
+          args: Prisma.SecureItemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecureItemPayload>
         }
         update: {
-          args: Prisma.LockerItemsUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerItemsPayload>
+          args: Prisma.SecureItemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecureItemPayload>
         }
         deleteMany: {
-          args: Prisma.LockerItemsDeleteManyArgs<ExtArgs>
+          args: Prisma.SecureItemDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.LockerItemsUpdateManyArgs<ExtArgs>
+          args: Prisma.SecureItemUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.LockerItemsUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerItemsPayload>[]
+          args: Prisma.SecureItemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecureItemPayload>[]
         }
         upsert: {
-          args: Prisma.LockerItemsUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerItemsPayload>
+          args: Prisma.SecureItemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecureItemPayload>
         }
         aggregate: {
-          args: Prisma.LockerItemsAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateLockerItems>
+          args: Prisma.SecureItemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSecureItem>
         }
         groupBy: {
-          args: Prisma.LockerItemsGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.LockerItemsGroupByOutputType>[]
+          args: Prisma.SecureItemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SecureItemGroupByOutputType>[]
         }
         count: {
-          args: Prisma.LockerItemsCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.LockerItemsCountAggregateOutputType> | number
+          args: Prisma.SecureItemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SecureItemCountAggregateOutputType> | number
         }
       }
     }
-    Locker: {
-      payload: Prisma.$LockerPayload<ExtArgs>
-      fields: Prisma.LockerFieldRefs
+    VaultSecureItems: {
+      payload: Prisma.$VaultSecureItemsPayload<ExtArgs>
+      fields: Prisma.VaultSecureItemsFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.LockerFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerPayload> | null
+          args: Prisma.VaultSecureItemsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultSecureItemsPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.LockerFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerPayload>
+          args: Prisma.VaultSecureItemsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultSecureItemsPayload>
         }
         findFirst: {
-          args: Prisma.LockerFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerPayload> | null
+          args: Prisma.VaultSecureItemsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultSecureItemsPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.LockerFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerPayload>
+          args: Prisma.VaultSecureItemsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultSecureItemsPayload>
         }
         findMany: {
-          args: Prisma.LockerFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerPayload>[]
+          args: Prisma.VaultSecureItemsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultSecureItemsPayload>[]
         }
         create: {
-          args: Prisma.LockerCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerPayload>
+          args: Prisma.VaultSecureItemsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultSecureItemsPayload>
         }
         createMany: {
-          args: Prisma.LockerCreateManyArgs<ExtArgs>
+          args: Prisma.VaultSecureItemsCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.LockerCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerPayload>[]
+          args: Prisma.VaultSecureItemsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultSecureItemsPayload>[]
         }
         delete: {
-          args: Prisma.LockerDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerPayload>
+          args: Prisma.VaultSecureItemsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultSecureItemsPayload>
         }
         update: {
-          args: Prisma.LockerUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerPayload>
+          args: Prisma.VaultSecureItemsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultSecureItemsPayload>
         }
         deleteMany: {
-          args: Prisma.LockerDeleteManyArgs<ExtArgs>
+          args: Prisma.VaultSecureItemsDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.LockerUpdateManyArgs<ExtArgs>
+          args: Prisma.VaultSecureItemsUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.LockerUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerPayload>[]
+          args: Prisma.VaultSecureItemsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultSecureItemsPayload>[]
         }
         upsert: {
-          args: Prisma.LockerUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$LockerPayload>
+          args: Prisma.VaultSecureItemsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultSecureItemsPayload>
         }
         aggregate: {
-          args: Prisma.LockerAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateLocker>
+          args: Prisma.VaultSecureItemsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVaultSecureItems>
         }
         groupBy: {
-          args: Prisma.LockerGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.LockerGroupByOutputType>[]
+          args: Prisma.VaultSecureItemsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VaultSecureItemsGroupByOutputType>[]
         }
         count: {
-          args: Prisma.LockerCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.LockerCountAggregateOutputType> | number
+          args: Prisma.VaultSecureItemsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VaultSecureItemsCountAggregateOutputType> | number
+        }
+      }
+    }
+    Vault: {
+      payload: Prisma.$VaultPayload<ExtArgs>
+      fields: Prisma.VaultFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VaultFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VaultFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultPayload>
+        }
+        findFirst: {
+          args: Prisma.VaultFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VaultFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultPayload>
+        }
+        findMany: {
+          args: Prisma.VaultFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultPayload>[]
+        }
+        create: {
+          args: Prisma.VaultCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultPayload>
+        }
+        createMany: {
+          args: Prisma.VaultCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VaultCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultPayload>[]
+        }
+        delete: {
+          args: Prisma.VaultDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultPayload>
+        }
+        update: {
+          args: Prisma.VaultUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultPayload>
+        }
+        deleteMany: {
+          args: Prisma.VaultDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VaultUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VaultUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultPayload>[]
+        }
+        upsert: {
+          args: Prisma.VaultUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VaultPayload>
+        }
+        aggregate: {
+          args: Prisma.VaultAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVault>
+        }
+        groupBy: {
+          args: Prisma.VaultGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VaultGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VaultCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VaultCountAggregateOutputType> | number
         }
       }
     }
@@ -834,6 +909,11 @@ export const UserScalarFieldEnum = {
   phone: 'phone',
   authHash: 'authHash',
   securityToken: 'securityToken',
+  enable2FA: 'enable2FA',
+  twoFactorSecret: 'twoFactorSecret',
+  recoveryCodes: 'recoveryCodes',
+  publicKey: 'publicKey',
+  encryptedPrivateKey: 'encryptedPrivateKey',
   createdAt: 'createdAt'
 } as const
 
@@ -851,42 +931,53 @@ export const LoginScalarFieldEnum = {
 export type LoginScalarFieldEnum = (typeof LoginScalarFieldEnum)[keyof typeof LoginScalarFieldEnum]
 
 
-export const ItemScalarFieldEnum = {
+export const ItemAccessScalarFieldEnum = {
   id: 'id',
-  ownerId: 'ownerId',
-  lockerId: 'lockerId',
+  userId: 'userId',
+  itemId: 'itemId',
+  encryptedRecordKey: 'encryptedRecordKey',
+  isOwner: 'isOwner',
+  createdAt: 'createdAt'
+} as const
+
+export type ItemAccessScalarFieldEnum = (typeof ItemAccessScalarFieldEnum)[keyof typeof ItemAccessScalarFieldEnum]
+
+
+export const SecureItemScalarFieldEnum = {
+  id: 'id',
   title: 'title',
   category: 'category',
+  isCompromised: 'isCompromised',
   ciphertext: 'ciphertext',
   iv: 'iv',
   tag: 'tag',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  isCompromised: 'isCompromised',
   lastScan: 'lastScan'
 } as const
 
-export type ItemScalarFieldEnum = (typeof ItemScalarFieldEnum)[keyof typeof ItemScalarFieldEnum]
+export type SecureItemScalarFieldEnum = (typeof SecureItemScalarFieldEnum)[keyof typeof SecureItemScalarFieldEnum]
 
 
-export const LockerItemsScalarFieldEnum = {
-  lockerId: 'lockerId',
+export const VaultSecureItemsScalarFieldEnum = {
+  vaultId: 'vaultId',
   itemId: 'itemId'
 } as const
 
-export type LockerItemsScalarFieldEnum = (typeof LockerItemsScalarFieldEnum)[keyof typeof LockerItemsScalarFieldEnum]
+export type VaultSecureItemsScalarFieldEnum = (typeof VaultSecureItemsScalarFieldEnum)[keyof typeof VaultSecureItemsScalarFieldEnum]
 
 
-export const LockerScalarFieldEnum = {
+export const VaultScalarFieldEnum = {
   id: 'id',
   ownerId: 'ownerId',
   title: 'title',
+  icon: 'icon',
+  enableMonitoring: 'enableMonitoring',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  enableMonitoring: 'enableMonitoring'
+  updatedAt: 'updatedAt'
 } as const
 
-export type LockerScalarFieldEnum = (typeof LockerScalarFieldEnum)[keyof typeof LockerScalarFieldEnum]
+export type VaultScalarFieldEnum = (typeof VaultScalarFieldEnum)[keyof typeof VaultScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -919,23 +1010,16 @@ export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 
 
 
 /**
- * Reference to a field of type 'DateTime'
- */
-export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
-    
-
-
-/**
- * Reference to a field of type 'Bytes'
- */
-export type BytesFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Bytes'>
-    
-
-
-/**
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'DateTime'
+ */
+export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
     
 
 
@@ -1098,9 +1182,10 @@ export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaC
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   login?: Prisma.LoginOmit
-  item?: Prisma.ItemOmit
-  lockerItems?: Prisma.LockerItemsOmit
-  locker?: Prisma.LockerOmit
+  itemAccess?: Prisma.ItemAccessOmit
+  secureItem?: Prisma.SecureItemOmit
+  vaultSecureItems?: Prisma.VaultSecureItemsOmit
+  vault?: Prisma.VaultOmit
 }
 
 /* Types for Logging */

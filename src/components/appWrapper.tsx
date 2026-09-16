@@ -1,7 +1,7 @@
 'use client';
 
-import { useLocker } from '@/hooks/use-locker';
 import { useSecurityAnalytics } from '@/hooks/use-security-analytics';
+import { useVaults } from '@/hooks/use-vaults';
 import { User } from '@/prisma/client';
 import {
   Avatar,
@@ -30,12 +30,11 @@ import React from 'react';
 import {
   TbBell,
   TbBellCheck,
-  TbKey,
+  TbLockShare,
   TbLockSquareRounded,
   TbMenu,
   TbPlus,
   TbSearch,
-  TbSettings,
   TbShieldLock,
   TbUserCircle,
 } from 'react-icons/tb';
@@ -47,7 +46,7 @@ import { Tooltip } from './ui/tooltip';
 
 export default function AppWrapper({ children, user }: { children: React.ReactNode; user: User }) {
   return (
-    <Flex direction="column" h="100vh" overflow="hidden" w="full">
+    <Flex direction="column" h="100vh" overflow="hidden" w="full" shadow="sm">
       {/* --- DESKTOP LAYOUT --- */}
       <Flex direction="column" display={{ base: 'none', md: 'flex' }} h="full" w="full">
         <Box borderBottom="1px solid" borderColor="border" bg="bg" w="full" flexShrink={0} px={6} py={2}>
@@ -79,7 +78,7 @@ export default function AppWrapper({ children, user }: { children: React.ReactNo
       <Flex direction="column" display={{ base: 'flex', md: 'none' }} h="full" w="full">
         <Box borderBottom="1px solid" borderColor="border" bg="bg.subtle" w="full" flexShrink={0}>
           <Collapsible.Root>
-            <Flex gap={1} px={4} py={3} align="center">
+            <Flex gap={1} px={[4, 6]} py={3} align="center">
               <Logo asLink href="/locker" />
               <ColorModeButton ml="auto" />
               <NotificationDrawer issueCount={3} />
@@ -111,8 +110,8 @@ export default function AppWrapper({ children, user }: { children: React.ReactNo
 
 const SidebarLinks: React.FC<{ user: User }> = ({ user }) => {
   const pathName = usePathname();
-  const { lockers } = useLocker();
-  const { totalIssues } = useSecurityAnalytics(lockers);
+  const { vaults } = useVaults();
+  const { totalIssues } = useSecurityAnalytics(vaults);
 
   return (
     <Flex direction="column" as="ul" flex={1} overflowY="auto" px={4} py={2} gap={2} w="full" h="full">
@@ -144,15 +143,15 @@ const SidebarLinks: React.FC<{ user: User }> = ({ user }) => {
         </Link>
       </Button>
       <Button
-        variant={pathName.startsWith('/password-generator') ? 'subtle' : 'ghost'}
+        variant={pathName.startsWith('/permissions') ? 'subtle' : 'ghost'}
         colorPalette="gray"
         justifyContent="flex-start"
         gap={2}
         asChild
       >
-        <Link as={NextLink} href="/password-generator">
-          <TbKey />
-          Password Generator
+        <Link as={NextLink} href="/permissions">
+          <TbLockShare />
+          Permissions
         </Link>
       </Button>
 
@@ -162,14 +161,14 @@ const SidebarLinks: React.FC<{ user: User }> = ({ user }) => {
         <Menu.Trigger asChild>
           <Button variant="ghost" colorPalette="gray" w="full" h="auto" py={3} px={3}>
             <Flex direction="row" align="center" gap={3} w="full">
-              <Avatar.Root variant="subtle" colorPalette="yellow">
+              <Avatar.Root variant="subtle" colorPalette="yellow" rounded="md">
                 <Avatar.Fallback>{user?.name?.charAt(0) ?? 'U'}</Avatar.Fallback>
               </Avatar.Root>
               <Flex direction="column" align="start" gap={0} flex={1}>
                 <Text fontSize="sm" fontWeight="bold" lineHeight="short" color="fg.default">
                   {user?.name ?? 'User'}
                 </Text>
-                <Text fontSize="xs" color="fg.muted">
+                <Text fontSize="2xs" color="fg.muted" truncate>
                   {user?.email ?? ''}
                 </Text>
               </Flex>
@@ -182,13 +181,7 @@ const SidebarLinks: React.FC<{ user: User }> = ({ user }) => {
             <Menu.Item asChild value="account">
               <Link href="/account">
                 <TbUserCircle />
-                Account
-              </Link>
-            </Menu.Item>
-            <Menu.Item asChild value="settings">
-              <Link href="/settings">
-                <TbSettings />
-                Settings
+                Account Settings
               </Link>
             </Menu.Item>
             <Menu.Separator />
@@ -233,6 +226,7 @@ const AppBar: React.FC<{ user: User }> = ({ user }) => {
       borderRight="1px solid"
       borderColor="border"
       justify="start"
+      shadow="sm"
     >
       <Box flex={1} overflowY="auto" w="full">
         <SidebarLinks user={user} />

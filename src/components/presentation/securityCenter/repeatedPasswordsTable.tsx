@@ -1,6 +1,6 @@
 'use client';
 import ScreenValue from '@/components/ui/screenValue';
-import { useLocker } from '@/hooks/use-locker';
+import { useLocker } from '@/hooks/use-vaults';
 import { RepeatedPassword } from '@/types/client';
 import { Badge, Button, EmptyState, Link, Table, Text } from '@chakra-ui/react';
 import NextLink from 'next/link';

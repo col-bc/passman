@@ -32,7 +32,11 @@ function Logo({ asLink = false, href = '/' }) {
   );
 
   if (asLink) {
-    return <Link href={href}>{content}</Link>;
+    return (
+      <Link href={href} style={{ textDecoration: 'none' }}>
+        {content}
+      </Link>
+    );
   }
   return content;
 }

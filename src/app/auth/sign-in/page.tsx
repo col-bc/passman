@@ -1,48 +1,25 @@
-import Illustration from '@/assets/tabler-illustrations/svg/dark/boy-with-key.svg';
 import SignInForm from '@/components/forms/auth/signIn';
-import { Box, Container, Flex, Heading, Text } from '@chakra-ui/react';
+import { Box, Card, Container, Flex, Heading, Text } from '@chakra-ui/react';
 
 export default function AuthPage() {
   return (
-    <Container maxW="5xl" py={10} px={8}>
+    <Container maxW="5xl" py={10} px={8} position="relative">
       <Flex gap={4}>
-        <Box flex={1}>
-          <Heading as="h1" size="4xl" fontWeight="black" mb={4}>
+        <Box flex={1} maxW="md" mx="auto">
+          <Heading as="h1" size="4xl" fontWeight="black" mb={4} textAlign="center">
             Sign In
           </Heading>
-          <Text fontSize="md" color="fg.muted" mb={8}>
+          <Text fontSize="md" color="fg.muted" mb={8} textAlign="center">
             Welcome back! Sign in to access your secure vault
           </Text>
-          <Box w="full" maxW="md" minW={0}>
+          <Card.Root variant="elevated">
+            <Card.Header>
+              <Card.Title>Please Sign In to Continue</Card.Title>
+            </Card.Header>
+
             <SignInForm />
-          </Box>
+          </Card.Root>
         </Box>
-        <Flex
-          display={{ base: 'none', lg: 'flex' }}
-          flex={1}
-          direction="column"
-          gap={4}
-          alignSelf="center"
-          justifyContent="center"
-        >
-          <Box
-            color="yellow.solid"
-            display={{ base: 'none', lg: 'flex' }}
-            alignItems="center"
-            justifyContent="center"
-            maxW="xl"
-            minW={0}
-          >
-            <Illustration
-              viewBox="0 0 800 600"
-              style={{
-                width: '100%',
-                maxWidth: '100%',
-                height: 'auto',
-              }}
-            />
-          </Box>
-        </Flex>
       </Flex>
     </Container>
   );

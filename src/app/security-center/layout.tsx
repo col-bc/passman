@@ -1,6 +1,6 @@
 import AppWrapper from '@/components/appWrapper';
 import LockerError from '@/components/presentation/locker/lockerError';
-import { LockerProvider } from '@/hooks/use-locker';
+import { LockerProvider } from '@/hooks/use-vaults';
 import { handleGetCurrentUser } from '@/lib/user/userActions';
 import { unauthorized } from 'next/navigation';
 

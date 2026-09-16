@@ -21,9 +21,36 @@ export type ActionState<T> =
 
 export type DALResult<T> = { success: true; data: T } | { success: false; type: ActionStateFailureType };
 
-export type EncryptedLocker = Prisma.LockerGetPayload<{
+export type UserProfile = Prisma.UserGetPayload<{
+  select: {
+    id: true;
+    email: true;
+    publicKey: true;
+    encryptedPrivateKey: true;
+    enable2FA: true;
+    name: true;
+    createdAt: true;
+    logins: true;
+    phone: true;
+    recoveryCodes: true;
+  };
+}>;
+
+export type SecureItemWithAccess = Prisma.SecureItemGetPayload<{
   include: {
-    lockerItems: {
+    accessors: {
+      select: {
+        userId: true;
+        encryptedRecordKey: true;
+        isOwner: true;
+      };
+    };
+  };
+}>;
+
+export type VaultWithItems = Prisma.VaultGetPayload<{
+  include: {
+    vaultItems: {
       include: {
         item: true;
       };

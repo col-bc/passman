@@ -11,6 +11,13 @@ const config = defineConfig({
         body: { value: 'var(--font-sans)' },
         mono: { value: 'var(--font-mono)' },
       },
+      radii: {
+        sm: { value: '8px' },
+        md: { value: '10px' },
+        lg: { value: '12px' },
+        xl: { value: '16px' },
+        full: { value: '9999px' },
+      },
     },
   },
 });

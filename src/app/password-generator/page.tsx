@@ -1,7 +1,7 @@
 import AppWrapper from '@/components/appWrapper';
 import LockerError from '@/components/presentation/locker/lockerError';
 import PasswordGenerator from '@/components/util/passwordGenerator';
-import { LockerProvider } from '@/hooks/use-locker';
+import { LockerProvider } from '@/hooks/use-vaults';
 import { handleGetCurrentUser } from '@/lib/user/userActions';
 import { Breadcrumb, Container, Heading } from '@chakra-ui/react';
 import { unauthorized } from 'next/navigation';
@@ -28,7 +28,7 @@ export default async function PasswordGeneratorPage() {
       <AppWrapper user={user!}>
         <>
           <Breadcrumb.Root variant="underline" borderBottom="1px solid" borderColor="border" bg="bg.subtle" shadow="xs">
-            <Container maxW="5xl" px={6} py={3}>
+            <Container maxW="5xl" px={[4, 6]} py={3}>
               <Breadcrumb.List>
                 <Breadcrumb.Item>
                   <Breadcrumb.CurrentLink>Lockers</Breadcrumb.CurrentLink>
@@ -36,7 +36,7 @@ export default async function PasswordGeneratorPage() {
               </Breadcrumb.List>
             </Container>
           </Breadcrumb.Root>
-          <Container maxW="5xl" p={6}>
+          <Container maxW="5xl" px={[4, 6]} py={6}>
             <Heading
               as="h1"
               fontSize="3xl"

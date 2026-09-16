@@ -124,3 +124,61 @@ export async function deriveAuthHash(password: string, email: string): Promise<s
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
+
+/**
+ * Generates an RSA-OAEP key pair and encrypts the private key with the provided Master Encryption Key (MEK).
+ * @param mek - The Master Encryption Key used to encrypt the private key.
+ * @returns An object containing the Base64-encoded public key and the encrypted private key.
+ */
+export async function generateUserKeyPair(mekHex: string): Promise<{ publicKey: string; encryptedPrivateKey: string }> {
+  const mek = await importKey(mekHex);
+  const keyPair = await window.crypto.subtle.generateKey(
+    {
+      name: 'RSA-OAEP',
+      modulusLength: 2048,
+      publicExponent: new Uint8Array([1, 0, 1]),
+      hash: 'SHA-256',
+    },
+    true, // Must be true so we can export the keys
+    ['encrypt', 'decrypt'],
+  );
+
+  const rawPublicKey = await window.crypto.subtle.exportKey('spki', keyPair.publicKey);
+  const publicKeyString = bufferToBase64(rawPublicKey);
+
+  const rawPrivateKey = await window.crypto.subtle.exportKey('pkcs8', keyPair.privateKey);
+
+  const iv = window.crypto.getRandomValues(new Uint8Array(12));
+  const encryptedPrivateKeyBuffer = await window.crypto.subtle.encrypt({ name: 'AES-GCM', iv }, mek, rawPrivateKey);
+
+  const encryptedKeyWithIv = new Uint8Array(iv.byteLength + encryptedPrivateKeyBuffer.byteLength);
+  encryptedKeyWithIv.set(iv, 0);
+  encryptedKeyWithIv.set(new Uint8Array(encryptedPrivateKeyBuffer), iv.byteLength);
+
+  const encryptedPrivateKeyString = bufferToBase64(encryptedKeyWithIv.buffer);
+
+  return {
+    publicKey: publicKeyString,
+    encryptedPrivateKey: encryptedPrivateKeyString,
+  };
+}
+
+/**
+ * Utility to convert an ArrayBuffer to a Base64 string for easy database storage
+ */
+function bufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  const binary = Array.from(bytes)
+    .map((b) => String.fromCharCode(b))
+    .join('');
+  return window.btoa(binary);
+}
+
+export function stringToUint8(str: string): Uint8Array {
+  const binary = window.atob(str);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}

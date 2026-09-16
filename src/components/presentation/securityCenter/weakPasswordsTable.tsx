@@ -1,7 +1,7 @@
 'use client';
 
 import ScreenValue from '@/components/ui/screenValue';
-import { useLocker } from '@/hooks/use-locker';
+import { useLocker } from '@/hooks/use-vaults';
 import { WeakPassword } from '@/types/client';
 import { Badge, Box, Button, EmptyState, Flex, Heading, Link, Popover, Table, Text } from '@chakra-ui/react';
 import NextLink from 'next/link';
@@ -123,9 +123,9 @@ function WeakPasswordDialogContent({ weakPassword }: { weakPassword: WeakPasswor
   return (
     <Flex direction="column" gap={2}>
       <Text whiteSpace="break-spaces">
-        The password for the field <strong>{weakPassword.label}</strong> in item{' '}
-        <strong>{weakPassword.lockerName}</strong> locker, {<strong>{weakPassword.itemName}</strong>} does not meet
-        modern security standards. Strengthen your password by:
+        The value for the field <strong>{weakPassword.label}</strong> in item <strong>{weakPassword.lockerName}</strong>{' '}
+        locker, {<strong>{weakPassword.itemName}</strong>} does not meet modern security standards. Strengthen your
+        password by:
       </Text>
       <Box as="ul" pl={4} listStyleType="disc">
         {weakPassword.warnings.map((warning, index) => (

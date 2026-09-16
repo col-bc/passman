@@ -53,9 +53,10 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   Login: 'Login',
-  Item: 'Item',
-  LockerItems: 'LockerItems',
-  Locker: 'Locker'
+  ItemAccess: 'ItemAccess',
+  SecureItem: 'SecureItem',
+  VaultSecureItems: 'VaultSecureItems',
+  Vault: 'Vault'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -78,6 +79,11 @@ export const UserScalarFieldEnum = {
   phone: 'phone',
   authHash: 'authHash',
   securityToken: 'securityToken',
+  enable2FA: 'enable2FA',
+  twoFactorSecret: 'twoFactorSecret',
+  recoveryCodes: 'recoveryCodes',
+  publicKey: 'publicKey',
+  encryptedPrivateKey: 'encryptedPrivateKey',
   createdAt: 'createdAt'
 } as const
 
@@ -95,42 +101,53 @@ export const LoginScalarFieldEnum = {
 export type LoginScalarFieldEnum = (typeof LoginScalarFieldEnum)[keyof typeof LoginScalarFieldEnum]
 
 
-export const ItemScalarFieldEnum = {
+export const ItemAccessScalarFieldEnum = {
   id: 'id',
-  ownerId: 'ownerId',
-  lockerId: 'lockerId',
+  userId: 'userId',
+  itemId: 'itemId',
+  encryptedRecordKey: 'encryptedRecordKey',
+  isOwner: 'isOwner',
+  createdAt: 'createdAt'
+} as const
+
+export type ItemAccessScalarFieldEnum = (typeof ItemAccessScalarFieldEnum)[keyof typeof ItemAccessScalarFieldEnum]
+
+
+export const SecureItemScalarFieldEnum = {
+  id: 'id',
   title: 'title',
   category: 'category',
+  isCompromised: 'isCompromised',
   ciphertext: 'ciphertext',
   iv: 'iv',
   tag: 'tag',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  isCompromised: 'isCompromised',
   lastScan: 'lastScan'
 } as const
 
-export type ItemScalarFieldEnum = (typeof ItemScalarFieldEnum)[keyof typeof ItemScalarFieldEnum]
+export type SecureItemScalarFieldEnum = (typeof SecureItemScalarFieldEnum)[keyof typeof SecureItemScalarFieldEnum]
 
 
-export const LockerItemsScalarFieldEnum = {
-  lockerId: 'lockerId',
+export const VaultSecureItemsScalarFieldEnum = {
+  vaultId: 'vaultId',
   itemId: 'itemId'
 } as const
 
-export type LockerItemsScalarFieldEnum = (typeof LockerItemsScalarFieldEnum)[keyof typeof LockerItemsScalarFieldEnum]
+export type VaultSecureItemsScalarFieldEnum = (typeof VaultSecureItemsScalarFieldEnum)[keyof typeof VaultSecureItemsScalarFieldEnum]
 
 
-export const LockerScalarFieldEnum = {
+export const VaultScalarFieldEnum = {
   id: 'id',
   ownerId: 'ownerId',
   title: 'title',
+  icon: 'icon',
+  enableMonitoring: 'enableMonitoring',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  enableMonitoring: 'enableMonitoring'
+  updatedAt: 'updatedAt'
 } as const
 
-export type LockerScalarFieldEnum = (typeof LockerScalarFieldEnum)[keyof typeof LockerScalarFieldEnum]
+export type VaultScalarFieldEnum = (typeof VaultScalarFieldEnum)[keyof typeof VaultScalarFieldEnum]
 
 
 export const SortOrder = {

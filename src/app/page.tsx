@@ -18,9 +18,10 @@ import {
   TbShieldLockFilled,
 } from 'react-icons/tb';
 
+const hexBackground = crypto.randomBytes(6000).toString('hex');
+
 export default async function HomePage() {
   const result = await handleGetCurrentUser();
-  const hexBackground = crypto.randomBytes(6000).toString('hex');
   const user = result.success ? result.data : null;
 
   return (
@@ -83,14 +84,15 @@ export default async function HomePage() {
                 protected.
               </Heading>
 
-              <Text fontSize={{ base: 'lg', md: 'xl' }} color="fg" maxW="2xl" lineHeight="relaxed">
-                Passman uses military-grade client-side encryption. Your master key never leaves your device,ensuring
-                you retain absolute control over your data.
+              <Text fontSize={{ base: 'lg', md: 'xl' }} color="fg" maxW="2xl" lineHeight="tall">
+                Passman uses military-grade AES-256 client-side encryption. Your master key never leaves your
+                device,ensuring you retain absolute control over your data. Enable sharing securely with others without
+                compromising your privacy.
               </Text>
 
               <Flex direction={{ base: 'column', sm: 'row' }} gap={4} mt={4} w="full" justify="center">
                 <Button asChild colorPalette="yellow" size="xl" variant="solid">
-                  <Link href={user ? '/locker' : '/auth/sign-up'}>
+                  <Link href={user ? '/vaults' : '/auth/sign-up'}>
                     Get Started Free <TbArrowRight />
                   </Link>
                 </Button>
@@ -168,7 +170,7 @@ export default async function HomePage() {
                     <TbKey />
                   </Flex>
                   <Heading fontSize="2xl" fontWeight="bold">
-                    Custom Lockers
+                    Custom Vaults
                   </Heading>
                   <Text color="fg.muted" fontSize="md" lineHeight="tall">
                     Organize your sensitive credentials, financial accounts, and secure notes into custom-tailored
@@ -399,7 +401,7 @@ export default async function HomePage() {
                 Create your account in seconds. Take full control of your private encryption keys today.
               </Text>
               <Button asChild colorPalette="yellow" size="xl" variant="solid" mt={4} px={10}>
-                <Link href={user ? '/locker' : '/auth/sign-up'}>
+                <Link href={user ? '/vaults' : '/auth/sign-up'}>
                   Create Your Vault Now <TbArrowRight />
                 </Link>
               </Button>

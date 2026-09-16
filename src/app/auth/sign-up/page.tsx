@@ -1,68 +1,25 @@
-import Illustration from '@/assets/tabler-illustrations/svg/dark/boy-and-laptop.svg';
 import SignUpForm from '@/components/forms/auth/signUp';
-import { Badge, Box, Container, Flex, Heading, Text } from '@chakra-ui/react';
-import { TbArrowsExchange, TbEyeOff, TbListDetails } from 'react-icons/tb';
+import { Box, Card, Container, Flex, Heading, Text } from '@chakra-ui/react';
 
 export default function SignUpPage() {
   return (
-    <Container maxW="5xl" py={10} px={8}>
+    <Container maxW="5xl" py={10} px={8} position="relative">
       <Flex gap={4}>
-        <Box flex={1}>
-          <Heading as="h1" size="4xl" fontWeight="black" mb={4}>
+        <Box flex={1} maxW="md" mx="auto">
+          <Heading as="h1" size="4xl" fontWeight="black" mb={4} textAlign="center">
             Sign Up
           </Heading>
-          <Text fontSize="md" color="fg.muted" mb={8}>
-            Create your account to start using Passman and securely manage your passwords and sensitive information with
-            ease.
+          <Text fontSize="md" color="fg.muted" mb={8} textAlign="center">
+            Create your account to start using Passman and take total control of your digital security.
           </Text>
 
-          <Box w="full" maxW="md" minW={0}>
+          <Card.Root variant="elevated">
+            <Card.Header>
+              <Card.Title>Welcome to Passman!</Card.Title>
+            </Card.Header>
             <SignUpForm />
-          </Box>
+          </Card.Root>
         </Box>
-        <Flex
-          display={{ base: 'none', lg: 'flex' }}
-          flex={1}
-          direction="column"
-          gap={6}
-          alignSelf="center"
-          justifyContent="center"
-        >
-          <Heading as="h2" size="2xl" color="fg.muted" textAlign="center" fontWeight="bold">
-            Welcome to Passman
-          </Heading>
-          <Flex justifyContent="center" alignItems="center" gap={2} mb={6}>
-            <Badge colorPalette="yellow" variant="subtle" rounded="full">
-              <TbListDetails size={16} />
-              Customizable
-            </Badge>
-            <Badge colorPalette="yellow" variant="subtle" rounded="full">
-              <TbEyeOff size={16} />
-              Private
-            </Badge>
-            <Badge colorPalette="yellow" variant="subtle" rounded="full">
-              <TbArrowsExchange size={16} />
-              E2E Encrypted
-            </Badge>
-          </Flex>
-          <Box
-            color="yellow.solid"
-            display={{ base: 'none', lg: 'flex' }}
-            alignItems="center"
-            justifyContent="center"
-            maxW="xl"
-            minW={0}
-          >
-            <Illustration
-              viewBox="0 0 800 600"
-              style={{
-                width: '100%',
-                maxWidth: '100%',
-                height: 'auto',
-              }}
-            />
-          </Box>
-        </Flex>
       </Flex>
     </Container>
   );

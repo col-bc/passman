@@ -28,17 +28,22 @@ export type User = Prisma.UserModel
  */
 export type Login = Prisma.LoginModel
 /**
- * Model Item
+ * Model ItemAccess
  * 
  */
-export type Item = Prisma.ItemModel
+export type ItemAccess = Prisma.ItemAccessModel
 /**
- * Model LockerItems
+ * Model SecureItem
  * 
  */
-export type LockerItems = Prisma.LockerItemsModel
+export type SecureItem = Prisma.SecureItemModel
 /**
- * Model Locker
+ * Model VaultSecureItems
  * 
  */
-export type Locker = Prisma.LockerModel
+export type VaultSecureItems = Prisma.VaultSecureItemsModel
+/**
+ * Model Vault
+ * 
+ */
+export type Vault = Prisma.VaultModel
