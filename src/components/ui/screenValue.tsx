@@ -27,6 +27,7 @@ export default function ScreenValue({ showDefault = false, ...props }: ScreenVal
         alignItems="center"
         gap={1}
         verticalAlign="middle"
+        lineHeight="shorter"
         fontFamily="mono"
         {...props}
       >

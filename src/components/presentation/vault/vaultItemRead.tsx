@@ -38,15 +38,15 @@ export default function VaultItemRead({
   itemContent: ItemContent[];
 }) {
   return (
-    <DataList.Root orientation="horizontal" gap={2} size="sm">
-      <DataList.Item display="flex" gap={2}>
+    <DataList.Root orientation="horizontal" size="sm" gap={0}>
+      <DataList.Item display="flex" gap={2} py={2}>
         <DataList.ItemLabel flex={1} fontWeight="bold">
           Title:
         </DataList.ItemLabel>
         <DataList.ItemValue flex={2}>{vaultItem?.item.title}</DataList.ItemValue>
       </DataList.Item>
       <Separator />
-      <DataList.Item display="flex" gap={2}>
+      <DataList.Item display="flex" gap={2} py={2}>
         <DataList.ItemLabel flex={1} fontWeight="bold">
           Category:
         </DataList.ItemLabel>
@@ -57,14 +57,14 @@ export default function VaultItemRead({
         </DataList.ItemValue>
       </DataList.Item>
       <Separator />
-      <DataList.Item display="flex" gap={2}>
+      <DataList.Item display="flex" gap={2} py={2}>
         <DataList.ItemLabel flex={1} fontSize="xs" fontWeight="bold">
           Vault Name:
         </DataList.ItemLabel>
         <DataList.ItemValue flex={2}>{vaultName ? vaultName : vaultItem?.vaultId}</DataList.ItemValue>
       </DataList.Item>
       <Separator />
-      <DataList.Item display="flex" gap={2}>
+      <DataList.Item display="flex" gap={2} py={2}>
         <DataList.ItemLabel flex={1} fontWeight="bold">
           Integrity:
         </DataList.ItemLabel>
@@ -96,13 +96,13 @@ export default function VaultItemRead({
         </Heading>
       </Flex>
 
-      <Flex direction="column" gap={2} mt={2}>
+      <Flex direction="column" mt={2}>
         {itemContent.map((value, idx) => {
           if (!value.value) return null;
           if (value.isMultiline) {
             return (
               <React.Fragment key={`item-content-fragment-${idx}`}>
-                <DataList.Item display="flex" flexDirection="column" alignItems="flex-start" gap={2}>
+                <DataList.Item display="flex" flexDirection="column" alignItems="flex-start" gap={2} py={2}>
                   <DataList.ItemLabel fontWeight="bold">{value.label}:</DataList.ItemLabel>
                 </DataList.Item>
                 <DataList.ItemValue flex={2}>{value.value}</DataList.ItemValue>
@@ -111,7 +111,7 @@ export default function VaultItemRead({
           }
           return (
             <React.Fragment key={`item-content-fragment-${idx}`}>
-              <DataList.Item display="flex" gap={2}>
+              <DataList.Item display="flex" gap={2} _hover={{ backgroundColor: 'gray.50' }} py={2}>
                 <DataList.ItemLabel flex={1} fontWeight="bold">
                   {value.label}:
                 </DataList.ItemLabel>

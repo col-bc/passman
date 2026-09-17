@@ -12,6 +12,7 @@ const config = defineConfig({
         mono: { value: 'var(--font-mono)' },
       },
       radii: {
+        xs: { value: '6px' },
         sm: { value: '8px' },
         md: { value: '10px' },
         lg: { value: '12px' },

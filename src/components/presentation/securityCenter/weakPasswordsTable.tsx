@@ -1,7 +1,7 @@
 'use client';
 
 import ScreenValue from '@/components/ui/screenValue';
-import { useLocker } from '@/hooks/use-vaults';
+import { useVaults } from '@/hooks/use-vaults';
 import { WeakPassword } from '@/types/client';
 import { Badge, Box, Button, EmptyState, Flex, Heading, Link, Popover, Table, Text } from '@chakra-ui/react';
 import NextLink from 'next/link';
@@ -9,14 +9,14 @@ import { TbArrowRight, TbShieldCheckFilled } from 'react-icons/tb';
 import FixIssueDialog from './fixIssueDialog';
 
 export default function WeakPasswordsTable({ weakPasswords }: { weakPasswords: WeakPassword[] }) {
-  const { lockers } = useLocker();
+  const { vaults } = useVaults();
 
   return (
     <Table.ScrollArea borderWidth="1px" w="full" borderRadius="sm" borderColor="border" shadow="sm">
       <Table.Root size="sm" variant="outline">
         <Table.Header>
           <Table.Row>
-            <Table.ColumnHeader fontWeight="semibold">Locker</Table.ColumnHeader>
+            <Table.ColumnHeader fontWeight="semibold">Vault</Table.ColumnHeader>
             <Table.ColumnHeader fontWeight="semibold">Item</Table.ColumnHeader>
             <Table.ColumnHeader fontWeight="semibold">Label</Table.ColumnHeader>
             <Table.ColumnHeader fontWeight="semibold">Value</Table.ColumnHeader>
@@ -38,13 +38,13 @@ export default function WeakPasswordsTable({ weakPasswords }: { weakPasswords: W
             </Table.Row>
           ) : null}
           {weakPasswords.map((wp) => {
-            const locker = lockers.find((l) => l.id === wp.lockerId);
-            const item = locker?.lockerItems.find((li) => li.item.id === wp.itemId)?.item;
+            const vault = vaults.find((v) => v.id === wp.vaultId);
+            const item = vault?.vaultItems.find((vi) => vi.item.id === wp.itemId)?.item;
             return (
-              <Table.Row key={`${wp.lockerId}-${wp.itemId}-${wp.label}`}>
-                <Table.Cell>{locker?.title || 'Unknown Locker'}</Table.Cell>
+              <Table.Row key={`${wp.vaultId}-${wp.itemId}-${wp.label}`}>
+                <Table.Cell>{vault?.title || 'Unknown Vault'}</Table.Cell>
                 <Table.Cell>
-                  <Link as={NextLink} href={`/locker/${wp.lockerId}/item/${wp.itemId}`} colorPalette="yellow">
+                  <Link as={NextLink} href={`/vaults/${wp.vaultId}/item/${wp.itemId}`} colorPalette="yellow">
                     {item?.title || 'Unknown Item'}
                   </Link>
                 </Table.Cell>
@@ -97,7 +97,7 @@ export default function WeakPasswordsTable({ weakPasswords }: { weakPasswords: W
                 </Table.Cell>
                 <Table.Cell>
                   <FixIssueDialog
-                    href={`/locker/${wp.lockerId}/item/${wp.itemId}?mode=edit&highlightIndex=${wp.fieldIndex}`}
+                    href={`/vaults/${wp.vaultId}/item/${wp.itemId}?mode=edit&highlightIndex=${wp.fieldIndex}`}
                     descriptionChildren={<WeakPasswordDialogContent weakPassword={wp} />}
                   >
                     <Button
@@ -123,8 +123,8 @@ function WeakPasswordDialogContent({ weakPassword }: { weakPassword: WeakPasswor
   return (
     <Flex direction="column" gap={2}>
       <Text whiteSpace="break-spaces">
-        The value for the field <strong>{weakPassword.label}</strong> in item <strong>{weakPassword.lockerName}</strong>{' '}
-        locker, {<strong>{weakPassword.itemName}</strong>} does not meet modern security standards. Strengthen your
+        The value for the field <strong>{weakPassword.label}</strong> in item <strong>{weakPassword.vaultName}</strong>{' '}
+        vault, {<strong>{weakPassword.itemName}</strong>} does not meet modern security standards. Strengthen your
         password by:
       </Text>
       <Box as="ul" pl={4} listStyleType="disc">

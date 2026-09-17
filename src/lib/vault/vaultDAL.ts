@@ -3,10 +3,10 @@ import { DALResult, VaultWithItems } from '@/types/server';
 import 'server-only';
 import { prisma } from '../prisma';
 
-export async function getVaultById(vaultId: string): Promise<DALResult<Vault | null>> {
+export async function getVaultById(vaultId: string, userId: string): Promise<DALResult<Vault | null>> {
   try {
     const vault = await prisma.vault.findUnique({
-      where: { id: vaultId },
+      where: { id: vaultId, ownerId: userId },
       include: {
         vaultItems: {
           include: {
@@ -25,7 +25,7 @@ export async function getVaultById(vaultId: string): Promise<DALResult<Vault | n
   }
 }
 
-export async function getVaultsByOwnerId(ownerId: string): Promise<DALResult<VaultWithItems[]>> {
+export async function getVaults(ownerId: string): Promise<DALResult<VaultWithItems[]>> {
   try {
     const vaults = await prisma.vault.findMany({
       where: { ownerId },
@@ -54,11 +54,11 @@ export async function createVault(ownerId: string, title: string, icon: string =
 
 export async function updateVault(
   vaultId: string,
-  data: { newTitle?: string; newIcon?: string },
+  data: { newTitle?: string; newIcon?: string; enableMonitoring?: boolean },
 ): Promise<DALResult<Vault | null>> {
   const updatedVault = await prisma.vault.update({
     where: { id: vaultId },
-    data: { title: data.newTitle, icon: data.newIcon },
+    data: { title: data.newTitle, icon: data.newIcon, enableMonitoring: data.enableMonitoring },
   });
   console.log(`Updated vault with ID ${vaultId}:`, updatedVault);
   if (!updatedVault) {

@@ -8,18 +8,19 @@ import NextLink from 'next/link';
 import React from 'react';
 import { TbDeviceFloppy, TbShieldSearch } from 'react-icons/tb';
 
-export default function SecurityMonitoringForm({ vault }: { vault: DecryptedVault }) {
+export default function SecurityMonitoringForm({ vault, onClose }: { vault: DecryptedVault; onClose: () => void }) {
   const [enrolled, setEnrolled] = React.useState(false);
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
-
+    console.log('Submitting security monitoring form with enrolled:', enrolled);
     const status = await handleUpdateVault(vault.id, { enableMonitoring: enrolled });
     if (status.success) {
       toaster.success({
         title: 'Vault Updated Successfully',
         description: 'Security monitoring settings have been updated for ' + vault.title,
       });
+      onClose();
     } else {
       console.error('Failed to update vault:', status);
       toaster.error({
@@ -36,7 +37,7 @@ export default function SecurityMonitoringForm({ vault }: { vault: DecryptedVaul
           colorPalette="yellow"
           variant="surface"
           checked={enrolled}
-          onCheckedChange={(val) => setEnrolled(!!val.checked)}
+          onCheckedChange={(val) => setEnrolled(val.checked === 'indeterminate' ? false : Boolean(val.checked))}
         >
           <CheckboxCard.HiddenInput />
           <CheckboxCard.Control>
@@ -110,7 +111,7 @@ export function SecurityMonitoringDialog({
               Security monitoring alerts you to potential security threats by scanning your password records in the
               background. Your data stays private and secure and you remain in control at all times.
             </Dialog.Description>
-            <SecurityMonitoringForm vault={vault} />
+            <SecurityMonitoringForm vault={vault} onClose={() => onOpenChange({ open: false })} />
           </Dialog.Body>
         </Dialog.Content>
       </Dialog.Positioner>

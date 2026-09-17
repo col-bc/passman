@@ -35,9 +35,9 @@ export default function VaultForm({ vault }: { vault?: DecryptedVault | null }) 
         setIcon('default');
         setShowIconPickerDialog(false);
         toaster.success({
-          title: 'Locker updated successfully.',
-          description: 'Your locker has been updated.',
-          action: { label: 'View Locker', onClick: () => router.push(`/vaults/${updatedVault.data.id}`) },
+          title: 'Vault updated successfully.',
+          description: 'Your vault has been updated.',
+          action: { label: 'View Vault', onClick: () => router.push(`/vaults/${updatedVault.data.id}`) },
         });
       }
     } else {
@@ -52,10 +52,11 @@ export default function VaultForm({ vault }: { vault?: DecryptedVault | null }) 
         setTitle('');
         setIcon('default');
         toaster.success({
-          title: 'Locker created successfully.',
-          description: 'Your new locker has been created.',
-          action: { label: 'View Locker', onClick: () => router.push(`/vaults/${newVault.data.id}`) },
+          title: 'Vault created successfully.',
+          description: 'Your new vault has been created.',
+          action: { label: 'View Vault', onClick: () => router.push(`/vaults/${newVault.data.id}`) },
         });
+        router.refresh();
       }
     }
   }
@@ -98,7 +99,7 @@ export default function VaultForm({ vault }: { vault?: DecryptedVault | null }) 
               <Field.Label>
                 Title <Field.RequiredIndicator />
               </Field.Label>
-              <Input placeholder="Enter locker title" value={title} onChange={(e) => setTitle(e.target.value)} />
+              <Input placeholder="Enter vault title" value={title} onChange={(e) => setTitle(e.target.value)} />
             </Field.Root>
           </Flex>
         </Dialog.Body>

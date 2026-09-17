@@ -1,6 +1,6 @@
 import {
   BreachedPassword,
-  DecryptedLocker,
+  DecryptedVault,
   ItemContent,
   PasswordOccurrence,
   RepeatedPassword,
@@ -10,11 +10,11 @@ import zxcvbn from 'zxcvbn';
 
 /**
  * Checks for breached passwords using the Have I Been Pwned API.
- * @param decryptedLockers - An array of decrypted lockers containing items with passwords to check.
+ * @param decryptedVaults - An array of decrypted vaults containing items with passwords to check.
  * @returns {Promise<BreachedPassword[]>} - A promise that resolves to an array of breached passwords.
  */
-export async function checkForBreaches(decryptedLockers: DecryptedLocker[]): Promise<BreachedPassword[]> {
-  const allItems = decryptedLockers.flatMap((l) => l.lockerItems);
+export async function checkForBreaches(decryptedVaults: DecryptedVault[]): Promise<BreachedPassword[]> {
+  const allItems = decryptedVaults.flatMap((l) => l.vaultItems);
   const breachedPasswords: BreachedPassword[] = [];
 
   for (const item of allItems) {
@@ -47,8 +47,8 @@ export async function checkForBreaches(decryptedLockers: DecryptedLocker[]): Pro
             breachedPasswords.push({
               itemId: item.item.id,
               itemName: item.item.title,
-              lockerId: item.lockerId,
-              lockerName: decryptedLockers.find((l) => l.id === item.lockerId)?.title || 'Unknown Locker',
+              vaultId: item.vaultId,
+              vaultName: decryptedVaults.find((l) => l.id === item.vaultId)?.title || 'Unknown Vault',
               label: field.label,
               password: field.value,
               breachCount: parseInt(count, 10),
@@ -66,15 +66,15 @@ export async function checkForBreaches(decryptedLockers: DecryptedLocker[]): Pro
 }
 
 /**
- * Finds repeated passwords across all lockers.
- * @param lockers - An array of decrypted lockers containing items with passwords to check.
- * @returns {RepeatedPassword[]} - An array of repeated passwords found across the lockers.
+ * Finds repeated passwords across all vaults.
+ * @param vaults - An array of decrypted vaults containing items with passwords to check.
+ * @returns {RepeatedPassword[]} - An array of repeated passwords found across the vaults.
  */
-export function findRepeatedPasswords(lockers: DecryptedLocker[]): RepeatedPassword[] {
+export function findRepeatedPasswords(vaults: DecryptedVault[]): RepeatedPassword[] {
   const passwordTracker = new Map<string, PasswordOccurrence[]>();
 
-  for (const locker of lockers) {
-    for (const item of locker.lockerItems) {
+  for (const vault of vaults) {
+    for (const item of vault.vaultItems) {
       if (item.item.category === 'credentials' && item.item.decryptedData) {
         const fields = Object.values(item.item.decryptedData) as unknown as ItemContent[];
 
@@ -85,8 +85,8 @@ export function findRepeatedPasswords(lockers: DecryptedLocker[]): RepeatedPassw
             currentOccurrences.push({
               itemId: item.item.id,
               itemName: item.item.title,
-              lockerId: locker.id,
-              lockerName: locker.title,
+              vaultId: vault.id,
+              vaultName: vault.title,
               label: field.label,
               fieldIndex: index,
             });
@@ -113,12 +113,13 @@ export function findRepeatedPasswords(lockers: DecryptedLocker[]): RepeatedPassw
   return repeatedPasswords;
 }
 
-/** * Checks for weak passwords using the zxcvbn library.
- * @param lockers - An array of decrypted lockers containing items with passwords to check.
- * @returns {WeakPassword[]} - An array of weak passwords found across the lockers.
+/**
+ * Checks for weak passwords using the zxcvbn library.
+ * @param vaults - An array of decrypted vaults containing items with passwords to check.
+ * @returns {WeakPassword[]} - An array of weak passwords found across the vaults.
  */
-export function findWeakPasswords(lockers: DecryptedLocker[]): WeakPassword[] {
-  const allItems = lockers.flatMap((l) => l.lockerItems);
+export function findWeakPasswords(vaults: DecryptedVault[]): WeakPassword[] {
+  const allItems = vaults.flatMap((l) => l.vaultItems);
   const weakPasswordsList: WeakPassword[] = [];
 
   for (const item of allItems) {
@@ -130,8 +131,8 @@ export function findWeakPasswords(lockers: DecryptedLocker[]): WeakPassword[] {
           weakPasswordsList.push({
             itemId: item.item.id,
             itemName: item.item.title,
-            lockerId: item.lockerId,
-            lockerName: lockers.find((l) => l.id === item.lockerId)?.title || 'Unknown Locker',
+            vaultId: item.vaultId,
+            vaultName: vaults.find((l) => l.id === item.vaultId)?.title || 'Unknown Vault',
             label: field.label,
             password: field.value,
             problems: (4 - analysis.score + (analysis.feedback.warning ? 1 : 0)) as number,

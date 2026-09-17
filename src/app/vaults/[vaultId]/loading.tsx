@@ -1,5 +1,5 @@
 import LoadingPage from '@/components/presentation/loadingPage';
 
-export default function LoadingLockerItemPage() {
+export default function LoadingVaultItemPage() {
   return <LoadingPage />;
 }

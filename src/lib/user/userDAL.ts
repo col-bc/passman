@@ -29,7 +29,7 @@ export async function getUserByEmail(email: string): Promise<DALResult<User | nu
 }
 
 const createDefaultVault = (userId: string) => {
-  // Create a default locker for the user
+  // Create a default vault for the user
   return prisma.vault.create({
     data: {
       title: 'Default Vault',

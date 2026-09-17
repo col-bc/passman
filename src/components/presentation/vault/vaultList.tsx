@@ -227,8 +227,8 @@ function VaultItem({ vault }: { vault: DecryptedVault }) {
         shadow="sm"
         _hover={{
           zIndex: 11,
-          scale: 1.025,
           shadow: 'md',
+          bg: 'gray.50',
         }}
         transition="all 0.2s ease-in-out"
         rounded="sm"
@@ -251,7 +251,7 @@ function VaultItem({ vault }: { vault: DecryptedVault }) {
               <Menu.Root>
                 <IconButton
                   as={Menu.Trigger}
-                  aria-label="Locker item options"
+                  aria-label="Vault item options"
                   variant="ghost"
                   size="sm"
                   onClick={(e) => e.stopPropagation()}
@@ -270,7 +270,7 @@ function VaultItem({ vault }: { vault: DecryptedVault }) {
                     </Menu.Item>
                     <Menu.Item value="move">
                       <TbArrowBarUp />
-                      Move Lockers
+                      Move Vault
                     </Menu.Item>
                     <Menu.Separator />
                     <Menu.Item
@@ -325,7 +325,7 @@ function VaultItem({ vault }: { vault: DecryptedVault }) {
             </Flex>
             <LinkOverlay asChild>
               <Link as={NextLink} href={`/vaults/${vault.id}`} colorPalette="yellow">
-                Open Locker <TbArrowRight />
+                Open Vault <TbArrowRight />
               </Link>
             </LinkOverlay>
           </Flex>

@@ -1,6 +1,6 @@
 'use client';
 import ScreenValue from '@/components/ui/screenValue';
-import { useLocker } from '@/hooks/use-vaults';
+import { useVaults } from '@/hooks/use-vaults';
 import { RepeatedPassword } from '@/types/client';
 import { Badge, Button, EmptyState, Link, Table, Text } from '@chakra-ui/react';
 import NextLink from 'next/link';
@@ -8,13 +8,13 @@ import { TbArrowRight, TbShieldCheckFilled } from 'react-icons/tb';
 import FixIssueDialog from './fixIssueDialog';
 
 export default function RepeatedPasswordsTable({ repeatedPasswords }: { repeatedPasswords: RepeatedPassword[] }) {
-  const { lockers } = useLocker();
+  const { vaults } = useVaults();
   return (
     <Table.ScrollArea borderWidth="1px" w="full" borderRadius="sm" borderColor="border" shadow="sm">
       <Table.Root size="sm" variant="outline">
         <Table.Header>
           <Table.Row>
-            <Table.ColumnHeader fontWeight="semibold">Locker</Table.ColumnHeader>
+            <Table.ColumnHeader fontWeight="semibold">Vault</Table.ColumnHeader>
             <Table.ColumnHeader fontWeight="semibold">Item</Table.ColumnHeader>
             <Table.ColumnHeader fontWeight="semibold">Label</Table.ColumnHeader>
             <Table.ColumnHeader fontWeight="semibold">Value</Table.ColumnHeader>
@@ -40,7 +40,7 @@ export default function RepeatedPasswordsTable({ repeatedPasswords }: { repeated
             return (
               <Table.Row key={rp.password}>
                 <Table.Cell>
-                  {firstOccurrence.lockerName}
+                  {firstOccurrence.vaultName}
                   {rp.count > 1 && (
                     <Text as="span" fontSize="xs" color="fg.muted" ml={2}>
                       (+{rp.count - 1} other)
@@ -50,7 +50,7 @@ export default function RepeatedPasswordsTable({ repeatedPasswords }: { repeated
                 <Table.Cell>
                   <Link
                     as={NextLink}
-                    href={`/locker/${firstOccurrence.lockerId}/item/${firstOccurrence.itemId}`}
+                    href={`/vaults/${firstOccurrence.vaultId}/item/${firstOccurrence.itemId}`}
                     colorPalette="yellow"
                   >
                     {firstOccurrence.itemName}
@@ -66,7 +66,7 @@ export default function RepeatedPasswordsTable({ repeatedPasswords }: { repeated
                 </Table.Cell>
                 <Table.Cell>
                   <FixIssueDialog
-                    href={`/locker/${firstOccurrence.lockerId}/item/${firstOccurrence.itemId}?mode=edit&highlightIndex=${firstOccurrence.fieldIndex}`}
+                    href={`/vaults/${firstOccurrence.vaultId}/item/${firstOccurrence.itemId}?mode=edit&highlightIndex=${firstOccurrence.fieldIndex}`}
                     descriptionChildren={<RepeatedPasswordDialogContent repeatedPassword={rp} />}
                   >
                     <Button size="xs" variant="subtle" colorPalette="yellow">

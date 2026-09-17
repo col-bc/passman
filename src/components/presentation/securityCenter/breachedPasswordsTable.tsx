@@ -1,7 +1,7 @@
 'use client';
 
 import ScreenValue from '@/components/ui/screenValue';
-import { useLocker } from '@/hooks/use-vaults';
+import { useVaults } from '@/hooks/use-vaults';
 import { BreachedPassword } from '@/types/client';
 import { Badge, Button, EmptyState, Flex, Link, Table, Text } from '@chakra-ui/react';
 import NextLink from 'next/link';
@@ -9,14 +9,14 @@ import { TbArrowRight, TbShieldCheckFilled } from 'react-icons/tb';
 import FixIssueDialog from './fixIssueDialog';
 
 export default function BreachedPasswordsTable({ breachedPasswords }: { breachedPasswords: BreachedPassword[] }) {
-  const { lockers } = useLocker();
+  const { vaults } = useVaults();
 
   return (
     <Table.ScrollArea borderWidth="1px" w="full" borderRadius="sm" borderColor="border" shadow="sm">
       <Table.Root size="sm" variant="outline">
         <Table.Header>
           <Table.Row>
-            <Table.ColumnHeader fontWeight="semibold">Locker</Table.ColumnHeader>
+            <Table.ColumnHeader fontWeight="semibold">Vault</Table.ColumnHeader>
             <Table.ColumnHeader fontWeight="semibold">Item</Table.ColumnHeader>
             <Table.ColumnHeader fontWeight="semibold">Label</Table.ColumnHeader>
             <Table.ColumnHeader fontWeight="semibold">Value</Table.ColumnHeader>
@@ -38,13 +38,13 @@ export default function BreachedPasswordsTable({ breachedPasswords }: { breached
             </Table.Row>
           ) : null}
           {breachedPasswords.map((bp) => {
-            const locker = lockers.find((l) => l.id === bp.lockerId);
-            const item = locker?.lockerItems.find((li) => li.item.id === bp.itemId)?.item;
+            const vault = vaults.find((v) => v.id === bp.itemId);
+            const item = vault?.vaultItems.find((vi) => vi.item.id === bp.itemId)?.item;
             return (
-              <Table.Row key={`${bp.lockerId}-${bp.itemId}-${bp.label}`}>
-                <Table.Cell>{locker?.title || 'Unknown Locker'}</Table.Cell>
+              <Table.Row key={`${bp.vaultId}-${bp.itemId}-${bp.label}`}>
+                <Table.Cell>{vault?.title || 'Unknown Vault'}</Table.Cell>
                 <Table.Cell>
-                  <Link as={NextLink} href={`/locker/${bp.lockerId}/item/${bp.itemId}`} colorPalette="yellow">
+                  <Link as={NextLink} href={`/vault/${bp.vaultId}/item/${bp.itemId}`} colorPalette="yellow">
                     {item?.title || 'Unknown Item'}
                   </Link>
                 </Table.Cell>
@@ -59,7 +59,7 @@ export default function BreachedPasswordsTable({ breachedPasswords }: { breached
                 </Table.Cell>
                 <Table.Cell>
                   <FixIssueDialog
-                    href={`/locker/${bp.lockerId}/item/${bp.itemId}?mode=edit&highlightIndex=${bp.fieldIndex}`}
+                    href={`/vault/${bp.vaultId}/item/${bp.itemId}?mode=edit&highlightIndex=${bp.fieldIndex}`}
                     descriptionChildren={<BreachedPasswordDialogContent breachedPasswords={bp} />}
                   >
                     <Button

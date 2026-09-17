@@ -30,7 +30,6 @@ import React from 'react';
 import {
   TbBell,
   TbBellCheck,
-  TbLockShare,
   TbLockSquareRounded,
   TbMenu,
   TbPlus,
@@ -46,12 +45,12 @@ import { Tooltip } from './ui/tooltip';
 
 export default function AppWrapper({ children, user }: { children: React.ReactNode; user: User }) {
   return (
-    <Flex direction="column" h="100vh" overflow="hidden" w="full" shadow="sm">
+    <Flex direction="column" h="100vh" overflow="hidden" w="full" bg="gray.50">
       {/* --- DESKTOP LAYOUT --- */}
       <Flex direction="column" display={{ base: 'none', md: 'flex' }} h="full" w="full">
         <Box borderBottom="1px solid" borderColor="border" bg="bg" w="full" flexShrink={0} px={6} py={2}>
           <Flex w="full" direction="row" gap={4} align="center">
-            <Logo asLink href="/locker" />
+            <Logo asLink href="/vaults" />
             <Box flex={1} minW={0} />
             <Tooltip content="Create New Item" positioning={{ placement: 'bottom' }}>
               <IconButton colorPalette="yellow" aria-label="Create New Item" variant="surface">
@@ -60,13 +59,12 @@ export default function AppWrapper({ children, user }: { children: React.ReactNo
             </Tooltip>
             <SearchBar query="" onQueryChange={() => {}} />
             <ColorModeButton />
-            <NotificationDrawer issueCount={3} />
+            <NotificationDrawer />
           </Flex>
         </Box>
 
         <Flex direction="row" align="stretch" h="full" w="full" flex={1} minH={0}>
           <AppBar user={user} />
-
           {/* Scrollable Main Area */}
           <Box as="main" flex={1} overflowY="auto" minH={0}>
             {children}
@@ -79,9 +77,9 @@ export default function AppWrapper({ children, user }: { children: React.ReactNo
         <Box borderBottom="1px solid" borderColor="border" bg="bg.subtle" w="full" flexShrink={0}>
           <Collapsible.Root>
             <Flex gap={1} px={[4, 6]} py={3} align="center">
-              <Logo asLink href="/locker" />
+              <Logo asLink href="/vaults" />
               <ColorModeButton ml="auto" />
-              <NotificationDrawer issueCount={3} />
+              <NotificationDrawer />
               <Collapsible.Trigger asChild>
                 <IconButton aria-label="Open navigation menu" variant="ghost">
                   <TbMenu />
@@ -114,49 +112,38 @@ const SidebarLinks: React.FC<{ user: User }> = ({ user }) => {
   const { totalIssues } = useSecurityAnalytics(vaults);
 
   return (
-    <Flex direction="column" as="ul" flex={1} overflowY="auto" px={4} py={2} gap={2} w="full" h="full">
-      <Button
-        variant={pathName.startsWith('/locker') ? 'subtle' : 'ghost'}
-        colorPalette="gray"
-        justifyContent="flex-start"
-        gap={2}
-        asChild
-      >
-        <Link as={NextLink} href="/locker">
+    <Flex direction="column" as="ul" flex={1} overflowY="auto" px={4} py={2} gap={1} w="full" h="full">
+      <NextLink href="/vaults" passHref style={{ width: '100%' }}>
+        <Button
+          variant={pathName.startsWith('/vaults') ? 'subtle' : 'ghost'}
+          colorPalette="gray"
+          justifyContent="flex-start"
+          gap={2}
+          w="full"
+        >
           <TbLockSquareRounded />
-          Lockers
-        </Link>
-      </Button>
-      <Button
-        variant={pathName.startsWith('/security-center') ? 'subtle' : 'ghost'}
-        colorPalette="gray"
-        justifyContent="flex-start"
-        gap={2}
-        asChild
-      >
-        <Link as={NextLink} href="/security-center">
+          Vaults
+        </Button>
+      </NextLink>
+      <NextLink href="/security-center" passHref style={{ width: '100%' }}>
+        <Button
+          variant={pathName.startsWith('/security-center') ? 'subtle' : 'ghost'}
+          colorPalette="gray"
+          justifyContent="flex-start"
+          gap={2}
+          w="full"
+        >
           <TbShieldLock />
           Security Center
-          <Badge colorPalette="red" variant="subtle" rounded="full" ml="auto">
-            {totalIssues}
-          </Badge>
-        </Link>
-      </Button>
-      <Button
-        variant={pathName.startsWith('/permissions') ? 'subtle' : 'ghost'}
-        colorPalette="gray"
-        justifyContent="flex-start"
-        gap={2}
-        asChild
-      >
-        <Link as={NextLink} href="/permissions">
-          <TbLockShare />
-          Permissions
-        </Link>
-      </Button>
+          {totalIssues > 0 && (
+            <Badge colorPalette="red" variant="subtle" rounded="full" ml="auto">
+              {totalIssues}
+            </Badge>
+          )}
+        </Button>
+      </NextLink>
 
-      <SearchBar query="" onQueryChange={() => {}} display={{ base: 'block', md: 'none' }} />
-      <Separator orientation="horizontal" mt="auto" />
+      <Separator orientation="horizontal" mt="auto" mb={2} />
       <Menu.Root positioning={{ placement: 'top-end' }}>
         <Menu.Trigger asChild>
           <Button variant="ghost" colorPalette="gray" w="full" h="auto" py={3} px={3}>
@@ -191,6 +178,8 @@ const SidebarLinks: React.FC<{ user: User }> = ({ user }) => {
           </Menu.Content>
         </Menu.Positioner>
       </Menu.Root>
+      <Separator orientation="horizontal" display={{ base: 'block', md: 'none' }} />
+      <SearchBar query="" onQueryChange={() => {}} display={{ base: 'block', md: 'none' }} />
     </Flex>
   );
 };
@@ -221,12 +210,11 @@ const AppBar: React.FC<{ user: User }> = ({ user }) => {
       direction="column"
       as="nav"
       h="full"
-      w={isDesktop ? '64' : 'full'}
+      w={isDesktop ? '2xs' : 'full'}
       bg="bg"
       borderRight="1px solid"
       borderColor="border"
       justify="start"
-      shadow="sm"
     >
       <Box flex={1} overflowY="auto" w="full">
         <SidebarLinks user={user} />
@@ -235,7 +223,9 @@ const AppBar: React.FC<{ user: User }> = ({ user }) => {
   );
 };
 
-const NotificationDrawer: React.FC<{ issueCount: number }> = ({ issueCount }) => {
+const NotificationDrawer: React.FC = () => {
+  const { vaults } = useVaults();
+  const { totalIssues, issues } = useSecurityAnalytics(vaults);
   return (
     <Drawer.Root>
       <Drawer.Trigger asChild>
@@ -243,11 +233,13 @@ const NotificationDrawer: React.FC<{ issueCount: number }> = ({ issueCount }) =>
           <IconButton aria-label="Open notifications" variant="ghost">
             <TbBell />
           </IconButton>
-          <Float zIndex={999}>
-            <Circle size="5" bg="red" color="white">
-              {issueCount}
-            </Circle>
-          </Float>
+          {totalIssues > 0 && (
+            <Float zIndex={999}>
+              <Circle size="5" bg="red" color="white">
+                {totalIssues}
+              </Circle>
+            </Float>
+          )}
         </Box>
       </Drawer.Trigger>
       <Drawer.Backdrop />
@@ -260,6 +252,31 @@ const NotificationDrawer: React.FC<{ issueCount: number }> = ({ issueCount }) =>
             </Drawer.CloseTrigger>
           </Drawer.Header>
           <Drawer.Body>
+            {totalIssues === 0 ? (
+              <EmptyState.Root>
+                <EmptyState.Indicator>
+                  <TbBellCheck />
+                </EmptyState.Indicator>
+                <EmptyState.Title textAlign="center">All Caught Up!</EmptyState.Title>
+                <EmptyState.Description textAlign="center">
+                  You have no new notifications at this time. Check back later for updates.
+                </EmptyState.Description>
+              </EmptyState.Root>
+            ) : (
+              <Box>
+                {issues.repeatPasswords.map((item) => (
+                  <Box key={item.occurrences[0].itemId}>
+                    Repeated password found for item ID: {item.occurrences[0].itemId}
+                  </Box>
+                ))}
+                {issues.weakPasswords.map((item) => (
+                  <Box key={item.itemId}>Weak password found for item ID: {item.itemId}</Box>
+                ))}
+                {issues.breaches.map((item) => (
+                  <Box key={item.itemId}>Breached password found for item ID: {item.itemId}</Box>
+                ))}
+              </Box>
+            )}
             <EmptyState.Root>
               <EmptyState.Indicator>
                 <TbBellCheck />

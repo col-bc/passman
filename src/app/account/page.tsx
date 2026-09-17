@@ -1,7 +1,8 @@
 import AppWrapper from '@/components/appWrapper';
 import AccountSettings from '@/components/presentation/account/accountSettings';
-import LockerError from '@/components/presentation/locker/lockerError';
-import { LockerProvider } from '@/hooks/use-vaults';
+import VaultError from '@/components/presentation/vault/vaultError';
+import { VaultProvider } from '@/hooks/use-vaults';
+
 import { handleGetCurrentUser } from '@/lib/user/userActions';
 import { Breadcrumb, Container, Heading } from '@chakra-ui/react';
 import { unauthorized } from 'next/navigation';
@@ -13,23 +14,17 @@ export default async function AccountPage() {
       unauthorized();
     }
     return (
-      <LockerError
+      <VaultError
         type={user.type}
         text="An error occurred while trying to fulfill your request. Please try again later."
       />
     );
   } else if (user.success && user.data) {
     return (
-      <LockerProvider userEmail={user.data.email}>
+      <VaultProvider userEmail={user.data.email}>
         <AppWrapper user={user.data}>
           <>
-            <Breadcrumb.Root
-              variant="underline"
-              borderBottom="1px solid"
-              borderColor="border"
-              bg="bg.subtle"
-              shadow="xs"
-            >
+            <Breadcrumb.Root>
               <Container maxW="5xl" px={[4, 6]} py={3}>
                 <Breadcrumb.List>
                   <Breadcrumb.Item>
@@ -55,7 +50,7 @@ export default async function AccountPage() {
             </Container>
           </>
         </AppWrapper>
-      </LockerProvider>
+      </VaultProvider>
     );
   }
 }

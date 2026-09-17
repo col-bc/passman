@@ -1,6 +1,6 @@
 import VaultItemForm from '@/components/forms/vault/vaultItem';
 import { handleGetCurrentUser } from '@/lib/user/userActions';
-import { handleGetVaultById } from '@/lib/vault/vaultActions';
+import { handleGetVaults } from '@/lib/vault/vaultActions';
 import { Breadcrumb, Container } from '@chakra-ui/react';
 import { unauthorized } from 'next/navigation';
 
@@ -16,18 +16,17 @@ export default async function NewVaultItemPage({ params }: Props) {
   if (!user.success || !user.data) {
     unauthorized();
   }
+  const vaultsStatus = await handleGetVaults();
 
   const resolvedParams = await params;
   const vaultId = resolvedParams.vaultId;
 
-  const vault = await handleGetVaultById(vaultId);
-  if (!vault.success || !vault.data) {
-    throw new Error('Failed to fetch vault data');
-  }
+  const currentVault = vaultsStatus.success ? vaultsStatus.data?.find((vault) => vault.id === vaultId) : null;
+  const vaults = vaultsStatus.success ? vaultsStatus.data : [];
 
   return (
     <>
-      <Breadcrumb.Root variant="underline" borderBottom="1px solid" borderColor="border" bg="bg.subtle" shadow="xs">
+      <Breadcrumb.Root>
         <Container maxW="5xl" px={[4, 6]} py={3}>
           <Breadcrumb.List>
             <Breadcrumb.Item>
@@ -35,7 +34,7 @@ export default async function NewVaultItemPage({ params }: Props) {
             </Breadcrumb.Item>
             <Breadcrumb.Separator />
             <Breadcrumb.Item>
-              <Breadcrumb.Link href={`/vaults/${vaultId}`}>{vault.data.title}</Breadcrumb.Link>
+              <Breadcrumb.Link href={`/vaults/${vaultId}`}>{currentVault?.title}</Breadcrumb.Link>
             </Breadcrumb.Item>
             <Breadcrumb.Separator />
             <Breadcrumb.Item>
@@ -45,7 +44,7 @@ export default async function NewVaultItemPage({ params }: Props) {
         </Container>
       </Breadcrumb.Root>
       <Container maxW="xl" px={[4, 6]} py={6}>
-        <VaultItemForm vaultItem={undefined} vaultId={vaultId} defaultMode="edit" />
+        <VaultItemForm vaultItem={undefined} vaultId={vaultId} vaultList={vaults} defaultMode="edit" />
       </Container>
     </>
   );

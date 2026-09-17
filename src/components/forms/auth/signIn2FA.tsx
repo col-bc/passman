@@ -1,6 +1,6 @@
 'use client';
 
-import { useLocker } from '@/hooks/use-vaults';
+import { useVaults } from '@/hooks/use-vaults';
 import { handleLogin2FA } from '@/lib/user/userActions';
 import { Alert, Button, Card, Field, Flex, IconButton, PinInput, Spinner } from '@chakra-ui/react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -10,7 +10,7 @@ import { TbAlertCircleFilled, TbArrowLeft, TbArrowRight } from 'react-icons/tb';
 export default function SignIn2FAForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { setMek } = useLocker();
+  const { setMek } = useVaults();
 
   const [otp, setOtp] = React.useState<string[]>(['', '', '', '', '', '']);
   const [loading, setLoading] = React.useState(false);
@@ -39,7 +39,7 @@ export default function SignIn2FAForm() {
         const errorMsg = 'Encryption key was lost during sign in. Please try again.';
         setError(errorMsg);
       }
-      router.push(searchParams.get('next') || '/locker');
+      router.push(searchParams.get('next') || '/vaults');
     }
     if (!status.success) {
       setError(status.error || 'An unknown error occurred.');

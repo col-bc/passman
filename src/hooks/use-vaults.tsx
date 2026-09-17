@@ -63,7 +63,7 @@ export function VaultProvider({ children, userEmail }: { children: React.ReactNo
   const handleUnlock = React.useCallback(
     async (vaultData: VaultWithItems[]): Promise<DecryptedVault[]> => {
       if (!mek) {
-        throw new Error('MEK is not set. Cannot unlock locker.');
+        throw new Error('MEK is not set. Cannot unlock vault.');
       }
       setUnlocking(true);
       try {
@@ -187,7 +187,7 @@ export function VaultProvider({ children, userEmail }: { children: React.ReactNo
                   <Flex direction="column" maxW="md" gap={4}>
                     <Dialog.Description>
                       Your session is active, but your encryption keys are missing. Please enter your master password to
-                      decrypt your lockers.
+                      decrypt your vaults.
                     </Dialog.Description>
                     <Field.Root colorPalette="yellow" invalid={!!unlockError}>
                       <Field.Label>Master Password</Field.Label>

@@ -2,11 +2,14 @@ import { handleGetCurrentUser } from '@/lib/user/userActions';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+const PUBLIC_ROUTES = ['/', '/auth', '/auth/*', '/about'];
+
 export async function proxy(request: NextRequest) {
-  if (request.nextUrl.pathname.includes('/locker')) {
+  if (!PUBLIC_ROUTES.some((route) => request.nextUrl.pathname.match(route))) {
     const result = await handleGetCurrentUser();
     if (!result.success || !result.data) {
-      return NextResponse.redirect(new URL('/auth/sign-in', request.url));
+      const redirectPath = `/auth/sign-in?next=${encodeURIComponent(request.nextUrl.pathname)}`;
+      return NextResponse.redirect(new URL(redirectPath, request.url));
     }
   }
 
@@ -14,5 +17,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/auth/:path*', '/locker', '/locker/:path*'],
+  matcher: ['/auth/:path*', '/vaults', '/vaults/:path*'],
 };

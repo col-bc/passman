@@ -5,10 +5,17 @@ import { EncryptedData } from '../crypto';
 import { prisma } from '../prisma';
 import { getUserById } from '../user/userDAL';
 
-export async function getItemsByVaultId(vaultId: string): Promise<DALResult<SecureItem[]>> {
+export async function getItemsByVaultId(vaultId: string, userId: string): Promise<DALResult<SecureItem[]>> {
   try {
     const items = await prisma.secureItem.findMany({
-      where: { vaultItems: { some: { vaultId } } },
+      where: {
+        vaultItems: {
+          some: {
+            vaultId: vaultId,
+            vault: { ownerId: userId },
+          },
+        },
+      },
     });
     return { success: true, data: items };
   } catch (error) {
@@ -17,11 +24,24 @@ export async function getItemsByVaultId(vaultId: string): Promise<DALResult<Secu
   }
 }
 
-export async function getItemById(itemId: string, vaultId: string): Promise<DALResult<SecureItem | null>> {
+export async function getItemById(
+  itemId: string,
+  vaultId: string,
+  userId: string,
+): Promise<DALResult<SecureItem | null>> {
   try {
     const item = await prisma.secureItem.findFirst({
-      where: { id: itemId, vaultId },
+      where: {
+        id: itemId,
+        vaultItems: {
+          some: {
+            vaultId: vaultId,
+            vault: { ownerId: userId },
+          },
+        },
+      },
     });
+
     if (!item) {
       return { success: false, type: 'NOT_FOUND' };
     }
@@ -55,17 +75,20 @@ export async function createItem({
     const encodedCiphertext = Buffer.from(encryptedData.ciphertext).toString('base64');
     const encodedIv = Buffer.from(encryptedData.iv).toString('base64');
     const encodedTag = Buffer.from(encryptedData.tag).toString('base64');
-
     const item = await prisma.secureItem.create({
       data: {
-        vaultId,
         title,
         category,
-        ownerId,
         ciphertext: encodedCiphertext,
         iv: encodedIv,
         tag: encodedTag,
-        user: { connect: { id: ownerId } },
+        vaultItems: {
+          create: {
+            vault: {
+              connect: { id: vaultId },
+            },
+          },
+        },
       },
     });
     return { success: true, data: item };

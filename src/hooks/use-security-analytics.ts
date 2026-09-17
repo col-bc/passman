@@ -1,11 +1,25 @@
 import { checkForBreaches, findRepeatedPasswords, findWeakPasswords } from '@/lib/securityCenter';
-import { BreachedPassword, DecryptedVault } from '@/types/client';
+import { BreachedPassword, DecryptedVault, DecryptedVaultItem, RepeatedPassword, WeakPassword } from '@/types/client';
 import React from 'react';
+
+export interface SecurityAnalytics {
+  issues: {
+    repeatPasswords: RepeatedPassword[];
+    weakPasswords: WeakPassword[];
+    breaches: BreachedPassword[];
+  };
+  totalIssues: number;
+  hasSecurityIssues: (vaultItem: DecryptedVaultItem) => boolean;
+  getIssuesByItem: (vaultItem: DecryptedVaultItem) => {
+    repeatPasswords: RepeatedPassword[];
+    weakPasswords: WeakPassword[];
+    breaches: BreachedPassword[];
+  };
+}
 
 export function useSecurityAnalytics(vaults: DecryptedVault[]) {
   const repeatedPasswords = React.useMemo(() => findRepeatedPasswords(vaults), [vaults]);
   const weakPasswords = React.useMemo(() => findWeakPasswords(vaults), [vaults]);
-
   const [breaches, setBreaches] = React.useState<BreachedPassword[]>([]);
 
   React.useEffect(() => {
@@ -26,19 +40,41 @@ export function useSecurityAnalytics(vaults: DecryptedVault[]) {
   }, [vaults]);
 
   const hasSecurityIssues = React.useCallback(
-    (lockerItem: DecryptedVault['vaultItems'][number]) => {
+    (vaultItem: DecryptedVaultItem) => {
       return (
         repeatedPasswords.some((item) =>
-          item.occurrences.some((occurrence) => occurrence.itemId === lockerItem.itemId),
+          item.occurrences.some((occurrence) => occurrence.itemId === vaultItem.itemId),
         ) ||
-        weakPasswords.some((item) => item.itemId === lockerItem.itemId) ||
-        breaches.some((item) => item.itemId === lockerItem.itemId)
+        weakPasswords.some((item) => item.itemId === vaultItem.itemId) ||
+        breaches.some((item) => item.itemId === vaultItem.itemId)
       );
+    },
+    [repeatedPasswords, weakPasswords, breaches],
+  );
+
+  const getIssuesByItem = React.useCallback(
+    (vaultItem: DecryptedVaultItem) => {
+      return {
+        repeatPasswords: repeatedPasswords.filter((item) =>
+          item.occurrences.some((occurrence) => occurrence.itemId === vaultItem.itemId),
+        ),
+        weakPasswords: weakPasswords.filter((item) => item.itemId === vaultItem.itemId),
+        breaches: breaches.filter((item) => item.itemId === vaultItem.itemId),
+      };
     },
     [repeatedPasswords, weakPasswords, breaches],
   );
 
   const totalIssues = repeatedPasswords.length + weakPasswords.length + breaches.length;
 
-  return { repeatedPasswords, weakPasswords, breaches, totalIssues, lockerItemHasIssues: hasSecurityIssues };
+  return {
+    issues: {
+      repeatPasswords: repeatedPasswords,
+      weakPasswords: weakPasswords,
+      breaches: breaches,
+    },
+    totalIssues,
+    hasSecurityIssues,
+    getIssuesByItem,
+  } as SecurityAnalytics;
 }

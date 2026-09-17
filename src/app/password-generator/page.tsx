@@ -1,7 +1,7 @@
 import AppWrapper from '@/components/appWrapper';
-import LockerError from '@/components/presentation/locker/lockerError';
+import VaultError from '@/components/presentation/vault/vaultError';
 import PasswordGenerator from '@/components/util/passwordGenerator';
-import { LockerProvider } from '@/hooks/use-vaults';
+import { VaultProvider } from '@/hooks/use-vaults';
 import { handleGetCurrentUser } from '@/lib/user/userActions';
 import { Breadcrumb, Container, Heading } from '@chakra-ui/react';
 import { unauthorized } from 'next/navigation';
@@ -13,7 +13,7 @@ export default async function PasswordGeneratorPage() {
       unauthorized();
     } else {
       return (
-        <LockerError
+        <VaultError
           type={userResult.type || 'SERVER_ERROR'}
           text={userResult.error || 'An error occurred while fetching user data.'}
         />
@@ -24,14 +24,14 @@ export default async function PasswordGeneratorPage() {
   const user = userResult.data;
 
   return (
-    <LockerProvider userEmail={user!.email}>
+    <VaultProvider userEmail={user!.email}>
       <AppWrapper user={user!}>
         <>
-          <Breadcrumb.Root variant="underline" borderBottom="1px solid" borderColor="border" bg="bg.subtle" shadow="xs">
+          <Breadcrumb.Root>
             <Container maxW="5xl" px={[4, 6]} py={3}>
               <Breadcrumb.List>
                 <Breadcrumb.Item>
-                  <Breadcrumb.CurrentLink>Lockers</Breadcrumb.CurrentLink>
+                  <Breadcrumb.CurrentLink>Vaults</Breadcrumb.CurrentLink>
                 </Breadcrumb.Item>
               </Breadcrumb.List>
             </Container>
@@ -52,6 +52,6 @@ export default async function PasswordGeneratorPage() {
           </Container>
         </>
       </AppWrapper>
-    </LockerProvider>
+    </VaultProvider>
   );
 }

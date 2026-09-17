@@ -42,7 +42,7 @@ export default async function VaultItemDetailPage({ params }: Props) {
 
   return (
     <>
-      <Breadcrumb.Root variant="underline" borderBottom="1px solid" borderColor="border" bg="bg.subtle" shadow="xs">
+      <Breadcrumb.Root>
         <Container maxW="5xl" px={[4, 6]} py={3}>
           <Breadcrumb.List>
             <Breadcrumb.Item>

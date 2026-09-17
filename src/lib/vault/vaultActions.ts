@@ -13,7 +13,7 @@ import { ActionState, VaultWithItems } from '@/types/server';
 import { revalidatePath } from 'next/cache';
 import React from 'react';
 import { createItem, deleteItem, getItemById, updateItem } from './itemDAL';
-import { createVault, getVaultById, getVaultsByOwnerId, updateVault } from './vaultDAL';
+import { createVault, getVaultById, getVaults, updateVault } from './vaultDAL';
 
 /**
  * Get the current authenticated user.
@@ -55,9 +55,8 @@ export async function handleGetVaults(): Promise<ActionState<VaultWithItems[]>> 
   if (!currentUser) {
     return { success: false, error: 'User not authenticated', type: 'UNAUTHORIZED' };
   }
-  console.log('[VaultActions] Current user:', currentUser.id);
 
-  const vaults = await getVaultsByOwnerId(currentUser.id);
+  const vaults = await getVaults(currentUser.id);
   console.log('[VaultActions] Fetching vaults for user:', currentUser.id);
 
   if (vaults.success) {
@@ -84,7 +83,7 @@ export async function handleGetVaultById(vaultId: string): Promise<ActionState<V
     return { success: false, error: 'User not authenticated', type: 'UNAUTHORIZED' };
   }
 
-  const vault = await getVaultById(vaultId);
+  const vault = await getVaultById(vaultId, currentUser.id);
 
   if (vault.success) {
     return { success: true, data: vault.data as Vault };
@@ -136,15 +135,11 @@ export async function handleCreateSecureVaultItem(
   encryptedData: EncryptedData,
   data: { category: string; title: string },
 ): Promise<ActionState<{ vaultId: string; itemId: string }>> {
-  const status = await getCurrentUser();
-  if (!status.success) {
-    return { success: false, error: 'User not authenticated', type: 'UNAUTHORIZED' };
-  }
-  const currentUser = status.data;
+  const currentUser = await getUser();
   if (!currentUser) {
     return { success: false, error: 'User not authenticated', type: 'UNAUTHORIZED' };
   }
-  const vault = await getVaultById(vaultId);
+  const vault = await getVaultById(vaultId, currentUser.id);
   if (!vault.success || !vault.data) {
     return { success: false, error: 'Vault not found', type: 'NOT_FOUND' };
   }
@@ -172,12 +167,12 @@ export async function handleCreateSecureVaultItem(
  * @returns {Promise<ActionState<SecureVaultItem>>} The action state containing the encrypted vault item.
  */
 export async function handleGetVaultItem(vaultId: string, itemId: string): Promise<ActionState<SecureItem>> {
-  const status = await getCurrentUser();
-  if (!status.success || !status.data) {
+  const currentUser = await getUser();
+  if (!currentUser) {
     return { success: false, error: 'User not authenticated', type: 'UNAUTHORIZED' };
   }
 
-  const vaultItem = await getItemById(itemId, vaultId);
+  const vaultItem = await getItemById(itemId, vaultId, currentUser.id!);
   if (!vaultItem.success) {
     if (vaultItem.type === 'NOT_FOUND') {
       return { success: false, error: 'Vault item not found', type: 'NOT_FOUND' };
@@ -202,12 +197,12 @@ export async function handleUpdateVaultItem(
   encryptedData: EncryptedData,
   data: { category: string; title: string },
 ): Promise<ActionState<{ vaultId: string; itemId: string }>> {
-  const status = await getCurrentUser();
-  if (!status.success || !status.data) {
+  const currentUser = await getUser();
+  if (!currentUser) {
     return { success: false, error: 'User not authenticated', type: 'UNAUTHORIZED' };
   }
 
-  const vault = await getVaultById(vaultId);
+  const vault = await getVaultById(vaultId, currentUser.id!);
   if (!vault.success) {
     if (vault.type === 'NOT_FOUND') {
       return { success: false, error: 'Vault not found', type: 'NOT_FOUND' };
@@ -242,8 +237,8 @@ export async function handleUpdateVaultItem(
  * @returns {Promise<ActionState<boolean>>} The action state indicating whether the deletion was successful.
  */
 export async function handleDeleteVaultItem(vaultId: string, itemId: string): Promise<ActionState<boolean>> {
-  const currentUserStatus = await getCurrentUser();
-  if (!currentUserStatus.success || !currentUserStatus.data) {
+  const currentUser = await getUser();
+  if (!currentUser) {
     return { success: false, error: 'User not authenticated', type: 'UNAUTHORIZED' };
   }
 

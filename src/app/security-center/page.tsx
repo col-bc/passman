@@ -1,25 +1,25 @@
-import LockerError from '@/components/presentation/locker/lockerError';
 import SecurityCenterDash from '@/components/presentation/securityCenter/securityCenterDash';
-import { handleGetLockers } from '@/lib/locker/lockerActions';
+import VaultError from '@/components/presentation/vault/vaultError';
 import { handleGetCurrentUser } from '@/lib/user/userActions';
+import { handleGetVaults } from '@/lib/vault/vaultActions';
 import { Breadcrumb, Container, Flex, Heading, Text } from '@chakra-ui/react';
 
 export default async function SecurityCenterPage() {
   const result = await handleGetCurrentUser();
   if (!result.success) {
-    return <LockerError type={result.type} text="No current user data available." />;
+    return <VaultError type={result.type} text="No current user data available." />;
   }
-  const lockerResult = await handleGetLockers();
-  if (!lockerResult.success) {
-    return <LockerError type={lockerResult.type} text="No locker data available." />;
+  const vaultsResult = await handleGetVaults();
+  if (!vaultsResult.success) {
+    return <VaultError type={vaultsResult.type} text="No vault data available." />;
   }
 
   const user = result.data;
-  const lockers = lockerResult.data;
+  const vaults = vaultsResult.data;
 
   return (
     <>
-      <Breadcrumb.Root variant="underline" borderBottom="1px solid" borderColor="border" bg="bg.subtle" shadow="xs">
+      <Breadcrumb.Root>
         <Container maxW="5xl" px={[4, 6]} py={3}>
           <Breadcrumb.List>
             <Breadcrumb.Item>
@@ -35,12 +35,12 @@ export default async function SecurityCenterPage() {
               Security Center
             </Heading>
             <Text color="muted" fontSize="sm" flexShrink={0}>
-              Review and manage security exceptions across all your lockers. Resolve issues to enhance your security
+              Review and manage security exceptions across all your vaults. Resolve issues to enhance your security
               score and protect your data.
             </Text>
           </Flex>
 
-          <SecurityCenterDash user={user!} encryptedLockers={lockers} />
+          <SecurityCenterDash user={user!} encryptedVaults={vaults} />
         </Flex>
       </Container>
     </>

@@ -6,7 +6,7 @@ import SignOutButton from './forms/auth/signOut';
 import Logo from './logo';
 import { ColorModeButton } from './ui/color-mode';
 
-function Navbar({ href = '/locker', user }: { href?: string; user: User | null }) {
+function Navbar({ href = '/vaults', user }: { href?: string; user: User | null }) {
   return (
     <Box as="nav" color="fg" bg="bg.subtle" borderBottomWidth={1} borderBottomColor="border.muted">
       <Collapsible.Root>
@@ -50,10 +50,10 @@ function Navbar({ href = '/locker', user }: { href?: string; user: User | null }
                     )}
                     {user && (
                       <>
-                        <Menu.Item value="lockers" asChild>
-                          <Link href="/locker">
+                        <Menu.Item value="vaults" asChild>
+                          <Link href="/vaults">
                             <TbLockSquareRounded size={16} />
-                            Lockers
+                            Vaults
                           </Link>
                         </Menu.Item>
 

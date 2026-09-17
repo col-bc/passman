@@ -1,6 +1,7 @@
 'use client';
 
 import DeleteVaultItemDialog from '@/components/presentation/vault/deleteVaultItemDialog';
+import VaultError from '@/components/presentation/vault/vaultError';
 import VaultItemRead from '@/components/presentation/vault/vaultItemRead';
 import { PasswordInput, PasswordStrengthMeter } from '@/components/ui/password-input';
 import { toaster } from '@/components/ui/toaster';
@@ -19,6 +20,7 @@ import {
 } from '@/lib/util/itemTemplates';
 import { handleCreateSecureVaultItem, handleUpdateVaultItem } from '@/lib/vault/vaultActions';
 import { DecryptedVaultItem, ItemContent } from '@/types/client';
+import { VaultWithItems } from '@/types/server';
 import {
   Alert,
   AlertContent,
@@ -46,6 +48,7 @@ import {
   Portal,
   Select,
   SimpleGrid,
+  Skeleton,
   Text,
   Textarea,
   VStack,
@@ -129,16 +132,18 @@ function VaultItemForm({
   vaultItem,
   vaultId,
   vaultName,
+  vaultList,
   defaultMode = 'read',
 }: {
   vaultItem?: DecryptedVaultItem;
   vaultId?: string;
   vaultName?: string;
+  vaultList?: VaultWithItems[];
   defaultMode?: 'read' | 'edit';
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { vaults, mek } = useVaults();
+  const { vaults, handleUnlock, mek } = useVaults();
 
   const highlightIndex = searchParams.get('highlightIndex')
     ? parseInt(searchParams.get('highlightIndex') as string, 10)
@@ -157,10 +162,13 @@ function VaultItemForm({
   const [showPasswordGeneratorDialog, setShowPasswordGeneratorDialog] = React.useState(false);
   const [passwordFieldIndex, setPasswordFieldIndex] = React.useState<number | null>(null);
 
-  const openPasswordGeneratorDialog = (index: number) => {
-    setPasswordFieldIndex(index);
-    setShowPasswordGeneratorDialog(true);
-  };
+  React.useEffect(() => {
+    if (mek) {
+      if (vaultList) {
+        handleUnlock(vaultList).catch(console.error);
+      }
+    }
+  }, [mek, vaultList, vaults.length, handleUnlock]);
 
   const initializeVaultItemContent = React.useCallback(() => {
     if (vaultItem && vaultItem.item.decryptedData) {
@@ -184,14 +192,50 @@ function VaultItemForm({
     load();
   }, [initializeVaultItemContent]);
 
+  const handleValueChange = React.useCallback((index: number, value: string) => {
+    setItemContent((prev) => prev.map((item, i) => (i === index ? { ...item, value } : item)));
+  }, []);
+
+  const handleLabelChange = React.useCallback((index: number, label: string) => {
+    setItemContent((prev) => prev.map((item, i) => (i === index ? { ...item, label } : item)));
+  }, []);
+
+  React.useEffect(() => {
+    if (highlightIndex === null || mode !== 'edit' || itemContent.length === 0) return;
+    const timeoutId = setTimeout(() => {
+      const element = document.getElementById(`field-row-${highlightIndex}`);
+
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        console.warn(`Could not find field-row-${highlightIndex} to scroll to.`);
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [highlightIndex, itemContent.length, mode]);
+
   const vaultOptions = React.useMemo(() => {
-    return createListCollection<{ value: string; label: string }>({
-      items: vaults.map((vault: { id: string; title: string }) => ({
-        value: vault.id,
-        label: vault.title,
-      })),
+    const items = !vaultList
+      ? []
+      : vaultList.map((vault) => ({
+          label: vault.title,
+          value: vault.id,
+        }));
+
+    return createListCollection({
+      items,
     });
-  }, [vaults]);
+  }, [vaultList]);
+
+  if (!mek) {
+    return <VaultError type="UNLOCK" text="Please re enter your Master Encryption Key to unlock the vault." />;
+  }
+
+  const openPasswordGeneratorDialog = (index: number) => {
+    setPasswordFieldIndex(index);
+    setShowPasswordGeneratorDialog(true);
+  };
 
   const handleTemplateChange = (selectedTemplate: string) => {
     setTemplate(selectedTemplate);
@@ -217,14 +261,6 @@ function VaultItemForm({
         break;
     }
   };
-
-  const handleValueChange = React.useCallback((index: number, value: string) => {
-    setItemContent((prev) => prev.map((item, i) => (i === index ? { ...item, value } : item)));
-  }, []);
-
-  const handleLabelChange = React.useCallback((index: number, label: string) => {
-    setItemContent((prev) => prev.map((item, i) => (i === index ? { ...item, label } : item)));
-  }, []);
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -280,21 +316,6 @@ function VaultItemForm({
     }
   }
 
-  React.useEffect(() => {
-    if (highlightIndex === null || mode !== 'edit' || itemContent.length === 0) return;
-    const timeoutId = setTimeout(() => {
-      const element = document.getElementById(`field-row-${highlightIndex}`);
-
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      } else {
-        console.warn(`Could not find field-row-${highlightIndex} to scroll to.`);
-      }
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  }, [highlightIndex, itemContent.length, mode]);
-
   return (
     <form onSubmit={handleSubmit}>
       <Card.Root variant="elevated" border="none" w="full" mx="auto" mb={8} position="relative">
@@ -309,7 +330,7 @@ function VaultItemForm({
             {!!vaultItem?.itemId && (
               <Flex align="center" gap={2}>
                 {mode === 'read' && (
-                  <Button variant="outline" size="xs" colorPalette="yellow" onClick={() => setMode('edit')}>
+                  <Button variant="plain" size="xs" colorPalette="yellow" onClick={() => setMode('edit')}>
                     <TbPencil />
                     Edit
                   </Button>
@@ -394,38 +415,42 @@ function VaultItemForm({
                   Vault
                   <Field.RequiredIndicator />
                 </Field.Label>
-                <Select.Root
-                  ref={templateSelectRef}
-                  multiple={false}
-                  size="sm"
-                  collection={vaultOptions}
-                  value={vaultId ? [vaultId] : vault ? [vault] : []}
-                  onValueChange={(e) => setVault(e.value[0])}
-                >
-                  <Select.Control>
-                    <Select.Trigger>
-                      <Select.ValueText placeholder="Select a Vault" />
-                    </Select.Trigger>
-                    <Select.IndicatorGroup>
-                      <Select.Indicator />
-                      <Select.ClearTrigger />
-                    </Select.IndicatorGroup>
-                  </Select.Control>
-                  <Select.Positioner>
-                    <Select.Content>
-                      {vaultOptions.items.length === 0 && (
-                        <Select.Item key="no-vaults" item={{ value: 'no-vaults', label: 'No vaults available' }}>
-                          <Select.ItemText>No vaults available</Select.ItemText>
-                        </Select.Item>
-                      )}
-                      {vaultOptions.items.map((option) => (
-                        <Select.Item key={option.value} item={option}>
-                          <Select.ItemText>{option.label}</Select.ItemText>
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select.Positioner>
-                </Select.Root>
+                {!!vaultOptions ? (
+                  <Select.Root
+                    ref={templateSelectRef}
+                    multiple={false}
+                    size="sm"
+                    collection={vaultOptions}
+                    value={vaultId ? [vaultId] : vault ? [vault] : []}
+                    onValueChange={(e) => setVault(e.value[0])}
+                  >
+                    <Select.Control>
+                      <Select.Trigger>
+                        <Select.ValueText placeholder="Select a Vault" />
+                      </Select.Trigger>
+                      <Select.IndicatorGroup>
+                        <Select.Indicator />
+                        <Select.ClearTrigger />
+                      </Select.IndicatorGroup>
+                    </Select.Control>
+                    <Select.Positioner>
+                      <Select.Content>
+                        {vaultOptions.items.length === 0 && (
+                          <Select.Item key="no-vaults" item={{ value: 'no-vaults', label: 'No vaults available' }}>
+                            <Select.ItemText>No vaults available</Select.ItemText>
+                          </Select.Item>
+                        )}
+                        {vaultOptions.items.map((option) => (
+                          <Select.Item key={option.value} item={option}>
+                            <Select.ItemText>{option.label}</Select.ItemText>
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Positioner>
+                  </Select.Root>
+                ) : (
+                  <Skeleton h="40px" />
+                )}
               </Field.Root>
 
               <Field.Root required colorPalette="yellow">
@@ -662,7 +687,7 @@ function VaultItemForm({
                 <DataList.Root orientation="horizontal" size="sm" mt={4}>
                   <DataList.Item display="flex" gap={2}>
                     <DataList.ItemLabel flex={1}>Integrity:</DataList.ItemLabel>
-                    <DataList.ItemValue flex={1}>
+                    <DataList.ItemValue flex={1} spaceX={2}>
                       <Badge colorPalette="green" variant="surface">
                         <TbRosetteDiscountCheck />
                         Verified
@@ -889,12 +914,12 @@ const PasswordField: React.FC<{
         <FieldMenu content={content} index={index} setItemContent={setItemContent} />
       </Group>
       <Collapsible.Content>
-        <Card.Root mt={2} variant="subtle">
+        <Card.Root mt={2} variant="subtle" rounded="xs">
           <Card.Body p={2}>
             <Float placement="top-end" offset={4}>
               <CloseButton onClick={() => setShow(false)} size="xs" colorPalette="gray" />
             </Float>
-            <Heading as="h3" size="sm" fontWeight="bold" mb={3}>
+            <Heading as="h3" size="sm" fontWeight="medium" mb={3}>
               Password Strength
             </Heading>
             <PasswordStrengthMeter max={4} value={strength} showLabel={false} mb={2} />

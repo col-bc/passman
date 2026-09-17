@@ -65,7 +65,7 @@ export default function VaultItemList({
 }) {
   const { currentVault, setCurrentVault, handleUnlock, mek, vaults } = useVaults();
   const router = useRouter();
-  const { lockerItemHasIssues } = useSecurityAnalytics(vaults);
+  const { hasSecurityIssues } = useSecurityAnalytics(vaults);
 
   const [enableBulk, setEnableBulk] = React.useState(false);
   const [selectedItems, setSelectedItems] = React.useState<Set<string>>(new Set());
@@ -87,22 +87,22 @@ export default function VaultItemList({
   }, [currentVault]);
 
   /**
-   * If the MEK is available and there are encrypted lockers but no decrypted lockers,
-   * attempt to unlock the lockers with the `handleUnlock` function.
+   * If the MEK is available and there are encrypted vaults but no decrypted vaults,
+   * attempt to unlock the vaults with the `handleUnlock` function.
    */
   React.useEffect(() => {
     if (!mek || encryptedVaults.length === 0) return;
     const encryptedItemCount = encryptedVaults.reduce((acc, v) => acc + v.vaultItems.length, 0);
     const decryptedItemCount = vaults.reduce((acc, v) => acc + v.vaultItems.length, 0);
-    // If we have zero lockers loaded OR the server count doesn't match our in-memory count, decrypt!
+    // If we have zero decrypted vault items loaded OR the server count doesn't match our in-memory count, decrypt!
     if (vaults.length === 0 || encryptedItemCount !== decryptedItemCount) {
       handleUnlock(encryptedVaults).catch(console.error);
     }
   }, [mek, encryptedVaults, vaults, handleUnlock]);
 
   /**
-   * When the lockers or lockerId change, find the locker with the matching ID and set it as the current locker.
-   * If no matching locker is found, log a warning to the console.
+   * When the vaults or vaultId change, find the vault with the matching ID and set it as the current vault.
+   * If no matching vault is found, log a warning to the console.
    */
   React.useEffect(() => {
     if (vaults.length > 0) {
@@ -111,12 +111,12 @@ export default function VaultItemList({
         setCurrentVault(vault);
       }
       if (!vault) {
-        console.warn(`Vault with ID ${vaultId} not found in decrypted lockers.`);
+        console.warn(`Vault with ID ${vaultId} not found in decrypted vaults.`);
       }
     }
   }, [vaults, vaultId, currentVault?.id, setCurrentVault]);
 
-  const openLockerItem = (item: DecryptedVaultItem) => {
+  const openVaultItem = (item: DecryptedVaultItem) => {
     router.push(`/vaults/${currentVault?.id}/item/${item.itemId}`);
   };
 
@@ -142,7 +142,7 @@ export default function VaultItemList({
   };
 
   if (!currentVault) {
-    return <div>Loading locker details...</div>;
+    return <div>Loading vault details...</div>;
   }
 
   const monitoringEnabled = currentVault.enableMonitoring;
@@ -179,7 +179,7 @@ export default function VaultItemList({
                   <Menu.Content w={48}>
                     <Menu.Item value="rename" onClick={() => setShowRenameDialog(true)}>
                       <TbEdit />
-                      Rename Locker
+                      Rename Vault
                     </Menu.Item>
                     <Menu.Item value="bulk" onClick={() => setEnableBulk(!enableBulk)}>
                       <TbStack2 />
@@ -187,7 +187,7 @@ export default function VaultItemList({
                     </Menu.Item>
                     <Menu.Item value="share">
                       <TbShare />
-                      Share Locker
+                      Share Vault
                     </Menu.Item>
                     <Menu.Item value="security-scan" onClick={() => setShowSecurityScanDialog(true)}>
                       <TbShield />
@@ -279,7 +279,7 @@ export default function VaultItemList({
           borderColor="yellow.muted"
           pb={1}
         >
-          Locker Items
+          Vault Items
         </Heading>
 
         {enableBulk && (
@@ -308,7 +308,7 @@ export default function VaultItemList({
             </EmptyState.Indicator>
             <EmptyState.Title>No Items Found</EmptyState.Title>
             <EmptyState.Description>
-              This locker has no items yet. Create your first item to get started.
+              This vault has no items yet. Create your first item to get started.
             </EmptyState.Description>
             <Link href={`/vaults/${currentVault.id}/item/new`}>
               <Button colorPalette="yellow" variant="solid" size="sm">
@@ -321,17 +321,17 @@ export default function VaultItemList({
         <List.Root listStyleType="none" gap={3}>
           {currentVault.vaultItems
             .sort((a, b) => new Date(b.item.updatedAt).getTime() - new Date(a.item.updatedAt).getTime())
-            .map((lockerItem, index) => (
+            .map((vaultItem, index) => (
               <List.Item
                 as="div"
                 role="group"
-                key={`locker-item-${lockerItem.itemId}-${index}`}
+                key={`vault-item-${vaultItem.itemId}-${index}`}
                 bg="bg.panel"
                 shadow="sm"
                 _hover={{
                   zIndex: 11,
-                  scale: 1.025,
                   shadow: 'md',
+                  bg: 'gray.50',
                 }}
                 transition="all 0.2s ease-in-out"
                 display="flex"
@@ -344,8 +344,8 @@ export default function VaultItemList({
                     colorPalette="yellow"
                     defaultChecked={false}
                     display={enableBulk ? 'inline-block' : 'none'}
-                    onCheckedChange={() => toggleSelectItem(lockerItem.itemId)}
-                    checked={selectedItems.has(lockerItem.itemId)}
+                    onCheckedChange={() => toggleSelectItem(vaultItem.itemId)}
+                    checked={selectedItems.has(vaultItem.itemId)}
                   >
                     <Checkbox.HiddenInput />
                     <Checkbox.Label srOnly>Bulk select</Checkbox.Label>
@@ -353,24 +353,24 @@ export default function VaultItemList({
                   </Checkbox.Root>
                   <Flex direction="row" align="center" width="full" gap={2}>
                     <Avatar.Root size="lg" rounded="sm" bg="yellow.subtle" color="yellow.fg">
-                      <Avatar.Fallback fontSize="2xl">{templateIcon(lockerItem.item.category)}</Avatar.Fallback>
+                      <Avatar.Fallback fontSize="2xl">{templateIcon(vaultItem.item.category)}</Avatar.Fallback>
                     </Avatar.Root>
 
                     <Flex direction="column" align="start" justify="start" flex={1}>
                       <Heading fontSize="lg" fontWeight="medium" letterSpacing="tighter" lineHeight="short" flex={1}>
-                        {lockerItem.item.title}
+                        {vaultItem.item.title}
                       </Heading>
-                      <Badge>{camelCaseToTitleCase(lockerItem.item.category)}</Badge>
+                      <Badge>{camelCaseToTitleCase(vaultItem.item.category)}</Badge>
                     </Flex>
 
                     <LinkOverlay asChild>
                       <Link
-                        href={`/vaults/${currentVault.id}/item/${lockerItem.itemId}`}
+                        href={`/vaults/${currentVault.id}/item/${vaultItem.itemId}`}
                         style={{ textDecoration: 'none' }}
                       />
                     </LinkOverlay>
 
-                    {monitoringEnabled && lockerItemHasIssues(lockerItem) && (
+                    {monitoringEnabled && hasSecurityIssues(vaultItem) && (
                       <Badge variant="surface" colorPalette="red" size="lg">
                         <TbAlertTriangle />
                       </Badge>
@@ -379,7 +379,7 @@ export default function VaultItemList({
                     <Menu.Root>
                       <Menu.Trigger asChild>
                         <IconButton
-                          aria-label="Locker item options"
+                          aria-label="Vault item options"
                           variant="ghost"
                           size="sm"
                           onClick={(e) => e.stopPropagation()}
@@ -389,7 +389,7 @@ export default function VaultItemList({
                       </Menu.Trigger>
                       <Menu.Positioner zIndex={999}>
                         <Menu.Content w={48}>
-                          <Menu.Item value="edit" onClick={() => openLockerItem(lockerItem)}>
+                          <Menu.Item value="edit" onClick={() => openVaultItem(vaultItem)}>
                             <TbPencil />
                             Edit
                           </Menu.Item>
@@ -399,7 +399,7 @@ export default function VaultItemList({
                           </Menu.Item>
                           <Menu.Item value="move">
                             <TbArrowBarUp />
-                            Move Lockers
+                            Move Vaults
                           </Menu.Item>
                           <Menu.Separator />
 
@@ -419,7 +419,7 @@ export default function VaultItemList({
                 </LinkBox>
                 <DeleteVaultItemDialog
                   vaultId={vaultId!}
-                  itemId={lockerItem.item.id}
+                  itemId={vaultItem.item.id}
                   open={showDeleteItemDialog}
                   onOpenChange={(details) => setShowDeleteItemDialog(!!details.open)}
                 />

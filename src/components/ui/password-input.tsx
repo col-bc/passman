@@ -103,7 +103,7 @@ export const PasswordStrengthMeter = React.forwardRef<HTMLDivElement, PasswordSt
           {Array.from({ length: max }).map((_, index) => (
             <Box
               key={index}
-              height="1"
+              height="1.5"
               flex="1"
               rounded="sm"
               data-selected={index < value ? '' : undefined}

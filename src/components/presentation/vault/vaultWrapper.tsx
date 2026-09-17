@@ -30,7 +30,7 @@ export default function VaultItemW({
   }, [mek, encryptedVaults, vaults.length, handleUnlock]);
 
   if (!mek) {
-    return <div>Please enter your Master Encryption Key (MEK) to unlock the locker.</div>;
+    return <div>Please enter your Master Encryption Key (MEK) to unlock the vault.</div>;
   }
 
   const vault = vaults.find((l) => l.id === vaultId);

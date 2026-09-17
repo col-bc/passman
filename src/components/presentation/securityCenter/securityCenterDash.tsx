@@ -1,9 +1,9 @@
 'use client';
 
 import { useSecurityAnalytics } from '@/hooks/use-security-analytics';
-import { useLocker } from '@/hooks/use-vaults';
+import { useVaults } from '@/hooks/use-vaults';
 import { User } from '@/prisma/client';
-import { EncryptedLocker } from '@/types/server';
+import { VaultWithItems } from '@/types/server';
 import { Box, Flex, Heading } from '@chakra-ui/react';
 import React from 'react';
 import BreachedPasswordsTable from './breachedPasswordsTable';
@@ -13,24 +13,23 @@ import WeakPasswordsTable from './weakPasswordsTable';
 
 export default function SecurityCenterDash({
   user,
-  encryptedLockers,
+  encryptedVaults,
 }: {
   user: User;
-  encryptedLockers: EncryptedLocker[];
+  encryptedVaults: VaultWithItems[];
 }) {
-  const { lockers, handleUnlock, mek } = useLocker();
-  const { repeatedPasswords, weakPasswords, breaches } = useSecurityAnalytics(lockers);
+  const { vaults, handleUnlock, mek } = useVaults();
+  const { issues } = useSecurityAnalytics(vaults);
 
-  // Consolidated auto-unlock effect
   React.useEffect(() => {
-    if (!mek || encryptedLockers.length === 0) return;
-    const encryptedItemCount = encryptedLockers.reduce((acc, l) => acc + l.lockerItems.length, 0);
-    const decryptedItemCount = lockers.reduce((acc, l) => acc + l.lockerItems.length, 0);
+    if (!mek || encryptedVaults.length === 0) return;
+    const encryptedItemCount = encryptedVaults.reduce((acc, l) => acc + l.vaultItems.length, 0);
+    const decryptedItemCount = vaults.reduce((acc, l) => acc + l.vaultItems.length, 0);
 
-    if (lockers.length === 0 || encryptedItemCount !== decryptedItemCount) {
-      handleUnlock(encryptedLockers).catch(console.error);
+    if (vaults.length === 0 || encryptedItemCount !== decryptedItemCount) {
+      handleUnlock(encryptedVaults).catch(console.error);
     }
-  }, [mek, encryptedLockers, lockers, handleUnlock]);
+  }, [mek, encryptedVaults, vaults, handleUnlock]);
 
   return (
     <Flex direction="column" gap={8} w="full">
@@ -54,7 +53,7 @@ export default function SecurityCenterDash({
             Repeated Passwords
           </Heading>
         </Flex>
-        <RepeatedPasswordsTable repeatedPasswords={repeatedPasswords} />
+        <RepeatedPasswordsTable repeatedPasswords={issues.repeatPasswords} />
       </Box>
 
       <Box>
@@ -74,7 +73,7 @@ export default function SecurityCenterDash({
             Weak Passwords
           </Heading>
         </Flex>
-        <WeakPasswordsTable weakPasswords={weakPasswords} />
+        <WeakPasswordsTable weakPasswords={issues.weakPasswords} />
       </Box>
 
       <Box>
@@ -94,7 +93,7 @@ export default function SecurityCenterDash({
             Breached Passwords
           </Heading>
         </Flex>
-        <BreachedPasswordsTable breachedPasswords={breaches} />
+        <BreachedPasswordsTable breachedPasswords={issues.breaches} />
       </Box>
     </Flex>
   );

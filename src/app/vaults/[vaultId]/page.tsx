@@ -1,4 +1,4 @@
-import VaultItemList from '@/components/presentation/vault/lockerItemList';
+import VaultItemList from '@/components/presentation/vault/vaultItemList';
 import { handleGetCurrentUser } from '@/lib/user/userActions';
 import { handleGetVaults } from '@/lib/vault/vaultActions';
 import { Breadcrumb, Container } from '@chakra-ui/react';
@@ -29,7 +29,7 @@ export default async function VaultPage({ params }: Props) {
 
   return (
     <>
-      <Breadcrumb.Root variant="underline" borderBottom="1px solid" borderColor="border" bg="bg.subtle" shadow="xs">
+      <Breadcrumb.Root>
         <Container maxW="5xl" px={[4, 6]} py={3}>
           <Breadcrumb.List>
             <Breadcrumb.Item>

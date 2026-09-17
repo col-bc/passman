@@ -1,34 +1,34 @@
-import LockerError from '@/components/presentation/locker/lockerError';
-import { handleGetLockerById } from '@/lib/locker/lockerActions';
+import VaultError from '@/components/presentation/vault/vaultError';
+import { handleGetVaultById } from '@/lib/vault/vaultActions';
 import { Box, Breadcrumb, Code, Container, Flex, Heading } from '@chakra-ui/react';
 import { TbHash } from 'react-icons/tb';
 
 type Props = {
   params: Promise<{
-    lockerId: string;
+    vaultId: string;
   }>;
 };
 
-export default async function ImportLockerItemsPage({ params }: Props) {
-  const { lockerId } = await params;
-  const locker = await handleGetLockerById(lockerId);
-  if (!locker.success) {
-    return <LockerError type={locker.type} text={locker.error} />;
+export default async function ImportVaultItemsPage({ params }: Props) {
+  const { vaultId } = await params;
+  const vault = await handleGetVaultById(vaultId);
+  if (!vault.success) {
+    return <VaultError type={vault.type} text={vault.error} />;
   }
 
-  const encryptedLocker = locker.data;
+  const encryptedVault = vault.data;
 
   return (
     <>
-      <Breadcrumb.Root variant="underline" borderBottom="1px solid" borderColor="border" bg="bg.subtle" shadow="xs">
+      <Breadcrumb.Root>
         <Container maxW="5xl" px={6} py={3}>
           <Breadcrumb.List>
             <Breadcrumb.Item>
-              <Breadcrumb.Link href={`/locker`}>Lockers</Breadcrumb.Link>
+              <Breadcrumb.Link href={`/vaults`}>Vaults</Breadcrumb.Link>
             </Breadcrumb.Item>
             <Breadcrumb.Separator />
             <Breadcrumb.Item>
-              <Breadcrumb.Link href={`/locker/${encryptedLocker.id}`}>{encryptedLocker.title}</Breadcrumb.Link>
+              <Breadcrumb.Link href={`/vaults/${encryptedVault.id}`}>{encryptedVault.title}</Breadcrumb.Link>
             </Breadcrumb.Item>
             <Breadcrumb.Separator />
             <Breadcrumb.Item>
@@ -45,7 +45,7 @@ export default async function ImportLockerItemsPage({ params }: Props) {
             </Heading>
             <Code display="inline-flex" variant="surface" alignItems="center" gap={2} fontFamily="heading">
               <TbHash />
-              {encryptedLocker.id}
+              {encryptedVault.id}
             </Code>
           </Box>
         </Flex>
