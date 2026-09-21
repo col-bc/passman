@@ -1,18 +1,18 @@
 import Provider from '@/components/ui/provider';
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Roboto_Flex, Roboto_Mono, Roboto_Slab } from 'next/font/google';
 
-const fontHeading = JetBrains_Mono({
+const fontHeading = Roboto_Slab({
   variable: '--font-heading',
   subsets: ['latin'],
 });
 
-const fontSans = Inter({
+const fontSans = Roboto_Flex({
   variable: '--font-sans',
   subsets: ['latin'],
 });
 
-const fontMono = JetBrains_Mono({
+const fontMono = Roboto_Mono({
   variable: '--font-mono',
   subsets: ['latin'],
 });

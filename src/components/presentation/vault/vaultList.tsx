@@ -18,11 +18,9 @@ import {
   Heading,
   HStack,
   Icon,
-  IconButton,
   Link,
   LinkBox,
   LinkOverlay,
-  Menu,
   SimpleGrid,
   Stat,
   Text,
@@ -31,19 +29,14 @@ import {
 import NextLink from 'next/link';
 import React from 'react';
 import {
-  TbArrowBarUp,
   TbArrowRight,
   TbCirclePlus,
-  TbDotsVertical,
   TbGaugeFilled,
   TbLayoutListFilled,
   TbLockSquareRounded,
-  TbPencil,
   TbPlus,
-  TbShare,
   TbShieldFilled,
   TbStack3Filled,
-  TbTrash,
 } from 'react-icons/tb';
 import DeleteVaultDialog from './deleteDialog';
 
@@ -71,7 +64,7 @@ export default function VaultList({ v }: { v: VaultWithItems[]; user?: User }) {
 
   return (
     <Flex direction="column" as="section" gap={10}>
-      <Card.Root variant="elevated" rounded="md">
+      <Card.Root variant="elevated">
         <Card.Header>
           <Flex direction={{ base: 'column', lg: 'row' }} gap={4}>
             <Heading as="h1" fontSize="3xl" fontWeight="extrabold" letterSpacing="tight" whiteSpace="nowrap" flex={1}>
@@ -219,21 +212,8 @@ function VaultItem({ vault }: { vault: DecryptedVault }) {
   }, [vault.vaultItems]);
 
   return (
-    <>
-      <GridItem
-        as="div"
-        key={`vault-${vault.id}`}
-        bg="bg.panel"
-        shadow="sm"
-        _hover={{
-          zIndex: 11,
-          shadow: 'md',
-          bg: 'gray.50',
-        }}
-        transition="all 0.2s ease-in-out"
-        rounded="sm"
-        gap={4}
-      >
+    <GridItem key={`vault-${vault.id}`}>
+      <Card.Root variant="outline" _hover={{ bg: 'bg.muted' }} transition="all 0.2s ease-in-out" gap={4}>
         <LinkBox w="full" p={4}>
           <Flex direction="column" align="start" justify="start" flex={1} gap={4}>
             <Flex direction="row" align="flex-start" width="full" gap={4}>
@@ -248,43 +228,6 @@ function VaultItem({ vault }: { vault: DecryptedVault }) {
                   {timeSinceDate(new Date(vault.updatedAt))}
                 </Text>
               </Flex>
-              <Menu.Root>
-                <IconButton
-                  as={Menu.Trigger}
-                  aria-label="Vault item options"
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <TbDotsVertical />
-                </IconButton>
-                <Menu.Positioner zIndex={999}>
-                  <Menu.Content w={48}>
-                    <Menu.Item value="edit">
-                      <TbPencil />
-                      Edit
-                    </Menu.Item>
-                    <Menu.Item value="share">
-                      <TbShare />
-                      Share
-                    </Menu.Item>
-                    <Menu.Item value="move">
-                      <TbArrowBarUp />
-                      Move Vault
-                    </Menu.Item>
-                    <Menu.Separator />
-                    <Menu.Item
-                      value="delete"
-                      color="red.fg"
-                      _hover={{ bg: 'red.subtle' }}
-                      onClick={() => setShowDeleteDialog(true)}
-                    >
-                      <TbTrash />
-                      Delete
-                    </Menu.Item>
-                  </Menu.Content>
-                </Menu.Positioner>
-              </Menu.Root>
             </Flex>
             <Flex direction="row" align="center" justify="start" flex={1} flexWrap="wrap" gap={2}>
               {counts.isEmpty && (
@@ -330,13 +273,13 @@ function VaultItem({ vault }: { vault: DecryptedVault }) {
             </LinkOverlay>
           </Flex>
         </LinkBox>
-      </GridItem>
+      </Card.Root>
 
       <DeleteVaultDialog
         vaultId={vault.id!}
         open={showDeleteDialog}
         onOpenChange={(details) => setShowDeleteDialog(details.open)}
       />
-    </>
+    </GridItem>
   );
 }

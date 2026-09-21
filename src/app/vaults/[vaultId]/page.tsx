@@ -1,7 +1,7 @@
 import VaultItemList from '@/components/presentation/vault/vaultItemList';
 import { handleGetCurrentUser } from '@/lib/user/userActions';
 import { handleGetVaults } from '@/lib/vault/vaultActions';
-import { Breadcrumb, Container } from '@chakra-ui/react';
+import { Container } from '@chakra-ui/react';
 import { unauthorized } from 'next/navigation';
 
 type Props = {
@@ -28,23 +28,8 @@ export default async function VaultPage({ params }: Props) {
   }
 
   return (
-    <>
-      <Breadcrumb.Root>
-        <Container maxW="5xl" px={[4, 6]} py={3}>
-          <Breadcrumb.List>
-            <Breadcrumb.Item>
-              <Breadcrumb.Link href={`/vaults`}>Vaults</Breadcrumb.Link>
-            </Breadcrumb.Item>
-            <Breadcrumb.Separator />
-            <Breadcrumb.Item>
-              <Breadcrumb.CurrentLink>{vaultTitle}</Breadcrumb.CurrentLink>
-            </Breadcrumb.Item>
-          </Breadcrumb.List>
-        </Container>
-      </Breadcrumb.Root>
-      <Container maxW="5xl" px={[4, 6]} py={6}>
-        <VaultItemList vaultId={vaultId} encryptedVaults={vaultsResponse.data} />
-      </Container>
-    </>
+    <Container maxW="5xl" px={[4, 6]} py={6}>
+      <VaultItemList vaultId={vaultId} encryptedVaults={vaultsResponse.data} />
+    </Container>
   );
 }

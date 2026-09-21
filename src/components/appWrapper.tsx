@@ -8,9 +8,9 @@ import {
   Badge,
   Box,
   Button,
+  Card,
   Circle,
   CloseButton,
-  Collapsible,
   Drawer,
   EmptyState,
   Flex,
@@ -30,8 +30,9 @@ import React from 'react';
 import {
   TbBell,
   TbBellCheck,
+  TbLayoutSidebarLeftCollapse,
+  TbLayoutSidebarLeftExpand,
   TbLockSquareRounded,
-  TbMenu,
   TbPlus,
   TbSearch,
   TbShieldLock,
@@ -41,70 +42,63 @@ import SignOutButton from './forms/auth/signOut';
 import Logo from './logo';
 import { ColorModeButton } from './ui/color-mode';
 import { Toaster } from './ui/toaster';
-import { Tooltip } from './ui/tooltip';
 
 export default function AppWrapper({ children, user }: { children: React.ReactNode; user: User }) {
+  const [open, setOpen] = React.useState(true);
   return (
-    <Flex direction="column" h="100vh" overflow="hidden" w="full" bg="gray.50">
-      {/* --- DESKTOP LAYOUT --- */}
-      <Flex direction="column" display={{ base: 'none', md: 'flex' }} h="full" w="full">
-        <Box borderBottom="1px solid" borderColor="border" bg="bg" w="full" flexShrink={0} px={6} py={2}>
-          <Flex w="full" direction="row" gap={4} align="center">
-            <Logo asLink href="/vaults" />
-            <Box flex={1} minW={0} />
-            <Tooltip content="Create New Item" positioning={{ placement: 'bottom' }}>
-              <IconButton colorPalette="yellow" aria-label="Create New Item" variant="surface">
-                <TbPlus />
-              </IconButton>
-            </Tooltip>
+    <Flex direction="column" h="100vh" overflow="hidden" w="full" bg="bg">
+      <Flex direction="row" align="stretch" h="full" w="full" flex={1} minH={0} bg="bg.muted">
+        <Sidebar user={user} open={open} />
+
+        <Box
+          as="main"
+          flex={1}
+          overflowY="auto"
+          overflowX="hidden"
+          minH={0}
+          roundedLeft={open ? '2xl' : '0px'}
+          bg="bg"
+          shadow="lg"
+        >
+          <Flex w="full" direction="row" gap={4} align="center" py={2} px={[4, 6]} mb={[0, 4, 6]} maxW="5xl" mx="auto">
+            <IconButton onClick={() => setOpen(!open)} aria-label="Toggle Sidebar" variant="ghost">
+              {open ? <TbLayoutSidebarLeftCollapse /> : <TbLayoutSidebarLeftExpand />}
+            </IconButton>
+
+            <IconButton colorPalette="yellow" aria-label="Create New Item" variant="surface" ml="auto">
+              <TbPlus />
+            </IconButton>
             <SearchBar query="" onQueryChange={() => {}} />
             <ColorModeButton />
             <NotificationDrawer />
           </Flex>
-        </Box>
-
-        <Flex direction="row" align="stretch" h="full" w="full" flex={1} minH={0}>
-          <AppBar user={user} />
-          {/* Scrollable Main Area */}
-          <Box as="main" flex={1} overflowY="auto" minH={0}>
-            {children}
-          </Box>
-        </Flex>
-      </Flex>
-
-      {/* --- MOBILE LAYOUT --- */}
-      <Flex direction="column" display={{ base: 'flex', md: 'none' }} h="full" w="full">
-        <Box borderBottom="1px solid" borderColor="border" bg="bg.subtle" w="full" flexShrink={0}>
-          <Collapsible.Root>
-            <Flex gap={1} px={[4, 6]} py={3} align="center">
-              <Logo asLink href="/vaults" />
-              <ColorModeButton ml="auto" />
-              <NotificationDrawer />
-              <Collapsible.Trigger asChild>
-                <IconButton aria-label="Open navigation menu" variant="ghost">
-                  <TbMenu />
-                </IconButton>
-              </Collapsible.Trigger>
-            </Flex>
-
-            <Collapsible.Content asChild>
-              <Box py={2} borderTop="1px solid" borderColor="border">
-                <SidebarLinks user={user} />
-              </Box>
-            </Collapsible.Content>
-          </Collapsible.Root>
-        </Box>
-
-        {/* Scrollable Main Area (Mobile) */}
-        <Box as="main" flex={1} bg="bg" color="fg" overflowY="auto" minH={0}>
           {children}
         </Box>
       </Flex>
-
       <Toaster />
     </Flex>
   );
 }
+
+const Sidebar: React.FC<{ user: User; open: boolean }> = ({ user, open }) => {
+  return (
+    <Box
+      as="aside"
+      width={open ? '260px' : '0px'}
+      overflow="hidden"
+      transition="width 0.2s ease-in-out"
+      borderRightWidth={open ? '1px' : '0px'}
+      borderColor="border.muted"
+    >
+      <Flex direction="column" h="full" w="260px" pt={4} px={3}>
+        <Box px={3} mb={6}>
+          <Logo asLink href="/vaults" />
+        </Box>
+        <SidebarLinks user={user} />
+      </Flex>
+    </Box>
+  );
+};
 
 const SidebarLinks: React.FC<{ user: User }> = ({ user }) => {
   const pathName = usePathname();
@@ -112,7 +106,7 @@ const SidebarLinks: React.FC<{ user: User }> = ({ user }) => {
   const { totalIssues } = useSecurityAnalytics(vaults);
 
   return (
-    <Flex direction="column" as="ul" flex={1} overflowY="auto" px={4} py={2} gap={1} w="full" h="full">
+    <Flex direction="column" as="ul" flex={1} overflowY="auto" gap={1} w="full" h="full">
       <NextLink href="/vaults" passHref style={{ width: '100%' }}>
         <Button
           variant={pathName.startsWith('/vaults') ? 'subtle' : 'ghost'}
@@ -184,45 +178,6 @@ const SidebarLinks: React.FC<{ user: User }> = ({ user }) => {
   );
 };
 
-const AppBar: React.FC<{ user: User }> = ({ user }) => {
-  const [viewportWidth, setViewportWidth] = React.useState<number>(0);
-
-  const handleResize = React.useCallback(() => {
-    setViewportWidth(window.innerWidth);
-  }, []);
-
-  React.useEffect(() => {
-    const handleEffect = () => {
-      setViewportWidth(window.innerWidth);
-    };
-    handleEffect();
-
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [handleResize]);
-
-  const isDesktop = viewportWidth >= 768;
-
-  return (
-    <Flex
-      direction="column"
-      as="nav"
-      h="full"
-      w={isDesktop ? '2xs' : 'full'}
-      bg="bg"
-      borderRight="1px solid"
-      borderColor="border"
-      justify="start"
-    >
-      <Box flex={1} overflowY="auto" w="full">
-        <SidebarLinks user={user} />
-      </Box>
-    </Flex>
-  );
-};
-
 const NotificationDrawer: React.FC = () => {
   const { vaults } = useVaults();
   const { totalIssues, issues } = useSecurityAnalytics(vaults);
@@ -263,29 +218,64 @@ const NotificationDrawer: React.FC = () => {
                 </EmptyState.Description>
               </EmptyState.Root>
             ) : (
-              <Box>
+              <Flex direction="column" gap="4">
                 {issues.repeatPasswords.map((item) => (
-                  <Box key={item.occurrences[0].itemId}>
-                    Repeated password found for item ID: {item.occurrences[0].itemId}
-                  </Box>
+                  <Card.Root key={item.occurrences[0].itemId} variant="subtle" size="sm">
+                    <Card.Header>
+                      <Card.Title>Repeated Password</Card.Title>
+                    </Card.Header>
+                    <Card.Body>
+                      <Card.Description>
+                        <strong>{item.occurrences[0].itemName}</strong> has a password that is repeated{' '}
+                        {item.occurrences.length} times.
+                      </Card.Description>
+                    </Card.Body>
+                    <Card.Footer>
+                      <Button size="sm" colorPalette="yellow" asChild>
+                        <Link href={`/vaults/${item.occurrences[0].vaultId}/item/${item.occurrences[0].itemId}`}>
+                          Fix Problem
+                        </Link>
+                      </Button>
+                    </Card.Footer>
+                  </Card.Root>
                 ))}
                 {issues.weakPasswords.map((item) => (
-                  <Box key={item.itemId}>Weak password found for item ID: {item.itemId}</Box>
+                  <Card.Root key={item.itemId} variant="subtle" size="sm">
+                    <Card.Header>
+                      <Card.Title>Weak Password</Card.Title>
+                    </Card.Header>
+                    <Card.Body>
+                      <Card.Description>
+                        <strong>{item.itemName}</strong> has a password that does not meet modern security standards.
+                      </Card.Description>
+                    </Card.Body>
+                    <Card.Footer>
+                      <Button size="sm" colorPalette="yellow" asChild>
+                        <Link href={`/vaults/${item.vaultId}/item/${item.itemId}`}>Fix Problem</Link>
+                      </Button>
+                    </Card.Footer>
+                  </Card.Root>
                 ))}
                 {issues.breaches.map((item) => (
-                  <Box key={item.itemId}>Breached password found for item ID: {item.itemId}</Box>
+                  <Card.Root key={item.itemId} variant="subtle" size="sm">
+                    <Card.Header>
+                      <Card.Title>Breached Password</Card.Title>
+                    </Card.Header>
+                    <Card.Body>
+                      <Card.Description>
+                        <strong>{item.itemName}</strong> has a password that has been found in {item.breachCount}{' '}
+                        breache{item.breachCount === 1 ? '' : 's'}.
+                      </Card.Description>
+                    </Card.Body>
+                    <Card.Footer>
+                      <Button size="sm" colorPalette="yellow" asChild>
+                        <Link href={`/vaults/${item.vaultId}/item/${item.itemId}`}>Fix Problem</Link>
+                      </Button>
+                    </Card.Footer>
+                  </Card.Root>
                 ))}
-              </Box>
+              </Flex>
             )}
-            <EmptyState.Root>
-              <EmptyState.Indicator>
-                <TbBellCheck />
-              </EmptyState.Indicator>
-              <EmptyState.Title textAlign="center">All Caught Up!</EmptyState.Title>
-              <EmptyState.Description textAlign="center">
-                You have no new notifications at this time. Check back later for updates.
-              </EmptyState.Description>
-            </EmptyState.Root>
           </Drawer.Body>
         </Drawer.Content>
       </Drawer.Positioner>

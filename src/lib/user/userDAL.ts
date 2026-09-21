@@ -197,8 +197,7 @@ export async function enableTwoFactor(
   }
 
   const verify = await verifyTotp({ secret, token: otpCode });
-  console.log(`[userDAL] TOTP verification result for user ${userId}: ${verify}`);
-  if (!verify) {
+  if (verify === null) {
     return {
       success: false,
       type: 'VALIDATION',

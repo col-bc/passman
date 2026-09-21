@@ -39,6 +39,7 @@ import {
   TbDotsVertical,
   TbDownload,
   TbEdit,
+  TbFilter,
   TbGaugeFilled,
   TbLayoutListFilled,
   TbListDetails,
@@ -69,6 +70,7 @@ export default function VaultItemList({
 
   const [enableBulk, setEnableBulk] = React.useState(false);
   const [selectedItems, setSelectedItems] = React.useState<Set<string>>(new Set());
+  const [sortOrder, setSortOrder] = React.useState<string>('date-desc');
 
   const [showRenameDialog, setShowRenameDialog] = React.useState(false);
   const [showDeleteItemDialog, setShowDeleteItemDialog] = React.useState(false);
@@ -141,10 +143,30 @@ export default function VaultItemList({
     }
   };
 
+  const sortedVaultItems = React.useMemo(() => {
+    if (!currentVault) return [];
+    const items = [...currentVault.vaultItems];
+    switch (sortOrder) {
+      case 'date-desc':
+        return items.sort((a, b) => b.item.createdAt.getTime() - a.item.createdAt.getTime());
+      case 'date-asc':
+        return items.sort((a, b) => a.item.createdAt.getTime() - b.item.createdAt.getTime());
+      case 'name-asc':
+        return items.sort((a, b) => a.item.title.localeCompare(b.item.title));
+      case 'name-desc':
+        return items.sort((a, b) => b.item.title.localeCompare(a.item.title));
+      case 'category-asc':
+        return items.sort((a, b) => a.item.category.localeCompare(b.item.category));
+      case 'category-desc':
+        return items.sort((a, b) => b.item.category.localeCompare(a.item.category));
+      default:
+        return items;
+    }
+  }, [currentVault, sortOrder]);
+
   if (!currentVault) {
     return <div>Loading vault details...</div>;
   }
-
   const monitoringEnabled = currentVault.enableMonitoring;
 
   return (
@@ -298,6 +320,24 @@ export default function VaultItemList({
             </Button>
           </Group>
         )}
+        <Menu.Root>
+          <IconButton as={Menu.Trigger} variant="surface" colorPalette="gray" size="sm">
+            <TbFilter />
+          </IconButton>
+          <Menu.Positioner>
+            <Menu.Content>
+              <Menu.RadioItemGroup>
+                <Menu.ItemGroupLabel>Sort By</Menu.ItemGroupLabel>
+                <Menu.RadioItem value="date-desc">Newest to Oldest</Menu.RadioItem>
+                <Menu.RadioItem value="date-asc">Oldest to Newest</Menu.RadioItem>
+                <Menu.RadioItem value="name-asc">Name A-Z</Menu.RadioItem>
+                <Menu.RadioItem value="name-desc">Name Z-A</Menu.RadioItem>
+                <Menu.RadioItem value="category-asc">Category A-Z</Menu.RadioItem>
+                <Menu.RadioItem value="category-desc">Category Z-A</Menu.RadioItem>
+              </Menu.RadioItemGroup>
+            </Menu.Content>
+          </Menu.Positioner>
+        </Menu.Root>
       </Flex>
 
       {currentVault.vaultItems.length === 0 ? (
@@ -322,101 +362,86 @@ export default function VaultItemList({
           {currentVault.vaultItems
             .sort((a, b) => new Date(b.item.updatedAt).getTime() - new Date(a.item.updatedAt).getTime())
             .map((vaultItem, index) => (
-              <List.Item
-                as="div"
-                role="group"
-                key={`vault-item-${vaultItem.itemId}-${index}`}
-                bg="bg.panel"
-                shadow="sm"
-                _hover={{
-                  zIndex: 11,
-                  shadow: 'md',
-                  bg: 'gray.50',
-                }}
-                transition="all 0.2s ease-in-out"
-                display="flex"
-                alignItems="center"
-                rounded="sm"
-                gap={2}
-              >
-                <LinkBox w="full" p={4}>
-                  <Checkbox.Root
-                    colorPalette="yellow"
-                    defaultChecked={false}
-                    display={enableBulk ? 'inline-block' : 'none'}
-                    onCheckedChange={() => toggleSelectItem(vaultItem.itemId)}
-                    checked={selectedItems.has(vaultItem.itemId)}
-                  >
-                    <Checkbox.HiddenInput />
-                    <Checkbox.Label srOnly>Bulk select</Checkbox.Label>
-                    <Checkbox.Control />
-                  </Checkbox.Root>
-                  <Flex direction="row" align="center" width="full" gap={2}>
-                    <Avatar.Root size="lg" rounded="sm" bg="yellow.subtle" color="yellow.fg">
-                      <Avatar.Fallback fontSize="2xl">{templateIcon(vaultItem.item.category)}</Avatar.Fallback>
-                    </Avatar.Root>
+              <List.Item key={`vault-item-${vaultItem.itemId}-${index}`}>
+                <Card.Root variant="outline" _hover={{ bg: 'bg.muted' }} transition="all 0.2s ease-in-out">
+                  <LinkBox w="full" p={4}>
+                    <Checkbox.Root
+                      colorPalette="yellow"
+                      defaultChecked={false}
+                      display={enableBulk ? 'inline-block' : 'none'}
+                      onCheckedChange={() => toggleSelectItem(vaultItem.itemId)}
+                      checked={selectedItems.has(vaultItem.itemId)}
+                    >
+                      <Checkbox.HiddenInput />
+                      <Checkbox.Label srOnly>Bulk select</Checkbox.Label>
+                      <Checkbox.Control />
+                    </Checkbox.Root>
 
-                    <Flex direction="column" align="start" justify="start" flex={1}>
-                      <Heading fontSize="lg" fontWeight="medium" letterSpacing="tighter" lineHeight="short" flex={1}>
-                        {vaultItem.item.title}
-                      </Heading>
-                      <Badge>{camelCaseToTitleCase(vaultItem.item.category)}</Badge>
-                    </Flex>
+                    <Flex direction="row" align="center" width="full" gap={2}>
+                      <Avatar.Root size="lg" rounded="sm" bg="yellow.subtle" color="yellow.fg">
+                        <Avatar.Fallback fontSize="2xl">{templateIcon(vaultItem.item.category)}</Avatar.Fallback>
+                      </Avatar.Root>
 
-                    <LinkOverlay asChild>
-                      <Link
-                        href={`/vaults/${currentVault.id}/item/${vaultItem.itemId}`}
-                        style={{ textDecoration: 'none' }}
-                      />
-                    </LinkOverlay>
+                      <Flex direction="column" align="start" justify="start" flex={1}>
+                        <Card.Title flex={1}>{vaultItem.item.title}</Card.Title>
+                        <Badge>{camelCaseToTitleCase(vaultItem.item.category)}</Badge>
+                      </Flex>
 
-                    {monitoringEnabled && hasSecurityIssues(vaultItem) && (
-                      <Badge variant="surface" colorPalette="red" size="lg">
-                        <TbAlertTriangle />
-                      </Badge>
-                    )}
+                      <LinkOverlay asChild>
+                        <Link
+                          href={`/vaults/${currentVault.id}/item/${vaultItem.itemId}`}
+                          style={{ textDecoration: 'none' }}
+                        />
+                      </LinkOverlay>
 
-                    <Menu.Root>
-                      <Menu.Trigger asChild>
-                        <IconButton
-                          aria-label="Vault item options"
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <TbDotsVertical />
-                        </IconButton>
-                      </Menu.Trigger>
-                      <Menu.Positioner zIndex={999}>
-                        <Menu.Content w={48}>
-                          <Menu.Item value="edit" onClick={() => openVaultItem(vaultItem)}>
-                            <TbPencil />
-                            Edit
-                          </Menu.Item>
-                          <Menu.Item value="share">
-                            <TbShare />
-                            Share
-                          </Menu.Item>
-                          <Menu.Item value="move">
-                            <TbArrowBarUp />
-                            Move Vaults
-                          </Menu.Item>
-                          <Menu.Separator />
+                      {monitoringEnabled && hasSecurityIssues(vaultItem) && (
+                        <Badge variant="surface" colorPalette="red" size="lg">
+                          <TbAlertTriangle />
+                        </Badge>
+                      )}
 
-                          <Menu.Item
-                            value="delete"
-                            color="red.fg"
-                            _hover={{ bg: 'red.subtle' }}
-                            onClick={() => setShowDeleteItemDialog(true)}
+                      <Menu.Root>
+                        <Menu.Trigger asChild>
+                          <IconButton
+                            aria-label="Vault item options"
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            <TbTrash />
-                            Delete
-                          </Menu.Item>
-                        </Menu.Content>
-                      </Menu.Positioner>
-                    </Menu.Root>
-                  </Flex>
-                </LinkBox>
+                            <TbDotsVertical />
+                          </IconButton>
+                        </Menu.Trigger>
+                        <Menu.Positioner zIndex={999}>
+                          <Menu.Content w={48}>
+                            <Menu.Item value="edit" onClick={() => openVaultItem(vaultItem)}>
+                              <TbPencil />
+                              Edit
+                            </Menu.Item>
+                            <Menu.Item value="share">
+                              <TbShare />
+                              Share
+                            </Menu.Item>
+                            <Menu.Item value="move">
+                              <TbArrowBarUp />
+                              Move Vaults
+                            </Menu.Item>
+                            <Menu.Separator />
+
+                            <Menu.Item
+                              value="delete"
+                              color="red.fg"
+                              _hover={{ bg: 'red.subtle' }}
+                              onClick={() => setShowDeleteItemDialog(true)}
+                            >
+                              <TbTrash />
+                              Delete
+                            </Menu.Item>
+                          </Menu.Content>
+                        </Menu.Positioner>
+                      </Menu.Root>
+                    </Flex>
+                  </LinkBox>
+                </Card.Root>
                 <DeleteVaultItemDialog
                   vaultId={vaultId!}
                   itemId={vaultItem.item.id}

@@ -3,7 +3,7 @@ import VaultError from '@/components/presentation/vault/vaultError';
 import PasswordGenerator from '@/components/util/passwordGenerator';
 import { VaultProvider } from '@/hooks/use-vaults';
 import { handleGetCurrentUser } from '@/lib/user/userActions';
-import { Breadcrumb, Container, Heading } from '@chakra-ui/react';
+import { Container, Heading } from '@chakra-ui/react';
 import { unauthorized } from 'next/navigation';
 
 export default async function PasswordGeneratorPage() {
@@ -26,31 +26,20 @@ export default async function PasswordGeneratorPage() {
   return (
     <VaultProvider userEmail={user!.email}>
       <AppWrapper user={user!}>
-        <>
-          <Breadcrumb.Root>
-            <Container maxW="5xl" px={[4, 6]} py={3}>
-              <Breadcrumb.List>
-                <Breadcrumb.Item>
-                  <Breadcrumb.CurrentLink>Vaults</Breadcrumb.CurrentLink>
-                </Breadcrumb.Item>
-              </Breadcrumb.List>
-            </Container>
-          </Breadcrumb.Root>
-          <Container maxW="5xl" px={[4, 6]} py={6}>
-            <Heading
-              as="h1"
-              fontSize="3xl"
-              mb={8}
-              fontWeight="extrabold"
-              letterSpacing="tight"
-              whiteSpace="nowrap"
-              flex={1}
-            >
-              Password Generator
-            </Heading>
-            <PasswordGenerator />
-          </Container>
-        </>
+        <Container maxW="5xl" px={[4, 6]} py={6}>
+          <Heading
+            as="h1"
+            fontSize="3xl"
+            mb={8}
+            fontWeight="extrabold"
+            letterSpacing="tight"
+            whiteSpace="nowrap"
+            flex={1}
+          >
+            Password Generator
+          </Heading>
+          <PasswordGenerator />
+        </Container>
       </AppWrapper>
     </VaultProvider>
   );
