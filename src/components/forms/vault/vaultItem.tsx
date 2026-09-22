@@ -7,6 +7,7 @@ import { PasswordInput, PasswordStrengthMeter } from '@/components/ui/password-i
 import { toaster } from '@/components/ui/toaster';
 import { Tooltip } from '@/components/ui/tooltip';
 import { PasswordGeneratorDialog } from '@/components/util/passwordGenerator';
+import { useSecurityAnalytics } from '@/hooks/use-security-analytics';
 import { useVaults } from '@/hooks/use-vaults';
 import { encryptPayload } from '@/lib/crypto';
 import formatDate from '@/lib/util/formats';
@@ -58,6 +59,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import React from 'react';
 import {
   TbAlignJustified,
+  TbAsterisk,
   TbAsteriskSimple,
   TbAt,
   TbBuildingBank,
@@ -144,6 +146,7 @@ function VaultItemForm({
   const router = useRouter();
   const searchParams = useSearchParams();
   const { vaults, handleUnlock, mek } = useVaults();
+  const { getIssuesByItem } = useSecurityAnalytics(vaults);
 
   const highlightIndex = searchParams.get('highlightIndex')
     ? parseInt(searchParams.get('highlightIndex') as string, 10)
@@ -157,6 +160,7 @@ function VaultItemForm({
   const [vault, setVault] = React.useState(vaultId || vaultItem?.vaultId || '');
   const [itemContent, setItemContent] = React.useState<ItemContent[]>([]);
   const [mode, setMode] = React.useState<'read' | 'edit'>(defaultMode);
+  const [hideSecurityIssues, setHideSecurityIssues] = React.useState(false);
 
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
   const [showPasswordGeneratorDialog, setShowPasswordGeneratorDialog] = React.useState(false);
@@ -227,6 +231,54 @@ function VaultItemForm({
       items,
     });
   }, [vaultList]);
+
+  const renderItemIssues = () => {
+    if (!vaultItem) return null;
+    const issues = getIssuesByItem(vaultItem);
+    const issueCount = issues.breaches.length + issues.weakPasswords.length + issues.repeatPasswords.length;
+
+    if (issueCount === 0) return null;
+
+    return (
+      <Alert.Root status="warning">
+        <AlertContent>
+          <Flex align="center" gap={2}>
+            <Alert.Indicator />
+            <Alert.Title flex={1}>{issueCount} Security Issues</Alert.Title>
+            <Button variant="surface" size="xs" onClick={() => setHideSecurityIssues(!hideSecurityIssues)}>
+              {hideSecurityIssues ? 'Show' : 'Hide'}
+            </Button>
+          </Flex>
+          <Collapsible.Root open={!hideSecurityIssues}>
+            <Collapsible.Content>
+              <Alert.Description>
+                <List.Root listStyle="disc" paddingLeft={5} gap={2} as="ul">
+                  {issues.breaches.map((breach, index) => (
+                    <List.Item key={index} as="li">
+                      A password in this item has been found in {breach.breachCount.toLocaleString()} data breaches.
+                      This password should be changed immediately.
+                    </List.Item>
+                  ))}
+                  {issues.weakPasswords.map((weakPassword, index) => (
+                    <List.Item key={index} as="li">
+                      The line &quot;{weakPassword.label}&quot; contains a weak password. Consider changing it to a
+                      stronger one.
+                    </List.Item>
+                  ))}
+                  {issues.repeatPasswords.map((repeatPassword, index) => (
+                    <List.Item key={index} as="li">
+                      The line &quot;{repeatPassword.occurrences[0].label}&quot; contains a repeated password that has
+                      been used {repeatPassword.count} times. Consider changing it to a unique password.
+                    </List.Item>
+                  ))}
+                </List.Root>
+              </Alert.Description>
+            </Collapsible.Content>
+          </Collapsible.Root>
+        </AlertContent>
+      </Alert.Root>
+    );
+  };
 
   if (!mek) {
     return <VaultError type="UNLOCK" text="Please re enter your Master Encryption Key to unlock the vault." />;
@@ -392,6 +444,8 @@ function VaultItemForm({
               </AlertContent>
             </Alert.Root>
           )}
+
+          {renderItemIssues()}
 
           {mode === 'edit' ? (
             // Metadata
@@ -675,8 +729,9 @@ function VaultItemForm({
                       </Group>
                     )}
                     {highlightIndex === index && (
-                      <Field.HelperText fontSize="sm">
-                        This is the field that was flagged by the Security Center.
+                      <Field.HelperText fontSize="xs" display="flex" alignItems="center" gap={1}>
+                        <TbAsterisk />
+                        The previous page highlighted this field.
                       </Field.HelperText>
                     )}
                   </Field.Root>

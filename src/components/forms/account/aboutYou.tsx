@@ -3,7 +3,7 @@
 import { toaster } from '@/components/ui/toaster';
 import { handleUpdateUser } from '@/lib/user/userActions';
 import { User } from '@/prisma/browser';
-import { Button, Card, Field, Input } from '@chakra-ui/react';
+import { Button, Card, Field, Input, InputGroup } from '@chakra-ui/react';
 import React from 'react';
 import { TbDeviceFloppy } from 'react-icons/tb';
 
@@ -51,23 +51,32 @@ export default function AboutYouForm({ user }: { user: User }) {
           </Field.Label>
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="John Doe" required />
         </Field.Root>
-        <Field.Root required disabled colorPalette="yellow">
+        <Field.Root required colorPalette="yellow">
           <Field.Label>
             Email <Field.RequiredIndicator />
           </Field.Label>
+
           <Input value={user.email!} placeholder="john.doe@example.com" required disabled />
           <Field.HelperText>Contact support to update your email address.</Field.HelperText>
         </Field.Root>
-        <Field.Root required colorPalette="yellow">
-          <Field.Label>
-            Phone <Field.RequiredIndicator />
-          </Field.Label>
-          <Input
-            value={phone}
-            onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
-            placeholder="123-456-7890"
-            required
-          />
+        <Field.Root colorPalette="yellow">
+          <Field.Label>Phone</Field.Label>
+          <InputGroup
+            endElement={
+              phone && (
+                <Button colorPalette="yellow" variant="outline" size="xs">
+                  Verify
+                </Button>
+              )
+            }
+          >
+            <Input
+              value={phone}
+              onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
+              placeholder="123-456-7890"
+              required
+            />
+          </InputGroup>
         </Field.Root>
       </Card.Body>
       <Card.Footer>

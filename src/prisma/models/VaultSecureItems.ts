@@ -359,6 +359,7 @@ export type VaultSecureItemsCreateOrConnectWithoutItemInput = {
 
 export type VaultSecureItemsCreateManyItemInputEnvelope = {
   data: Prisma.VaultSecureItemsCreateManyItemInput | Prisma.VaultSecureItemsCreateManyItemInput[]
+  skipDuplicates?: boolean
 }
 
 export type VaultSecureItemsUpsertWithWhereUniqueWithoutItemInput = {
@@ -400,6 +401,7 @@ export type VaultSecureItemsCreateOrConnectWithoutVaultInput = {
 
 export type VaultSecureItemsCreateManyVaultInputEnvelope = {
   data: Prisma.VaultSecureItemsCreateManyVaultInput | Prisma.VaultSecureItemsCreateManyVaultInput[]
+  skipDuplicates?: boolean
 }
 
 export type VaultSecureItemsUpsertWithWhereUniqueWithoutVaultInput = {
@@ -1162,6 +1164,7 @@ export type VaultSecureItemsCreateManyArgs<ExtArgs extends runtime.Types.Extensi
    * The data used to create many VaultSecureItems.
    */
   data: Prisma.VaultSecureItemsCreateManyInput | Prisma.VaultSecureItemsCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1180,6 +1183,7 @@ export type VaultSecureItemsCreateManyAndReturnArgs<ExtArgs extends runtime.Type
    * The data used to create many VaultSecureItems.
    */
   data: Prisma.VaultSecureItemsCreateManyInput | Prisma.VaultSecureItemsCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

@@ -3,6 +3,7 @@
 import { VaultIconMap } from '@/components/forms/vault/iconPicker';
 import { VaultFormDialog } from '@/components/forms/vault/vaultForm';
 import { useVaults } from '@/hooks/use-vaults';
+import { calculateScore } from '@/lib/securityCenter';
 import { timeSinceDate } from '@/lib/util/formats';
 import { templateIcon } from '@/lib/util/itemTemplates';
 import { User } from '@/prisma/client';
@@ -22,6 +23,7 @@ import {
   LinkBox,
   LinkOverlay,
   SimpleGrid,
+  Spinner,
   Stat,
   Text,
   VStack,
@@ -42,7 +44,21 @@ import DeleteVaultDialog from './deleteDialog';
 
 export default function VaultList({ v }: { v: VaultWithItems[]; user?: User }) {
   const [showCreateVaultDialog, setShowCreateVaultDialog] = React.useState(false);
-  const { handleUnlock, vaults, mek } = useVaults();
+  const { handleUnlock, vaults, currentVault, mek } = useVaults();
+
+  const [securityScore, setSecurityScore] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    let max = 0,
+      actual = 0;
+    for (const vault of vaults) {
+      const { actualScore, maxScore } = calculateScore(vault);
+      max = (max || 0) + maxScore;
+      actual = (actual || 0) + actualScore;
+    }
+    const handleEffect = () => setSecurityScore(max > 0 ? (actual / max) * 100 : null);
+    handleEffect();
+  }, [vaults]);
 
   React.useEffect(() => {
     if (mek && v.length > 0 && vaults.length === 0) {
@@ -106,7 +122,9 @@ export default function VaultList({ v }: { v: VaultWithItems[]; user?: User }) {
                   <TbGaugeFilled />
                 </Icon>
               </HStack>
-              <Stat.ValueText fontFamily="mono">??</Stat.ValueText>
+              <Stat.ValueText fontFamily="mono">
+                {securityScore !== null ? `${securityScore.toFixed(0)}%` : <Spinner size="sm" />}
+              </Stat.ValueText>
             </Stat.Root>
 
             <Stat.Root p="4" rounded="sm" bg="bg.muted" color="fg.muted">

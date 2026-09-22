@@ -1,13 +1,13 @@
 import Provider from '@/components/ui/provider';
 import type { Metadata } from 'next';
-import { Roboto_Flex, Roboto_Mono, Roboto_Slab } from 'next/font/google';
+import { Josefin_Sans, Roboto_Mono, Rubik } from 'next/font/google';
 
-const fontHeading = Roboto_Slab({
+const fontHeading = Josefin_Sans({
   variable: '--font-heading',
   subsets: ['latin'],
 });
 
-const fontSans = Roboto_Flex({
+const fontSans = Rubik({
   variable: '--font-sans',
   subsets: ['latin'],
 });

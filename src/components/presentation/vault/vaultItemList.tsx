@@ -88,6 +88,17 @@ export default function VaultItemList({
     return fields;
   }, [currentVault]);
 
+  const [securityScore, setSecurityScore] = React.useState<number>(0);
+
+  React.useEffect(() => {
+    if (!currentVault) return;
+    const totalItems = currentVault.vaultItems.length;
+    const insecureItems = currentVault.vaultItems.filter((item) => hasSecurityIssues(item)).length;
+    const handleEffect = () =>
+      setSecurityScore(totalItems === 0 ? 0 : ((totalItems - insecureItems) / totalItems) * 100);
+    handleEffect();
+  }, [currentVault, hasSecurityIssues]);
+
   /**
    * If the MEK is available and there are encrypted vaults but no decrypted vaults,
    * attempt to unlock the vaults with the `handleUnlock` function.
@@ -274,7 +285,7 @@ export default function VaultItemList({
                   <TbGaugeFilled />
                 </Icon>
               </HStack>
-              <Stat.ValueText>80</Stat.ValueText>
+              <Stat.ValueText>{securityScore !== null ? `${securityScore.toFixed(0)}%` : '??'}</Stat.ValueText>
             </Stat.Root>
 
             <Stat.Root p="4" rounded="sm" bg="bg.muted" color="fg.muted">
@@ -359,97 +370,95 @@ export default function VaultItemList({
         </EmptyState.Root>
       ) : (
         <List.Root listStyleType="none" gap={3}>
-          {currentVault.vaultItems
-            .sort((a, b) => new Date(b.item.updatedAt).getTime() - new Date(a.item.updatedAt).getTime())
-            .map((vaultItem, index) => (
-              <List.Item key={`vault-item-${vaultItem.itemId}-${index}`}>
-                <Card.Root variant="outline" _hover={{ bg: 'bg.muted' }} transition="all 0.2s ease-in-out">
-                  <LinkBox w="full" p={4}>
-                    <Checkbox.Root
-                      colorPalette="yellow"
-                      defaultChecked={false}
-                      display={enableBulk ? 'inline-block' : 'none'}
-                      onCheckedChange={() => toggleSelectItem(vaultItem.itemId)}
-                      checked={selectedItems.has(vaultItem.itemId)}
-                    >
-                      <Checkbox.HiddenInput />
-                      <Checkbox.Label srOnly>Bulk select</Checkbox.Label>
-                      <Checkbox.Control />
-                    </Checkbox.Root>
+          {sortedVaultItems.map((vaultItem, index) => (
+            <List.Item key={`vault-item-${vaultItem.itemId}-${index}`}>
+              <Card.Root variant="outline" _hover={{ bg: 'bg.muted' }} transition="all 0.2s ease-in-out">
+                <LinkBox w="full" p={4}>
+                  <Checkbox.Root
+                    colorPalette="yellow"
+                    defaultChecked={false}
+                    display={enableBulk ? 'inline-block' : 'none'}
+                    onCheckedChange={() => toggleSelectItem(vaultItem.itemId)}
+                    checked={selectedItems.has(vaultItem.itemId)}
+                  >
+                    <Checkbox.HiddenInput />
+                    <Checkbox.Label srOnly>Bulk select</Checkbox.Label>
+                    <Checkbox.Control />
+                  </Checkbox.Root>
 
-                    <Flex direction="row" align="center" width="full" gap={2}>
-                      <Avatar.Root size="lg" rounded="sm" bg="yellow.subtle" color="yellow.fg">
-                        <Avatar.Fallback fontSize="2xl">{templateIcon(vaultItem.item.category)}</Avatar.Fallback>
-                      </Avatar.Root>
+                  <Flex direction="row" align="center" width="full" gap={2}>
+                    <Avatar.Root size="lg" rounded="sm" bg="yellow.subtle" color="yellow.fg">
+                      <Avatar.Fallback fontSize="2xl">{templateIcon(vaultItem.item.category)}</Avatar.Fallback>
+                    </Avatar.Root>
 
-                      <Flex direction="column" align="start" justify="start" flex={1}>
-                        <Card.Title flex={1}>{vaultItem.item.title}</Card.Title>
-                        <Badge>{camelCaseToTitleCase(vaultItem.item.category)}</Badge>
-                      </Flex>
-
-                      <LinkOverlay asChild>
-                        <Link
-                          href={`/vaults/${currentVault.id}/item/${vaultItem.itemId}`}
-                          style={{ textDecoration: 'none' }}
-                        />
-                      </LinkOverlay>
-
-                      {monitoringEnabled && hasSecurityIssues(vaultItem) && (
-                        <Badge variant="surface" colorPalette="red" size="lg">
-                          <TbAlertTriangle />
-                        </Badge>
-                      )}
-
-                      <Menu.Root>
-                        <Menu.Trigger asChild>
-                          <IconButton
-                            aria-label="Vault item options"
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <TbDotsVertical />
-                          </IconButton>
-                        </Menu.Trigger>
-                        <Menu.Positioner zIndex={999}>
-                          <Menu.Content w={48}>
-                            <Menu.Item value="edit" onClick={() => openVaultItem(vaultItem)}>
-                              <TbPencil />
-                              Edit
-                            </Menu.Item>
-                            <Menu.Item value="share">
-                              <TbShare />
-                              Share
-                            </Menu.Item>
-                            <Menu.Item value="move">
-                              <TbArrowBarUp />
-                              Move Vaults
-                            </Menu.Item>
-                            <Menu.Separator />
-
-                            <Menu.Item
-                              value="delete"
-                              color="red.fg"
-                              _hover={{ bg: 'red.subtle' }}
-                              onClick={() => setShowDeleteItemDialog(true)}
-                            >
-                              <TbTrash />
-                              Delete
-                            </Menu.Item>
-                          </Menu.Content>
-                        </Menu.Positioner>
-                      </Menu.Root>
+                    <Flex direction="column" align="start" justify="start" flex={1}>
+                      <Card.Title flex={1}>{vaultItem.item.title}</Card.Title>
+                      <Badge>{camelCaseToTitleCase(vaultItem.item.category)}</Badge>
                     </Flex>
-                  </LinkBox>
-                </Card.Root>
-                <DeleteVaultItemDialog
-                  vaultId={vaultId!}
-                  itemId={vaultItem.item.id}
-                  open={showDeleteItemDialog}
-                  onOpenChange={(details) => setShowDeleteItemDialog(!!details.open)}
-                />
-              </List.Item>
-            ))}
+
+                    <LinkOverlay asChild>
+                      <Link
+                        href={`/vaults/${currentVault.id}/item/${vaultItem.itemId}`}
+                        style={{ textDecoration: 'none' }}
+                      />
+                    </LinkOverlay>
+
+                    {monitoringEnabled && hasSecurityIssues(vaultItem) && (
+                      <Badge variant="surface" colorPalette="red" size="lg">
+                        <TbAlertTriangle />
+                      </Badge>
+                    )}
+
+                    <Menu.Root>
+                      <Menu.Trigger asChild>
+                        <IconButton
+                          aria-label="Vault item options"
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <TbDotsVertical />
+                        </IconButton>
+                      </Menu.Trigger>
+                      <Menu.Positioner zIndex={999}>
+                        <Menu.Content w={48}>
+                          <Menu.Item value="edit" onClick={() => openVaultItem(vaultItem)}>
+                            <TbPencil />
+                            Edit
+                          </Menu.Item>
+                          <Menu.Item value="share">
+                            <TbShare />
+                            Share
+                          </Menu.Item>
+                          <Menu.Item value="move">
+                            <TbArrowBarUp />
+                            Move Vaults
+                          </Menu.Item>
+                          <Menu.Separator />
+
+                          <Menu.Item
+                            value="delete"
+                            color="red.fg"
+                            _hover={{ bg: 'red.subtle' }}
+                            onClick={() => setShowDeleteItemDialog(true)}
+                          >
+                            <TbTrash />
+                            Delete
+                          </Menu.Item>
+                        </Menu.Content>
+                      </Menu.Positioner>
+                    </Menu.Root>
+                  </Flex>
+                </LinkBox>
+              </Card.Root>
+              <DeleteVaultItemDialog
+                vaultId={vaultId!}
+                itemId={vaultItem.item.id}
+                open={showDeleteItemDialog}
+                onOpenChange={(details) => setShowDeleteItemDialog(!!details.open)}
+              />
+            </List.Item>
+          ))}
         </List.Root>
       )}
 

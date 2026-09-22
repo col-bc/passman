@@ -71,8 +71,8 @@ export default async function HomePage() {
 
               <Heading
                 as="h1"
-                fontSize={{ base: '5xl', md: '7xl' }}
-                fontWeight="extrabold"
+                fontSize={{ base: '5xl', md: '6xl', lg: '7xl' }}
+                fontWeight="semibold"
                 letterSpacing="tighter"
                 maxW="4xl"
                 lineHeight="1.1"
@@ -84,13 +84,13 @@ export default async function HomePage() {
                 protected.
               </Heading>
 
-              <Text fontSize={{ base: 'lg', md: 'xl' }} color="fg" maxW="2xl" lineHeight="tall">
+              <Text fontSize={{ base: 'lg', md: 'xl' }} color="fg" maxW="full" lineHeight="tall">
                 Passman uses military-grade AES-256 client-side encryption. Your master key never leaves your
                 device,ensuring you retain absolute control over your data. Enable sharing securely with others without
                 compromising your privacy.
               </Text>
 
-              <Flex direction={{ base: 'column', sm: 'row' }} gap={4} mt={4} w="full" justify="center">
+              <Flex direction={{ base: 'column', sm: 'row' }} gap={[4, 4, 6]} mt={4} w="full" justify="center">
                 <Button asChild colorPalette="yellow" size="xl" variant="solid">
                   <Link href={user ? '/vaults' : '/auth/sign-up'}>
                     Get Started Free <TbArrowRight />

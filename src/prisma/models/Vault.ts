@@ -456,6 +456,7 @@ export type VaultCreateOrConnectWithoutUserInput = {
 
 export type VaultCreateManyUserInputEnvelope = {
   data: Prisma.VaultCreateManyUserInput | Prisma.VaultCreateManyUserInput[]
+  skipDuplicates?: boolean
 }
 
 export type VaultUpsertWithWhereUniqueWithoutUserInput = {
@@ -1350,6 +1351,7 @@ export type VaultCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * The data used to create many Vaults.
    */
   data: Prisma.VaultCreateManyInput | Prisma.VaultCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1368,6 +1370,7 @@ export type VaultCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extension
    * The data used to create many Vaults.
    */
   data: Prisma.VaultCreateManyInput | Prisma.VaultCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

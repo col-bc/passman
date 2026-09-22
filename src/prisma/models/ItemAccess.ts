@@ -454,6 +454,7 @@ export type ItemAccessCreateOrConnectWithoutUserInput = {
 
 export type ItemAccessCreateManyUserInputEnvelope = {
   data: Prisma.ItemAccessCreateManyUserInput | Prisma.ItemAccessCreateManyUserInput[]
+  skipDuplicates?: boolean
 }
 
 export type ItemAccessUpsertWithWhereUniqueWithoutUserInput = {
@@ -507,6 +508,7 @@ export type ItemAccessCreateOrConnectWithoutItemInput = {
 
 export type ItemAccessCreateManyItemInputEnvelope = {
   data: Prisma.ItemAccessCreateManyItemInput | Prisma.ItemAccessCreateManyItemInput[]
+  skipDuplicates?: boolean
 }
 
 export type ItemAccessUpsertWithWhereUniqueWithoutItemInput = {
@@ -1325,6 +1327,7 @@ export type ItemAccessCreateManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * The data used to create many ItemAccesses.
    */
   data: Prisma.ItemAccessCreateManyInput | Prisma.ItemAccessCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1343,6 +1346,7 @@ export type ItemAccessCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Exte
    * The data used to create many ItemAccesses.
    */
   data: Prisma.ItemAccessCreateManyInput | Prisma.ItemAccessCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

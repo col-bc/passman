@@ -40,7 +40,7 @@ export default function FixIssueDialog({
             {href && (
               <Dialog.ActionTrigger asChild>
                 <NextLink href={href} passHref>
-                  <Button as="a" colorPalette="yellow" size="sm">
+                  <Button colorPalette="yellow" size="sm">
                     Fix Issue <TbTool />
                   </Button>
                 </NextLink>

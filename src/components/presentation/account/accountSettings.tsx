@@ -6,7 +6,7 @@ import { Badge, Card, Flex, Heading, Link, List, Stack } from '@chakra-ui/react'
 
 export default function AccountSettings({ user }: { user: User }) {
   return (
-    <Flex gap={10} flexDirection={{ base: 'column-reverse', lg: 'row' }}>
+    <Flex gap={10} flexDirection={{ base: 'column-reverse', lg: 'row' }} h="full" maxH="full">
       <Flex direction="column" gap={{ base: 8, lg: 10 }} flex={1}>
         <Card.Root id="about-you" variant="elevated">
           <Card.Header>
@@ -26,8 +26,8 @@ export default function AccountSettings({ user }: { user: User }) {
           <Card.Header>
             <Stack direction="row" justify="space-between" gap={2}>
               <Card.Title>Two-Factor Authentication</Card.Title>
-              <Badge colorPalette="green" size="lg">
-                Enabled
+              <Badge colorPalette={user.enable2FA ? 'green' : 'yellow'} size="lg">
+                {user.enable2FA ? 'Enabled' : 'Available'}
               </Badge>
             </Stack>
           </Card.Header>
@@ -53,7 +53,7 @@ export default function AccountSettings({ user }: { user: User }) {
         </Card.Root>
       </Flex>
 
-      <Flex direction="column" as="nav" maxW="2xs" w="full" color="text.muted">
+      <Flex direction="column" as="nav" maxW="2xs" w="full" color="text.muted" position="sticky" top={4}>
         <Heading as="h6" size="sm" mb={2} px={2} pb={1} borderBottom="1px solid" borderColor="border.muted">
           ON THIS PAGE
         </Heading>

@@ -17,7 +17,7 @@ export default async function AuthLayout({
   return (
     <VaultProvider userEmail={user?.email || ''}>
       <Flex direction="column" minH="100vh" h="full" position="relative">
-        <Navbar user={user} />
+        <Navbar user={user} href="/" />
         <Box
           position="absolute"
           inset={0}

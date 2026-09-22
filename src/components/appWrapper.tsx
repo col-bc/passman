@@ -11,6 +11,7 @@ import {
   Card,
   Circle,
   CloseButton,
+  Dialog,
   Drawer,
   EmptyState,
   Flex,
@@ -23,6 +24,7 @@ import {
   Menu,
   Separator,
   Text,
+  useMediaQuery,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -30,13 +32,16 @@ import React from 'react';
 import {
   TbBell,
   TbBellCheck,
-  TbLayoutSidebarLeftCollapse,
+  TbLayoutNavbarCollapseFilled,
+  TbLayoutNavbarExpandFilled,
+  TbLayoutSidebarLeftCollapseFilled,
   TbLayoutSidebarLeftExpand,
   TbLockSquareRounded,
   TbPlus,
   TbSearch,
   TbShieldLock,
   TbUserCircle,
+  TbX,
 } from 'react-icons/tb';
 import SignOutButton from './forms/auth/signOut';
 import Logo from './logo';
@@ -45,10 +50,19 @@ import { Toaster } from './ui/toaster';
 
 export default function AppWrapper({ children, user }: { children: React.ReactNode; user: User }) {
   const [open, setOpen] = React.useState(true);
+  const [isMobile] = useMediaQuery(['(max-width: 768px)']);
+
+  const getToggleIcon = () => {
+    if (isMobile) {
+      return open ? <TbLayoutNavbarCollapseFilled /> : <TbLayoutNavbarExpandFilled />;
+    }
+    return open ? <TbLayoutSidebarLeftCollapseFilled /> : <TbLayoutSidebarLeftExpand />;
+  };
+
   return (
-    <Flex direction="column" h="100vh" overflow="hidden" w="full" bg="bg">
-      <Flex direction="row" align="stretch" h="full" w="full" flex={1} minH={0} bg="bg.muted">
-        <Sidebar user={user} open={open} />
+    <Flex direction="column" h="100vh" overflowX="hidden" w="full" bg="bg">
+      <Flex direction={{ base: 'column', md: 'row' }} align="stretch" h="full" w="full" flex={1} minH={0} bg="bg.muted">
+        <Sidebar user={user} open={open} setOpen={setOpen} />
 
         <Box
           as="main"
@@ -56,19 +70,25 @@ export default function AppWrapper({ children, user }: { children: React.ReactNo
           overflowY="auto"
           overflowX="hidden"
           minH={0}
-          roundedLeft={open ? '2xl' : '0px'}
+          roundedTopLeft={open ? '2xl' : '0px'}
+          roundedTopRight={{ base: open ? '2xl' : '0px', md: '0px' }}
+          transition="border-radius 0.2s ease-in-out"
           bg="bg"
           shadow="lg"
         >
-          <Flex w="full" direction="row" gap={4} align="center" py={2} px={[4, 6]} mb={[0, 4, 6]} maxW="5xl" mx="auto">
-            <IconButton onClick={() => setOpen(!open)} aria-label="Toggle Sidebar" variant="ghost">
-              {open ? <TbLayoutSidebarLeftCollapse /> : <TbLayoutSidebarLeftExpand />}
+          <Flex w="full" direction="row" gap={4} align="center" pt={4} px={[4, 6]} mb={[0, 4, 6]} maxW="5xl" mx="auto">
+            <IconButton onClick={() => setOpen(!open)} aria-label="Toggle Sidebar" variant="ghost" mr="auto">
+              {getToggleIcon()}
             </IconButton>
 
             <IconButton colorPalette="yellow" aria-label="Create New Item" variant="surface" ml="auto">
               <TbPlus />
             </IconButton>
-            <SearchBar query="" onQueryChange={() => {}} />
+
+            <Box>
+              <SearchBar query="" onQueryChange={() => {}} />
+            </Box>
+
             <ColorModeButton />
             <NotificationDrawer />
           </Flex>
@@ -80,20 +100,34 @@ export default function AppWrapper({ children, user }: { children: React.ReactNo
   );
 }
 
-const Sidebar: React.FC<{ user: User; open: boolean }> = ({ user, open }) => {
+const Sidebar: React.FC<{ user: User; open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>> }> = ({
+  user,
+  open,
+  setOpen,
+}) => {
   return (
     <Box
       as="aside"
-      width={open ? '260px' : '0px'}
+      width={{ base: 'full', md: open ? '260px' : '0px' }}
+      height={{ base: open ? '340px' : '0px', md: 'full' }}
       overflow="hidden"
-      transition="width 0.2s ease-in-out"
-      borderRightWidth={open ? '1px' : '0px'}
+      transition="all 0.2s ease-in-out"
+      borderRightWidth={{ base: '0px', md: open ? '1px' : '0px' }}
+      borderBottomWidth={{ base: open ? '1px' : '0px', md: '0px' }}
       borderColor="border.muted"
     >
-      <Flex direction="column" h="full" w="260px" pt={4} px={3}>
-        <Box px={3} mb={6}>
-          <Logo asLink href="/vaults" />
-        </Box>
+      <Flex direction="column" h={{ base: '340px', md: 'full' }} minW="260px" w="full" pt={4} px={3}>
+        <Flex px={3} mb={6} justifyContent="space-between" alignItems="center">
+          <Logo asLink href="/vaults" forceFull />
+          <IconButton
+            aria-label="Close Sidebar"
+            variant="ghost"
+            onClick={() => setOpen(false)}
+            display={{ base: 'flex', md: 'none' }}
+          >
+            <TbX />
+          </IconButton>
+        </Flex>
         <SidebarLinks user={user} />
       </Flex>
     </Box>
@@ -105,28 +139,32 @@ const SidebarLinks: React.FC<{ user: User }> = ({ user }) => {
   const { vaults } = useVaults();
   const { totalIssues } = useSecurityAnalytics(vaults);
 
+  const isCurrentPath = (path: string) => pathName.startsWith(path);
+
   return (
-    <Flex direction="column" as="ul" flex={1} overflowY="auto" gap={1} w="full" h="full">
-      <NextLink href="/vaults" passHref style={{ width: '100%' }}>
-        <Button
-          variant={pathName.startsWith('/vaults') ? 'subtle' : 'ghost'}
-          colorPalette="gray"
-          justifyContent="flex-start"
-          gap={2}
-          w="full"
-        >
+    <Flex direction="column" as="ul" flex={1} overflowY="auto" gap={1} w="full" h="full" p="1px">
+      <Button
+        variant={isCurrentPath('/vaults') ? 'plain' : 'subtle'}
+        colorPalette={isCurrentPath('/vaults') ? 'yellow' : 'transparent'}
+        w="full"
+        justifyContent="flex-start"
+        gap={2}
+        asChild
+      >
+        <NextLink href="/vaults">
           <TbLockSquareRounded />
           Vaults
-        </Button>
-      </NextLink>
-      <NextLink href="/security-center" passHref style={{ width: '100%' }}>
-        <Button
-          variant={pathName.startsWith('/security-center') ? 'subtle' : 'ghost'}
-          colorPalette="gray"
-          justifyContent="flex-start"
-          gap={2}
-          w="full"
-        >
+        </NextLink>
+      </Button>
+      <Button
+        variant={isCurrentPath('/security-center') ? 'plain' : 'subtle'}
+        colorPalette={isCurrentPath('/security-center') ? 'yellow' : 'transparent'}
+        justifyContent="flex-start"
+        gap={2}
+        w="full"
+        asChild
+      >
+        <NextLink href="/security-center">
           <TbShieldLock />
           Security Center
           {totalIssues > 0 && (
@@ -134,13 +172,13 @@ const SidebarLinks: React.FC<{ user: User }> = ({ user }) => {
               {totalIssues}
             </Badge>
           )}
-        </Button>
-      </NextLink>
+        </NextLink>
+      </Button>
 
       <Separator orientation="horizontal" mt="auto" mb={2} />
       <Menu.Root positioning={{ placement: 'top-end' }}>
         <Menu.Trigger asChild>
-          <Button variant="ghost" colorPalette="gray" w="full" h="auto" py={3} px={3}>
+          <Button variant="subtle" colorPalette="transparent" w="full" h="auto" py={3} px={3}>
             <Flex direction="row" align="center" gap={3} w="full">
               <Avatar.Root variant="subtle" colorPalette="yellow" rounded="md">
                 <Avatar.Fallback>{user?.name?.charAt(0) ?? 'U'}</Avatar.Fallback>
@@ -172,8 +210,6 @@ const SidebarLinks: React.FC<{ user: User }> = ({ user }) => {
           </Menu.Content>
         </Menu.Positioner>
       </Menu.Root>
-      <Separator orientation="horizontal" display={{ base: 'block', md: 'none' }} />
-      <SearchBar query="" onQueryChange={() => {}} display={{ base: 'block', md: 'none' }} />
     </Flex>
   );
 };
@@ -202,9 +238,7 @@ const NotificationDrawer: React.FC = () => {
         <Drawer.Content>
           <Drawer.Header>
             <Drawer.Title>Notifications</Drawer.Title>
-            <Drawer.CloseTrigger>
-              <CloseButton aria-label="Close notifications" />
-            </Drawer.CloseTrigger>
+            <CloseButton as={Drawer.CloseTrigger} aria-label="Close notifications" />
           </Drawer.Header>
           <Drawer.Body>
             {totalIssues === 0 ? (
@@ -232,7 +266,9 @@ const NotificationDrawer: React.FC = () => {
                     </Card.Body>
                     <Card.Footer>
                       <Button size="sm" colorPalette="yellow" asChild>
-                        <Link href={`/vaults/${item.occurrences[0].vaultId}/item/${item.occurrences[0].itemId}`}>
+                        <Link
+                          href={`/vaults/${item.occurrences[0].vaultId}/item/${item.occurrences[0].itemId}?mode=edit&highlightIndex=${item.occurrences[0].fieldIndex}`}
+                        >
                           Fix Problem
                         </Link>
                       </Button>
@@ -251,7 +287,11 @@ const NotificationDrawer: React.FC = () => {
                     </Card.Body>
                     <Card.Footer>
                       <Button size="sm" colorPalette="yellow" asChild>
-                        <Link href={`/vaults/${item.vaultId}/item/${item.itemId}`}>Fix Problem</Link>
+                        <Link
+                          href={`/vaults/${item.vaultId}/item/${item.itemId}?mode=edit&highlightIndex=${item.fieldIndex}`}
+                        >
+                          Fix Problem
+                        </Link>
                       </Button>
                     </Card.Footer>
                   </Card.Root>
@@ -269,7 +309,11 @@ const NotificationDrawer: React.FC = () => {
                     </Card.Body>
                     <Card.Footer>
                       <Button size="sm" colorPalette="yellow" asChild>
-                        <Link href={`/vaults/${item.vaultId}/item/${item.itemId}`}>Fix Problem</Link>
+                        <Link
+                          href={`/vaults/${item.vaultId}/item/${item.itemId}?mode=edit&highlightIndex=${item.fieldIndex}`}
+                        >
+                          Fix Problem
+                        </Link>
                       </Button>
                     </Card.Footer>
                   </Card.Root>
@@ -286,6 +330,32 @@ const NotificationDrawer: React.FC = () => {
 const SearchBar: React.FC<
   { query: string; onQueryChange: (query: string) => void } & Omit<InputGroupProps, 'children'>
 > = ({ query, onQueryChange, ...props }) => {
+  const [isMobile] = useMediaQuery(['(max-width: 767px)']);
+
+  if (isMobile)
+    return (
+      <Dialog.Root>
+        <IconButton as={Dialog.Trigger} variant="ghost">
+          <TbSearch />
+        </IconButton>
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content>
+            <Dialog.Header>
+              <Input
+                placeholder="Search..."
+                variant="subtle"
+                colorPalette="yellow"
+                size="xl"
+                value={query}
+                onChange={(e) => onQueryChange(e.target.value)}
+              />
+            </Dialog.Header>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Dialog.Root>
+    );
+
   return (
     <InputGroup
       startElement={<TbSearch />}

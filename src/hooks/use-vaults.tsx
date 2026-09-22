@@ -1,6 +1,7 @@
 'use client';
 
 import SignOutButton from '@/components/forms/auth/signOut';
+import VaultError from '@/components/presentation/vault/vaultError';
 import { PasswordInput } from '@/components/ui/password-input';
 import { decryptPayload, deriveHexKey, stringToUint8 } from '@/lib/crypto';
 import { DecryptedVault, DecryptedVaultItem } from '@/types/client';
@@ -36,7 +37,7 @@ export function VaultProvider({ children, userEmail }: { children: React.ReactNo
 
   const [unlocking, setUnlocking] = React.useState<boolean>(false);
   const [mek, setMek] = React.useState<string | null>(null);
-  const [error, setError] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<{ text: string; type: string } | null>(null);
   const [vaults, setVaults] = React.useState<DecryptedVault[]>([]);
   const [currentVault, setCurrentVault] = React.useState<DecryptedVault | null>(null);
   const [passwordInput, setPasswordInput] = React.useState('');
@@ -110,7 +111,7 @@ export function VaultProvider({ children, userEmail }: { children: React.ReactNo
         return decryptedVaults;
       } catch (error) {
         console.error('Failed to unlock vault:', error);
-        setError(true);
+        setError({ type: 'unlock', text: 'Failed to unlock vault.' });
         return [];
       } finally {
         setUnlocking(false);
@@ -152,7 +153,7 @@ export function VaultProvider({ children, userEmail }: { children: React.ReactNo
     }
   }, []);
 
-  if (error) return null;
+  if (error) return <VaultError type={error.type} text={error.text} />;
   return (
     <VaultContext.Provider value={contextValue}>
       {children}

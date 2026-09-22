@@ -146,3 +146,25 @@ export function findWeakPasswords(vaults: DecryptedVault[]): WeakPassword[] {
   }
   return weakPasswordsList;
 }
+
+export function calculateScore(vault: DecryptedVault) {
+  // max score is 4 points per password field
+  const maxScore = vault.vaultItems.reduce((acc, item) => {
+    const fields = Object.values(item.item.decryptedData!) as unknown as ItemContent[];
+    return acc + fields.filter((field) => field.type === 'password').length * 4;
+  }, 0);
+  const actualScore = vault.vaultItems.reduce((acc, item) => {
+    const fields = Object.values(item.item.decryptedData!) as unknown as ItemContent[];
+    return (
+      acc +
+      fields
+        .filter((field) => field.type === 'password')
+        .reduce((fieldAcc, field) => {
+          const analysis = zxcvbn(field.value);
+          return fieldAcc + analysis.score;
+        }, 0)
+    );
+  }, 0);
+
+  return { maxScore, actualScore };
+}

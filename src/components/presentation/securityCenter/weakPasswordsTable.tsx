@@ -3,7 +3,7 @@
 import ScreenValue from '@/components/ui/screenValue';
 import { useVaults } from '@/hooks/use-vaults';
 import { WeakPassword } from '@/types/client';
-import { Badge, Box, Button, EmptyState, Flex, Heading, Link, Popover, Table, Text } from '@chakra-ui/react';
+import { Badge, Box, EmptyState, Flex, Heading, Link, Popover, Table, Text } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { TbArrowRight, TbShieldCheckFilled } from 'react-icons/tb';
 import FixIssueDialog from './fixIssueDialog';
@@ -100,14 +100,7 @@ export default function WeakPasswordsTable({ weakPasswords }: { weakPasswords: W
                     href={`/vaults/${wp.vaultId}/item/${wp.itemId}?mode=edit&highlightIndex=${wp.fieldIndex}`}
                     descriptionChildren={<WeakPasswordDialogContent weakPassword={wp} />}
                   >
-                    <Button
-                      size="xs"
-                      variant="subtle"
-                      colorPalette="yellow"
-                      onClick={() => console.log('Fix Issue', wp)}
-                    >
-                      Resolve Issue <TbArrowRight />
-                    </Button>
+                    Resolve Issue <TbArrowRight />
                   </FixIssueDialog>
                 </Table.Cell>
               </Table.Row>

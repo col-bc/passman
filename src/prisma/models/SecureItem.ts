@@ -1400,6 +1400,7 @@ export type SecureItemCreateManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * The data used to create many SecureItems.
    */
   data: Prisma.SecureItemCreateManyInput | Prisma.SecureItemCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1418,6 +1419,7 @@ export type SecureItemCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Exte
    * The data used to create many SecureItems.
    */
   data: Prisma.SecureItemCreateManyInput | Prisma.SecureItemCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**

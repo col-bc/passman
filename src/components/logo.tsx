@@ -3,7 +3,7 @@
 import { Box, Flex, Heading, Link } from '@chakra-ui/react';
 import { TbPacman, TbPassword } from 'react-icons/tb';
 
-function Logo({ asLink = false, href = '/' }) {
+function Logo({ asLink = false, href = '/', forceFull = false }) {
   const content = (
     <Box
       as="div"
@@ -22,10 +22,16 @@ function Logo({ asLink = false, href = '/' }) {
       fontSize="lg"
     >
       <Flex as="span" alignItems="center">
-        <TbPacman size={20} />
+        <TbPacman size={24} />
         <TbPassword size={16} />
       </Flex>
-      <Heading as="span" fontSize="lg" fontWeight="semibold" mx={1.5} display={{ base: 'none', sm: 'inline' }}>
+      <Heading
+        as="span"
+        fontSize="lg"
+        fontWeight="medium"
+        mx={1.5}
+        display={forceFull ? 'inline' : { base: 'none', sm: 'inline' }}
+      >
         Passman
       </Heading>
     </Box>
