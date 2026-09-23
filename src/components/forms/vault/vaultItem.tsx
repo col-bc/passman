@@ -316,6 +316,7 @@ function VaultItemForm({
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
+    setError('');
 
     if (!mek) {
       setError('Master encryption key is not available. Please unlock your account.');
@@ -346,7 +347,7 @@ function VaultItemForm({
           type: 'success',
         });
         setMode('read');
-        router.push(`/vaults/${vault}/item/${status.data.itemId}`);
+        router.push(`/vaults/${vault}/${status.data.itemId}`);
       }
     } else {
       // Create a new vault item
@@ -360,11 +361,11 @@ function VaultItemForm({
         description: `The item "${title}" has been successfully created in the vault.`,
         action: {
           label: 'View Item',
-          onClick: () => router.push(`/vaults/${vault}/item/${status.data.itemId}`),
+          onClick: () => router.push(`/vaults/${vault}/${status.data.itemId}`),
         },
         type: 'success',
       });
-      router.push(`/vaults/${vault}/item/${status.data.itemId}`);
+      router.push(`/vaults/${vault}/${status.data.itemId}`);
     }
   }
 

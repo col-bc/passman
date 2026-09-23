@@ -44,7 +44,7 @@ export default function BreachedPasswordsTable({ breachedPasswords }: { breached
               <Table.Row key={`${bp.vaultId}-${bp.itemId}-${bp.label}`}>
                 <Table.Cell>{vault?.title || 'Unknown Vault'}</Table.Cell>
                 <Table.Cell>
-                  <Link as={NextLink} href={`/vault/${bp.vaultId}/item/${bp.itemId}`} colorPalette="yellow">
+                  <Link as={NextLink} href={`/vault/${bp.vaultId}/${bp.itemId}`} colorPalette="yellow">
                     {item?.title || 'Unknown Item'}
                   </Link>
                 </Table.Cell>
@@ -59,7 +59,7 @@ export default function BreachedPasswordsTable({ breachedPasswords }: { breached
                 </Table.Cell>
                 <Table.Cell>
                   <FixIssueDialog
-                    href={`/vault/${bp.vaultId}/item/${bp.itemId}?mode=edit&highlightIndex=${bp.fieldIndex}`}
+                    href={`/vault/${bp.vaultId}/${bp.itemId}?mode=edit&highlightIndex=${bp.fieldIndex}`}
                     descriptionChildren={<BreachedPasswordDialogContent breachedPasswords={bp} />}
                   >
                     <Button

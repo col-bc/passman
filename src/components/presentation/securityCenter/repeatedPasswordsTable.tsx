@@ -50,7 +50,7 @@ export default function RepeatedPasswordsTable({ repeatedPasswords }: { repeated
                 <Table.Cell>
                   <Link
                     as={NextLink}
-                    href={`/vaults/${firstOccurrence.vaultId}/item/${firstOccurrence.itemId}`}
+                    href={`/vaults/${firstOccurrence.vaultId}/${firstOccurrence.itemId}`}
                     colorPalette="yellow"
                   >
                     {firstOccurrence.itemName}
@@ -66,7 +66,7 @@ export default function RepeatedPasswordsTable({ repeatedPasswords }: { repeated
                 </Table.Cell>
                 <Table.Cell>
                   <FixIssueDialog
-                    href={`/vaults/${firstOccurrence.vaultId}/item/${firstOccurrence.itemId}?mode=edit&highlightIndex=${firstOccurrence.fieldIndex}`}
+                    href={`/vaults/${firstOccurrence.vaultId}/${firstOccurrence.itemId}?mode=edit&highlightIndex=${firstOccurrence.fieldIndex}`}
                     descriptionChildren={<RepeatedPasswordDialogContent repeatedPassword={rp} />}
                   >
                     <Button size="xs" variant="subtle" colorPalette="yellow">

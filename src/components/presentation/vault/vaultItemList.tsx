@@ -10,49 +10,49 @@ import { templateIcon } from '@/lib/util/itemTemplates';
 import { DecryptedVaultItem } from '@/types/client';
 import { VaultWithItems } from '@/types/server';
 import {
-  Avatar,
-  Badge,
-  Button,
-  Card,
-  Checkbox,
-  EmptyState,
-  Flex,
-  Group,
-  Heading,
-  HStack,
-  Icon,
-  IconButton,
-  Link,
-  LinkBox,
-  LinkOverlay,
-  List,
-  Menu,
-  SimpleGrid,
-  Stat,
-  VStack,
+    Avatar,
+    Badge,
+    Button,
+    Card,
+    Checkbox,
+    EmptyState,
+    Flex,
+    Group,
+    Heading,
+    HStack,
+    Icon,
+    IconButton,
+    Link,
+    LinkBox,
+    LinkOverlay,
+    List,
+    Menu,
+    SimpleGrid,
+    Stat,
+    VStack,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import {
-  TbAlertTriangle,
-  TbArrowBarUp,
-  TbDotsVertical,
-  TbDownload,
-  TbEdit,
-  TbFilter,
-  TbGaugeFilled,
-  TbLayoutListFilled,
-  TbListDetails,
-  TbLockSquareRounded,
-  TbPencil,
-  TbPlus,
-  TbShare,
-  TbShield,
-  TbShieldFilled,
-  TbStack2,
-  TbStack3Filled,
-  TbTrash,
-  TbUpload,
+    TbAlertTriangle,
+    TbArrowBarUp,
+    TbDotsVertical,
+    TbDownload,
+    TbEdit,
+    TbFilter,
+    TbGaugeFilled,
+    TbLayoutListFilled,
+    TbListDetails,
+    TbLockSquareRounded,
+    TbPencil,
+    TbPlus,
+    TbShare,
+    TbShield,
+    TbShieldFilled,
+    TbStack2,
+    TbStack3Filled,
+    TbTrash,
+    TbUpload,
 } from 'react-icons/tb';
 import DeleteVaultDialog from './deleteDialog';
 import DeleteVaultItemDialog from './deleteVaultItemDialog';
@@ -130,7 +130,7 @@ export default function VaultItemList({
   }, [vaults, vaultId, currentVault?.id, setCurrentVault]);
 
   const openVaultItem = (item: DecryptedVaultItem) => {
-    router.push(`/vaults/${currentVault?.id}/item/${item.itemId}`);
+    router.push(`/vaults/${currentVault?.id}/${item.itemId}`);
   };
 
   const toggleSelectItem = (itemId: string) => {
@@ -248,7 +248,7 @@ export default function VaultItemList({
                   </Menu.Content>
                 </Menu.Positioner>
               </Menu.Root>
-              <Link href={`/vaults/${currentVault.id}/item/new`} w={{ base: 'full', md: '1/2', lg: 'auto' }}>
+              <Link href={`/vaults/${currentVault.id}/new`} w={{ base: 'full', md: '1/2', lg: 'auto' }}>
                 <Button colorPalette="yellow" variant="solid" w="full">
                   <TbPlus />
                   Add New Item
@@ -361,7 +361,7 @@ export default function VaultItemList({
             <EmptyState.Description>
               This vault has no items yet. Create your first item to get started.
             </EmptyState.Description>
-            <Link href={`/vaults/${currentVault.id}/item/new`}>
+            <Link href={`/vaults/${currentVault.id}/new`}>
               <Button colorPalette="yellow" variant="solid" size="sm">
                 Add New Item
               </Button>
@@ -398,7 +398,7 @@ export default function VaultItemList({
 
                     <LinkOverlay asChild>
                       <Link
-                        href={`/vaults/${currentVault.id}/item/${vaultItem.itemId}`}
+                        href={`/vaults/${currentVault.id}/${vaultItem.itemId}`}
                         style={{ textDecoration: 'none' }}
                       />
                     </LinkOverlay>

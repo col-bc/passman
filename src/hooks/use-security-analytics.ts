@@ -1,3 +1,5 @@
+'use client';
+
 import { checkForBreaches, findRepeatedPasswords, findWeakPasswords } from '@/lib/securityCenter';
 import { BreachedPassword, DecryptedVault, DecryptedVaultItem, RepeatedPassword, WeakPassword } from '@/types/client';
 import React from 'react';
@@ -24,15 +26,15 @@ export function useSecurityAnalytics(vaults: DecryptedVault[]) {
 
   React.useEffect(() => {
     let cancelled = false;
-
-    checkForBreaches(vaults)
-      .then((breached) => {
-        if (!cancelled) setBreaches(breached);
-      })
-      .catch((error) => {
-        console.error('Error checking for breaches:', error);
-        if (!cancelled) setBreaches([]);
-      });
+    if (vaults.length > 0)
+      checkForBreaches(vaults)
+        .then((breached) => {
+          if (!cancelled) setBreaches(breached);
+        })
+        .catch((error) => {
+          console.error('Error checking for breaches:', error);
+          if (!cancelled) setBreaches([]);
+        });
 
     return () => {
       cancelled = true;

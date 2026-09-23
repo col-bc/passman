@@ -86,11 +86,12 @@ export async function encryptPayload(payload: unknown, hexKey: string): Promise<
 export async function decryptPayload<T = unknown>(data: EncryptedData, hexKey: string): Promise<T> {
   const key = await importKey(hexKey);
 
+  console.log('[decryptPayload] Starting decryption with data:', data, ' and mek:', hexKey);
+
   // Web Crypto API requires the ciphertext and tag to be concatenated
   const combinedBuffer = new Uint8Array(data.ciphertext.length + data.tag.length);
   combinedBuffer.set(data.ciphertext, 0);
   combinedBuffer.set(data.tag, data.ciphertext.length);
-
   try {
     const decryptedBuffer = await window.crypto.subtle.decrypt(
       {
@@ -101,12 +102,14 @@ export async function decryptPayload<T = unknown>(data: EncryptedData, hexKey: s
       combinedBuffer,
     );
 
+    console.log('[decryptPayload] Decryption successful, obtained buffer:', decryptedBuffer);
+
     // Decode bytes and parse JSON
     const jsonString = new TextDecoder().decode(decryptedBuffer);
     return JSON.parse(jsonString) as T;
   } catch (error) {
-    console.error('Decryption error:', error);
-    throw new Error('Decryption failed. The payload may have been tampered with or the key is incorrect.');
+    console.error('[decryptPayload] Decryption failed with error:', error);
+    throw error;
   }
 }
 

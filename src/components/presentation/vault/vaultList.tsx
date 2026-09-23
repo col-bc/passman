@@ -2,6 +2,7 @@
 
 import { VaultIconMap } from '@/components/forms/vault/iconPicker';
 import { VaultFormDialog } from '@/components/forms/vault/vaultForm';
+import { useSecurityAnalytics } from '@/hooks/use-security-analytics';
 import { useVaults } from '@/hooks/use-vaults';
 import { calculateScore } from '@/lib/securityCenter';
 import { timeSinceDate } from '@/lib/util/formats';
@@ -23,7 +24,6 @@ import {
   LinkBox,
   LinkOverlay,
   SimpleGrid,
-  Spinner,
   Stat,
   Text,
   VStack,
@@ -44,7 +44,8 @@ import DeleteVaultDialog from './deleteDialog';
 
 export default function VaultList({ v }: { v: VaultWithItems[]; user?: User }) {
   const [showCreateVaultDialog, setShowCreateVaultDialog] = React.useState(false);
-  const { handleUnlock, vaults, currentVault, mek } = useVaults();
+  const { handleUnlock, vaults, mek } = useVaults();
+  const { totalIssues } = useSecurityAnalytics(vaults);
 
   const [securityScore, setSecurityScore] = React.useState<number | null>(null);
 
@@ -115,6 +116,7 @@ export default function VaultList({ v }: { v: VaultWithItems[]; user?: User }) {
               </HStack>
               <Stat.ValueText fontFamily="mono">{aggregateStats.fieldCount}</Stat.ValueText>
             </Stat.Root>
+
             <Stat.Root p="4" rounded="sm" bg="bg.muted" color="fg.muted">
               <HStack justify="space-between">
                 <Stat.Label>Security Score</Stat.Label>
@@ -123,7 +125,7 @@ export default function VaultList({ v }: { v: VaultWithItems[]; user?: User }) {
                 </Icon>
               </HStack>
               <Stat.ValueText fontFamily="mono">
-                {securityScore !== null ? `${securityScore.toFixed(0)}%` : <Spinner size="sm" />}
+                {securityScore !== null ? `${securityScore.toFixed(0)}%` : 'N/A'}
               </Stat.ValueText>
             </Stat.Root>
 
@@ -134,7 +136,7 @@ export default function VaultList({ v }: { v: VaultWithItems[]; user?: User }) {
                   <TbShieldFilled />
                 </Icon>
               </HStack>
-              <Stat.ValueText fontFamily="mono"></Stat.ValueText>
+              <Stat.ValueText fontFamily="mono">{totalIssues !== null ? totalIssues : 'N/A'}</Stat.ValueText>
             </Stat.Root>
           </SimpleGrid>
         </Card.Body>

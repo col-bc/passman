@@ -47,9 +47,9 @@ export function VaultProvider({ children, userEmail }: { children: React.ReactNo
 
   const handleManualUnlock = async (e: React.SyntheticEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setUnlockError(null);
     try {
-      const derivedMek = await deriveHexKey(passwordInput, userEmail);
+      const normalizedEmail = userEmail.trim().toLowerCase();
+      const derivedMek = await deriveHexKey(passwordInput, normalizedEmail);
       setMek(derivedMek);
       if (process.env.NODE_ENV === 'development') {
         sessionStorage.setItem('DEV_MEK_CACHE', derivedMek);
@@ -66,58 +66,62 @@ export function VaultProvider({ children, userEmail }: { children: React.ReactNo
       if (!mek) {
         throw new Error('MEK is not set. Cannot unlock vault.');
       }
-      setUnlocking(true);
-      try {
-        const decryptedVaults: DecryptedVault[] = await Promise.all(
-          vaultData.map(async (vault) => {
-            const decryptedItems: (DecryptedVaultItem | null)[] = await Promise.all(
-              vault.vaultItems.map(async (vaultItem) => {
-                try {
-                  const decryptedItem = await decryptPayload(
-                    {
-                      ciphertext: stringToUint8(vaultItem.item.ciphertext),
-                      iv: stringToUint8(vaultItem.item.iv),
-                      tag: stringToUint8(vaultItem.item.tag),
-                    },
-                    mek,
-                  );
-
-                  const decryptedVaultItem: DecryptedVaultItem = {
-                    id: vaultItem.vaultId + '-' + vaultItem.itemId,
-                    vaultId: vaultItem.vaultId,
-                    itemId: vaultItem.itemId,
-                    item: {
-                      ...vaultItem.item,
-                      decryptedData: JSON.parse(decryptedItem as string),
-                    },
-                  } as unknown as DecryptedVaultItem;
-
-                  return decryptedVaultItem;
-                } catch (error) {
-                  console.warn('Failed to decrypt vault item:', error);
-                  return null;
-                }
-              }),
-            );
-            const filteredItems = decryptedItems.filter((item) => item !== null) as DecryptedVaultItem[];
-            return {
-              ...vault,
-              lockerItems: filteredItems,
-              vaultItems: filteredItems,
-            };
-          }),
-        );
-        setVaults(decryptedVaults);
-        return decryptedVaults;
-      } catch (error) {
-        console.error('Failed to unlock vault:', error);
-        setError({ type: 'unlock', text: 'Failed to unlock vault.' });
-        return [];
-      } finally {
-        setUnlocking(false);
+      if (!error) {
+        setUnlocking(true);
+        try {
+          const decryptedVaults: DecryptedVault[] = await Promise.all(
+            vaultData.map(async (vault) => {
+              const decryptedItems: (DecryptedVaultItem | null)[] = await Promise.all(
+                vault.vaultItems.map(async (vaultItem) => {
+                  try {
+                    console.log(`[handleUnlock] Starting to decrypt ${vaultItem.vaultId}-${vaultItem.itemId}`);
+                    const decryptedItem = await decryptPayload(
+                      {
+                        ciphertext: stringToUint8(vaultItem.item.ciphertext),
+                        iv: stringToUint8(vaultItem.item.iv),
+                        tag: stringToUint8(vaultItem.item.tag),
+                      },
+                      mek,
+                    );
+                    console.log('[handleUnlock] Decrypted item:', decryptedItem);
+                    const decryptedVaultItem: DecryptedVaultItem = {
+                      id: vaultItem.vaultId + '-' + vaultItem.itemId,
+                      vaultId: vaultItem.vaultId,
+                      itemId: vaultItem.itemId,
+                      item: {
+                        ...vaultItem.item,
+                        decryptedData: JSON.parse(decryptedItem as string),
+                      },
+                    } as unknown as DecryptedVaultItem;
+                    return decryptedVaultItem;
+                  } catch (error) {
+                    console.warn('Failed to decrypt vault item:', error);
+                    return null;
+                  }
+                }),
+              );
+              const filteredItems = decryptedItems.filter((item) => item !== null) as DecryptedVaultItem[];
+              return {
+                ...vault,
+                lockerItems: filteredItems,
+                vaultItems: filteredItems,
+              };
+            }),
+          );
+          console.log('[handleUnlock] Decrypted vaults:', decryptedVaults);
+          setVaults(decryptedVaults);
+          return decryptedVaults;
+        } catch (error) {
+          setError({ type: 'unlock', text: 'Failed to unlock vault.' });
+          console.warn('[handleUnlock] Failed to unlock vault with error: ', error);
+          return [];
+        } finally {
+          setUnlocking(false);
+        }
       }
+      return [];
     },
-    [mek, setError, setVaults, setUnlocking],
+    [mek, setError, setVaults, setUnlocking, error],
   );
 
   const contextValue: VaultContext = React.useMemo(
@@ -154,96 +158,74 @@ export function VaultProvider({ children, userEmail }: { children: React.ReactNo
   }, []);
 
   if (error) return <VaultError type={error.type} text={error.text} />;
-  return (
-    <VaultContext.Provider value={contextValue}>
-      {children}
+  else
+    return (
+      <VaultContext.Provider value={contextValue}>
+        {children}
 
-      <Dialog.Root
-        open={dialogOpen}
-        onOpenChange={(e) => setDialogOpen(e.open)}
-        onExitComplete={() => setUnlocking(false)}
-        closeOnInteractOutside={false}
-        placement="center"
-      >
-        <Dialog.Backdrop backdropFilter="blur(10px)" />
-        <Dialog.Positioner>
-          <Dialog.Content maxW="lg" w="full" bg="bg.panel">
-            <Dialog.Header>
-              <Dialog.Title>Vault Locked</Dialog.Title>
-            </Dialog.Header>
-            {unlocking ? (
-              <Dialog.Body>
-                <Flex direction="column" align="center" justify="center" maxW="sm" w="full">
-                  <Box bg="bg.panel" p={6} borderRadius="md" textAlign="center">
-                    <Spinner size="xl" color="yellow.solid" mb={4} />
-                    <Text fontSize="sm" color="fg.muted">
-                      Please wait while we decrypt your information.
-                    </Text>
-                  </Box>
-                </Flex>
-              </Dialog.Body>
-            ) : (
-              <>
-                <Dialog.Body>
-                  <Flex direction="column" maxW="md" gap={4}>
-                    <Dialog.Description>
-                      Your session is active, but your encryption keys are missing. Please enter your master password to
-                      decrypt your vaults.
-                    </Dialog.Description>
-                    <Field.Root colorPalette="yellow" invalid={!!unlockError}>
-                      <Field.Label>Master Password</Field.Label>
-                      <PasswordInput
-                        type="password"
-                        value={passwordInput}
-                        onChange={(e) => setPasswordInput(e.target.value)}
-                        placeholder="Enter your master password"
-                      />
-                      {unlockError && <Field.ErrorText>{unlockError}</Field.ErrorText>}
-                    </Field.Root>
-                  </Flex>
-                </Dialog.Body>
-                <Dialog.Footer>
-                  <SignOutButton variant="subtle" />
-                  <Button
-                    type="button"
-                    colorPalette="yellow"
-                    ml="auto"
-                    loading={unlocking}
-                    loadingText="Unlocking..."
-                    onClick={handleManualUnlock}
-                  >
-                    <TbLockOpen />
-                    Unlock Vault
-                  </Button>
-                </Dialog.Footer>
-              </>
-            )}
-          </Dialog.Content>
-        </Dialog.Positioner>
-      </Dialog.Root>
-
-      {error && (
-        <Dialog.Root open={!!error}>
+        <Dialog.Root
+          open={dialogOpen}
+          onOpenChange={(e) => setDialogOpen(e.open)}
+          onExitComplete={() => setUnlocking(false)}
+          closeOnInteractOutside={false}
+          placement="center"
+        >
           <Dialog.Backdrop backdropFilter="blur(10px)" />
           <Dialog.Positioner>
             <Dialog.Content maxW="lg" w="full" bg="bg.panel">
               <Dialog.Header>
-                <Dialog.Title>Error</Dialog.Title>
+                <Dialog.Title>Vault Locked</Dialog.Title>
               </Dialog.Header>
-              <Dialog.Body>
-                <Text fontSize="sm" color="fg.muted">
-                  {error}
-                </Text>
-              </Dialog.Body>
-              <Dialog.Footer>
-                <Button type="button" colorPalette="yellow" onClick={() => {}}>
-                  Close
-                </Button>
-              </Dialog.Footer>
+              {unlocking ? (
+                <Dialog.Body>
+                  <Flex direction="column" align="center" justify="center" maxW="sm" w="full">
+                    <Box bg="bg.panel" p={6} borderRadius="md" textAlign="center">
+                      <Spinner size="xl" color="yellow.solid" mb={4} />
+                      <Text fontSize="sm" color="fg.muted">
+                        Please wait while we decrypt your information.
+                      </Text>
+                    </Box>
+                  </Flex>
+                </Dialog.Body>
+              ) : (
+                <>
+                  <Dialog.Body>
+                    <Flex direction="column" maxW="md" gap={4}>
+                      <Dialog.Description>
+                        Your session is active, but your encryption keys are missing. Please enter your master password
+                        to decrypt your vaults.
+                      </Dialog.Description>
+                      <Field.Root colorPalette="yellow" invalid={!!unlockError}>
+                        <Field.Label>Master Password</Field.Label>
+                        <PasswordInput
+                          type="password"
+                          value={passwordInput}
+                          onChange={(e) => setPasswordInput(e.target.value)}
+                          placeholder="Enter your master password"
+                        />
+                        {unlockError && <Field.ErrorText>{unlockError}</Field.ErrorText>}
+                      </Field.Root>
+                    </Flex>
+                  </Dialog.Body>
+                  <Dialog.Footer>
+                    <SignOutButton variant="subtle" />
+                    <Button
+                      type="button"
+                      colorPalette="yellow"
+                      ml="auto"
+                      loading={unlocking}
+                      loadingText="Unlocking..."
+                      onClick={handleManualUnlock}
+                    >
+                      <TbLockOpen />
+                      Unlock Vault
+                    </Button>
+                  </Dialog.Footer>
+                </>
+              )}
             </Dialog.Content>
           </Dialog.Positioner>
         </Dialog.Root>
-      )}
-    </VaultContext.Provider>
-  );
+      </VaultContext.Provider>
+    );
 }

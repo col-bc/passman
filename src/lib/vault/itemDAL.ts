@@ -116,7 +116,13 @@ export async function updateItem(
     }
     const item = await prisma.secureItem.update({
       where: { id: itemId },
-      data: updateData,
+      data: {
+        title: updateData.title,
+        category: updateData.category,
+        ciphertext: updateData.ciphertext,
+        iv: updateData.iv,
+        tag: updateData.tag,
+      },
     });
     return { success: true, data: item };
   } catch (error) {

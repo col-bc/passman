@@ -28,7 +28,7 @@ export default async function VaultPage({ params }: Props) {
   }
 
   return (
-    <Container maxW="5xl" px={[4, 6]} py={6}>
+    <Container maxW="5xl" px={[4, 6]} py={6} mx="auto">
       <VaultItemList vaultId={vaultId} encryptedVaults={vaultsResponse.data} />
     </Container>
   );

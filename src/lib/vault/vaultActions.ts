@@ -156,7 +156,7 @@ export async function handleCreateSecureVaultItem(
   }
 
   revalidatePath(`/vaults/${vaultId}`);
-  revalidatePath(`/vaults/${vaultId}/item/${result.data.id}`);
+  revalidatePath(`/vaults/${vaultId}/${result.data.id}`);
   return { success: true, data: { vaultId: vaultId, itemId: result.data?.id || '' } };
 }
 
@@ -226,7 +226,7 @@ export async function handleUpdateVaultItem(
     }
   }
   revalidatePath(`/vaults/${vaultId}`);
-  revalidatePath(`/vaults/${vaultId}/item/${result.data?.id}`);
+  revalidatePath(`/vaults/${vaultId}/${result.data?.id}`);
   return { success: true, data: { vaultId: vaultId, itemId: result.data?.id || '' } };
 }
 
@@ -254,6 +254,6 @@ export async function handleDeleteVaultItem(vaultId: string, itemId: string): Pr
   }
 
   revalidatePath(`/vaults/${vaultId}`);
-  revalidatePath(`/vaults/${vaultId}/item/${itemId}`);
+  revalidatePath(`/vaults/${vaultId}/${itemId}`);
   return { success: true, data: true };
 }

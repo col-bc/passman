@@ -117,6 +117,8 @@ export default function SignInForm() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email address"
               autoComplete="email"
+              autoCapitalize="none"
+              autoCorrect="off"
               tabIndex={1}
               required
             />

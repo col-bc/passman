@@ -44,7 +44,7 @@ export default function WeakPasswordsTable({ weakPasswords }: { weakPasswords: W
               <Table.Row key={`${wp.vaultId}-${wp.itemId}-${wp.label}`}>
                 <Table.Cell>{vault?.title || 'Unknown Vault'}</Table.Cell>
                 <Table.Cell>
-                  <Link as={NextLink} href={`/vaults/${wp.vaultId}/item/${wp.itemId}`} colorPalette="yellow">
+                  <Link as={NextLink} href={`/vaults/${wp.vaultId}/${wp.itemId}`} colorPalette="yellow">
                     {item?.title || 'Unknown Item'}
                   </Link>
                 </Table.Cell>
@@ -97,7 +97,7 @@ export default function WeakPasswordsTable({ weakPasswords }: { weakPasswords: W
                 </Table.Cell>
                 <Table.Cell>
                   <FixIssueDialog
-                    href={`/vaults/${wp.vaultId}/item/${wp.itemId}?mode=edit&highlightIndex=${wp.fieldIndex}`}
+                    href={`/vaults/${wp.vaultId}/${wp.itemId}?mode=edit&highlightIndex=${wp.fieldIndex}`}
                     descriptionChildren={<WeakPasswordDialogContent weakPassword={wp} />}
                   >
                     Resolve Issue <TbArrowRight />

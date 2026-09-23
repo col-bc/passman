@@ -36,6 +36,7 @@ import {
   TbLayoutNavbarExpandFilled,
   TbLayoutSidebarLeftCollapseFilled,
   TbLayoutSidebarLeftExpand,
+  TbLockPassword,
   TbLockSquareRounded,
   TbPlus,
   TbSearch,
@@ -45,19 +46,12 @@ import {
 } from 'react-icons/tb';
 import SignOutButton from './forms/auth/signOut';
 import Logo from './logo';
+import AppCrumbs from './presentation/appCrumbs';
 import { ColorModeButton } from './ui/color-mode';
 import { Toaster } from './ui/toaster';
 
 export default function AppWrapper({ children, user }: { children: React.ReactNode; user: User }) {
   const [open, setOpen] = React.useState(true);
-  const [isMobile] = useMediaQuery(['(max-width: 768px)']);
-
-  const getToggleIcon = () => {
-    if (isMobile) {
-      return open ? <TbLayoutNavbarCollapseFilled /> : <TbLayoutNavbarExpandFilled />;
-    }
-    return open ? <TbLayoutSidebarLeftCollapseFilled /> : <TbLayoutSidebarLeftExpand />;
-  };
 
   return (
     <Flex direction="column" h="100vh" overflowX="hidden" w="full" bg="bg">
@@ -76,9 +70,14 @@ export default function AppWrapper({ children, user }: { children: React.ReactNo
           bg="bg"
           shadow="lg"
         >
-          <Flex w="full" direction="row" gap={4} align="center" pt={4} px={[4, 6]} mb={[0, 4, 6]} maxW="5xl" mx="auto">
+          <Flex w="full" direction="row" gap={4} align="center" pt={4} pb={2} px={[4, 6]} maxW="5xl" mx="auto">
             <IconButton onClick={() => setOpen(!open)} aria-label="Toggle Sidebar" variant="ghost" mr="auto">
-              {getToggleIcon()}
+              <Box display={{ base: 'flex', md: 'none' }}>
+                {open ? <TbLayoutNavbarCollapseFilled /> : <TbLayoutNavbarExpandFilled />}
+              </Box>
+              <Box display={{ base: 'none', md: 'flex' }}>
+                {open ? <TbLayoutSidebarLeftCollapseFilled /> : <TbLayoutSidebarLeftExpand />}
+              </Box>
             </IconButton>
 
             <IconButton colorPalette="yellow" aria-label="Create New Item" variant="surface" ml="auto">
@@ -92,6 +91,9 @@ export default function AppWrapper({ children, user }: { children: React.ReactNo
             <ColorModeButton />
             <NotificationDrawer />
           </Flex>
+          <Box mb={[0, 4, 6]} maxW="5xl" py={2} px={[4, 6]} mx="auto">
+            <AppCrumbs w="full" colorPalette="gray" bg="bg.subtle" rounded="sm" p={2} />
+          </Box>
           {children}
         </Box>
       </Flex>
@@ -172,6 +174,19 @@ const SidebarLinks: React.FC<{ user: User }> = ({ user }) => {
               {totalIssues}
             </Badge>
           )}
+        </NextLink>
+      </Button>
+      <Button
+        variant={isCurrentPath('/password-generator') ? 'plain' : 'subtle'}
+        colorPalette={isCurrentPath('/password-generator') ? 'yellow' : 'transparent'}
+        justifyContent="flex-start"
+        gap={2}
+        w="full"
+        asChild
+      >
+        <NextLink href="/password-generator">
+          <TbLockPassword />
+          Password Generator
         </NextLink>
       </Button>
 
@@ -267,7 +282,7 @@ const NotificationDrawer: React.FC = () => {
                     <Card.Footer>
                       <Button size="sm" colorPalette="yellow" asChild>
                         <Link
-                          href={`/vaults/${item.occurrences[0].vaultId}/item/${item.occurrences[0].itemId}?mode=edit&highlightIndex=${item.occurrences[0].fieldIndex}`}
+                          href={`/vaults/${item.occurrences[0].vaultId}/${item.occurrences[0].itemId}?mode=edit&highlightIndex=${item.occurrences[0].fieldIndex}`}
                         >
                           Fix Problem
                         </Link>
@@ -288,7 +303,7 @@ const NotificationDrawer: React.FC = () => {
                     <Card.Footer>
                       <Button size="sm" colorPalette="yellow" asChild>
                         <Link
-                          href={`/vaults/${item.vaultId}/item/${item.itemId}?mode=edit&highlightIndex=${item.fieldIndex}`}
+                          href={`/vaults/${item.vaultId}/${item.itemId}?mode=edit&highlightIndex=${item.fieldIndex}`}
                         >
                           Fix Problem
                         </Link>
@@ -310,7 +325,7 @@ const NotificationDrawer: React.FC = () => {
                     <Card.Footer>
                       <Button size="sm" colorPalette="yellow" asChild>
                         <Link
-                          href={`/vaults/${item.vaultId}/item/${item.itemId}?mode=edit&highlightIndex=${item.fieldIndex}`}
+                          href={`/vaults/${item.vaultId}/${item.itemId}?mode=edit&highlightIndex=${item.fieldIndex}`}
                         >
                           Fix Problem
                         </Link>
@@ -330,7 +345,17 @@ const NotificationDrawer: React.FC = () => {
 const SearchBar: React.FC<
   { query: string; onQueryChange: (query: string) => void } & Omit<InputGroupProps, 'children'>
 > = ({ query, onQueryChange, ...props }) => {
+  const [mounted, setMounted] = React.useState(false);
   const [isMobile] = useMediaQuery(['(max-width: 767px)']);
+
+  React.useEffect(() => {
+    const handleMount = () => setMounted(true);
+    handleMount();
+  }, []);
+
+  if (!mounted) {
+    return <Box w="full" maxW={{ base: 'full', md: '2xs' }} h="10" />;
+  }
 
   if (isMobile)
     return (

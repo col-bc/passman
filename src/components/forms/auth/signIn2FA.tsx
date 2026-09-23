@@ -38,6 +38,7 @@ export default function SignIn2FAForm() {
       } else {
         const errorMsg = 'Encryption key was lost during sign in. Please try again.';
         setError(errorMsg);
+        return;
       }
       router.push(searchParams.get('next') || '/vaults');
     }
