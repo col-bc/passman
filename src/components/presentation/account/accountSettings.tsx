@@ -1,5 +1,6 @@
 import AboutYouForm from '@/components/forms/account/aboutYou';
 import ChangePasswordForm from '@/components/forms/account/changePasswordForm';
+import SharingKeysForm from '@/components/forms/account/sharingKeys';
 import TwoFactorForm from '@/components/forms/account/twoFactor';
 import { User } from '@/prisma/client';
 import { Badge, Card, Flex, Heading, Link, List, Stack } from '@chakra-ui/react';
@@ -41,6 +42,18 @@ export default function AccountSettings({ user }: { user: User }) {
           <Card.Body>
             <Card.Description>There are no billable items at this time.</Card.Description>
           </Card.Body>
+        </Card.Root>
+
+        <Card.Root id="sharing-keys" variant="elevated">
+          <Card.Header>
+            <Card.Title>Sharing Keys</Card.Title>
+            <Card.Description>
+              These keys are used to securely share information with users you trust. Your data will be encrypted with
+              asymmetric encryption using your public key and can only be decrypted with your private key stored
+              securely in memory.
+            </Card.Description>
+          </Card.Header>
+          <SharingKeysForm user={user} />
         </Card.Root>
 
         <Card.Root id="notifications" variant="elevated">

@@ -25,9 +25,9 @@ export default function RepeatedPasswordsTable({ repeatedPasswords }: { repeated
           {repeatedPasswords.length === 0 ? (
             <Table.Row>
               <Table.Cell colSpan={5} textAlign="center" py={4}>
-                <EmptyState.Root>
+                <EmptyState.Root size="sm">
                   <EmptyState.Indicator>
-                    <TbShieldCheckFilled size={32} />
+                    <TbShieldCheckFilled size={24} />
                   </EmptyState.Indicator>
                   <EmptyState.Title>No Repeated Passwords Found</EmptyState.Title>
                 </EmptyState.Root>

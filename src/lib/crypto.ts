@@ -86,8 +86,6 @@ export async function encryptPayload(payload: unknown, hexKey: string): Promise<
 export async function decryptPayload<T = unknown>(data: EncryptedData, hexKey: string): Promise<T> {
   const key = await importKey(hexKey);
 
-  console.log('[decryptPayload] Starting decryption with data:', data, ' and mek:', hexKey);
-
   // Web Crypto API requires the ciphertext and tag to be concatenated
   const combinedBuffer = new Uint8Array(data.ciphertext.length + data.tag.length);
   combinedBuffer.set(data.ciphertext, 0);
@@ -102,13 +100,11 @@ export async function decryptPayload<T = unknown>(data: EncryptedData, hexKey: s
       combinedBuffer,
     );
 
-    console.log('[decryptPayload] Decryption successful, obtained buffer:', decryptedBuffer);
-
     // Decode bytes and parse JSON
     const jsonString = new TextDecoder().decode(decryptedBuffer);
     return JSON.parse(jsonString) as T;
   } catch (error) {
-    console.error('[decryptPayload] Decryption failed with error:', error);
+    console.warn('[decryptPayload] Decryption failed with error:', error);
     throw error;
   }
 }
@@ -166,6 +162,14 @@ export async function generateUserKeyPair(mekHex: string): Promise<{ publicKey: 
   };
 }
 
+export async function decryptPrivateKey(encryptedPrivateKeyString: string, mekHex: string): Promise<ArrayBuffer> {
+  const mek = await importKey(mekHex);
+  const encryptedKeyWithIv = stringToUint8(encryptedPrivateKeyString);
+  const iv = encryptedKeyWithIv.slice(0, 12);
+  const encryptedPrivateKeyBuffer = encryptedKeyWithIv.slice(12);
+  return window.crypto.subtle.decrypt({ name: 'AES-GCM', iv }, mek, encryptedPrivateKeyBuffer);
+}
+
 /**
  * Utility to convert an ArrayBuffer to a Base64 string for easy database storage
  */
@@ -184,4 +188,19 @@ export function stringToUint8(str: string): Uint8Array {
     bytes[i] = binary.charCodeAt(i);
   }
   return bytes;
+}
+
+export function arrayBufferToPem(buffer: ArrayBuffer, type: 'PRIVATE' | 'PUBLIC'): string {
+  // Convert ArrayBuffer to Base64
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  const base64 = window.btoa(binary);
+
+  // Wrap the Base64 string to 64 characters per line
+  const lines = base64.match(/.{1,64}/g) || [];
+
+  return [`-----BEGIN ${type} KEY-----`, ...lines, `-----END ${type} KEY-----`].join('\n');
 }

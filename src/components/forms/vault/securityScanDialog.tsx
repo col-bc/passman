@@ -3,13 +3,13 @@
 import { toaster } from '@/components/ui/toaster';
 import { handleUpdateVault } from '@/lib/vault/vaultActions';
 import { DecryptedVault } from '@/types/client';
-import { Button, CheckboxCard, Dialog, DialogOpenChangeDetails, Flex, Float, Link, Text } from '@chakra-ui/react';
+import { Button, CheckboxCard, Dialog, DialogOpenChangeDetails, Flex, Float, Link } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import React from 'react';
 import { TbDeviceFloppy, TbShieldSearch } from 'react-icons/tb';
 
 export default function SecurityMonitoringForm({ vault, onClose }: { vault: DecryptedVault; onClose: () => void }) {
-  const [enrolled, setEnrolled] = React.useState(false);
+  const [enrolled, setEnrolled] = React.useState(vault.enableMonitoring);
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -32,7 +32,14 @@ export default function SecurityMonitoringForm({ vault, onClose }: { vault: Decr
 
   return (
     <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-      <Flex direction="column" gap={4}>
+      <Dialog.Body display="flex" flexDirection="column" gap={4}>
+        <Dialog.Title fontFamily="heading" letterSpacing="tighter">
+          Manage Security Monitoring
+        </Dialog.Title>
+        <Dialog.Description>
+          Security monitoring alerts you to potential security threats by scanning your password records in the
+          background. Your data stays private and secure and you remain in control at all times.
+        </Dialog.Description>
         <CheckboxCard.Root
           colorPalette="yellow"
           variant="surface"
@@ -53,7 +60,7 @@ export default function SecurityMonitoringForm({ vault, onClose }: { vault: Decr
             </Float>
           </CheckboxCard.Control>
         </CheckboxCard.Root>
-        <Text>
+        <Dialog.Description>
           Enrolling in security monitoring, indicates your consent and agreement to the{' '}
           <Link as={NextLink} href="/terms" colorPalette="yellow">
             terms and conditions
@@ -63,13 +70,14 @@ export default function SecurityMonitoringForm({ vault, onClose }: { vault: Decr
             privacy policy
           </Link>
           .
-        </Text>
-
+        </Dialog.Description>
+      </Dialog.Body>
+      <Dialog.Footer>
         <Button colorPalette="yellow" type="submit">
           <TbDeviceFloppy />
           Save Changes
         </Button>
-      </Flex>
+      </Dialog.Footer>
     </form>
   );
 }
@@ -103,16 +111,8 @@ export function SecurityMonitoringDialog({
             </Flex>
             <Dialog.CloseTrigger />
           </Dialog.Header>
-          <Dialog.Body spaceY={4}>
-            <Dialog.Title fontFamily="heading" letterSpacing="tighter">
-              Manage Security Monitoring
-            </Dialog.Title>
-            <Dialog.Description>
-              Security monitoring alerts you to potential security threats by scanning your password records in the
-              background. Your data stays private and secure and you remain in control at all times.
-            </Dialog.Description>
-            <SecurityMonitoringForm vault={vault} onClose={() => onOpenChange({ open: false })} />
-          </Dialog.Body>
+
+          <SecurityMonitoringForm vault={vault} onClose={() => onOpenChange({ open: false })} />
         </Dialog.Content>
       </Dialog.Positioner>
     </Dialog.Root>

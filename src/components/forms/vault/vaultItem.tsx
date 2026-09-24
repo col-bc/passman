@@ -19,7 +19,7 @@ import {
   SecureNoteTemplate,
   templateIcon,
 } from '@/lib/util/itemTemplates';
-import { handleCreateSecureVaultItem, handleUpdateVaultItem } from '@/lib/vault/vaultActions';
+import { handleCreateSecureVaultItem, handleGetVaults, handleUpdateVaultItem } from '@/lib/vault/vaultActions';
 import { DecryptedVaultItem, ItemContent } from '@/types/client';
 import { VaultWithItems } from '@/types/server';
 import {
@@ -56,7 +56,7 @@ import {
 } from '@chakra-ui/react';
 import { keyframes } from '@emotion/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React from 'react';
+import React, { startTransition } from 'react';
 import {
   TbAlignJustified,
   TbAsterisk,
@@ -234,6 +234,14 @@ function VaultItemForm({
 
   const renderItemIssues = () => {
     if (!vaultItem) return null;
+
+    // Determine monitoring status
+    const monitoringEnabled = vaultList
+      ? vaultList.find((v) => v.id === vaultId && v.enableMonitoring)
+      : (vaults.find((v) => v.id === vaultId && v.enableMonitoring) ?? false);
+
+    if (!monitoringEnabled) return null;
+
     const issues = getIssuesByItem(vaultItem);
     const issueCount = issues.breaches.length + issues.weakPasswords.length + issues.repeatPasswords.length;
 
@@ -322,7 +330,6 @@ function VaultItemForm({
       setError('Master encryption key is not available. Please unlock your account.');
       return;
     }
-
     if (!title || !vault || !template) {
       setError('Please fill in all required fields.');
       return;
@@ -340,15 +347,25 @@ function VaultItemForm({
       if (!status.success) {
         setError(status.error || 'Failed to update vault item.');
         return;
-      } else {
-        toaster.success({
-          title: 'Vault Item Saved',
-          description: `The item "${title}" has been successfully saved in the Vault.`,
-          type: 'success',
-        });
-        setMode('read');
-        router.push(`/vaults/${vault}/${status.data.itemId}`);
       }
+
+      toaster.success({
+        title: 'Vault Item Saved',
+        description: `The item "${title}" has been successfully saved in the Vault.`,
+        type: 'success',
+      });
+      setMode('read');
+
+      // Fetch fresh data and decrypt it into context
+      const freshVaults = await handleGetVaults();
+      if (freshVaults.success && freshVaults.data) {
+        await handleUnlock(freshVaults.data);
+      }
+
+      startTransition(() => {
+        router.refresh();
+        router.push(`/vaults/${vault}/${status.data.itemId}`);
+      });
     } else {
       // Create a new vault item
       const status = await handleCreateSecureVaultItem(vault, encryptedData, { category: template, title });
@@ -356,6 +373,13 @@ function VaultItemForm({
         setError(status.error || 'Failed to create vault item.');
         return;
       }
+
+      // Fetch fresh encrypted data and decrypt it into context
+      const freshVaults = await handleGetVaults();
+      if (freshVaults.success && freshVaults.data) {
+        await handleUnlock(freshVaults.data);
+      }
+
       toaster.success({
         title: 'Vault Item Created',
         description: `The item "${title}" has been successfully created in the vault.`,
@@ -365,7 +389,11 @@ function VaultItemForm({
         },
         type: 'success',
       });
-      router.push(`/vaults/${vault}/${status.data.itemId}`);
+
+      startTransition(() => {
+        router.refresh();
+        router.push(`/vaults/${vault}/${status.data.itemId}`);
+      });
     }
   }
 
@@ -375,6 +403,9 @@ function VaultItemForm({
         <Card.Header>
           <Flex gap={4} align="center">
             <Avatar.Root variant="subtle" rounded="sm" colorPalette="yellow" size="lg">
+              <Avatar.Image
+                src={`https://logos.hunter.io/${vaultItem?.item.decryptedData.find((data) => data.type === 'URL')?.value || undefined}`}
+              />
               <Avatar.Fallback fontSize="xl">{templateIcon(vaultItem?.item.category || 'new')}</Avatar.Fallback>
             </Avatar.Root>
             <Heading as="h1" size="2xl" fontFamily="heading" fontWeight="bolder" letterSpacing="tighter" flex={1}>

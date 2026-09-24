@@ -16,7 +16,6 @@ import {
   QrCode,
   SimpleGrid,
   Stack,
-  Text,
   VStack,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
@@ -86,13 +85,15 @@ export default function TwoFactorForm({ user }: { user: User }) {
 
   if (!enabled) {
     return (
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} style={{ width: '100%' }}>
         <Card.Body>
           <Stack gap={4}>
-            <Text>Scan the QR code below with your authenticator app to enable two-factor authentication.</Text>
+            <Card.Description>
+              Scan the QR code below with your authenticator app to enable two-factor authentication.
+            </Card.Description>
             {QRCode}
             <Field.Root>
-              <Group attached maxW="xs" w="full">
+              <Group attached maxW="sm" w="full">
                 <Input variant="subtle" value={totpSecret} readOnly />
                 <IconButton variant="subtle" aria-label="Copy secret" onClick={copySecret}>
                   {copiedSecret ? <TbCopyCheck /> : <TbCopy />}
@@ -102,23 +103,28 @@ export default function TwoFactorForm({ user }: { user: User }) {
             </Field.Root>
 
             {error && (
-              <Alert.Root>
+              <Alert.Root status="error">
+                {' '}
                 <Alert.Indicator>
                   <TbAlertCircle />
                 </Alert.Indicator>
-                <Alert.Title>Error</Alert.Title>
-                <Alert.Description>{error}</Alert.Description>
+                <Alert.Content>
+                  <Alert.Title>Error</Alert.Title>
+                  <Alert.Description>{error}</Alert.Description>
+                </Alert.Content>
               </Alert.Root>
             )}
 
-            <Field.Root>
-              <Field.Label>One-Time Password</Field.Label>
+            <Field.Root required>
+              <Field.Label>
+                One-Time Password <Field.RequiredIndicator />
+              </Field.Label>
               <PinInput.Root
                 value={otpCode}
                 onValueChange={(v) => setOtpCode(v.value)}
                 colorPalette="yellow"
                 otp
-                attached
+                required
               >
                 <PinInput.HiddenInput />
                 <PinInput.Control>
@@ -146,10 +152,10 @@ export default function TwoFactorForm({ user }: { user: User }) {
   return (
     <Card.Body>
       <VStack gap={4}>
-        <Text>
+        <Card.Description>
           Two-factor authentication is enabled for your account. To ensure you never lose access, make sure you make
           note of these recovery codes and store them in a safe place.
-        </Text>
+        </Card.Description>
         <Collapsible.Root w="full">
           <Collapsible.Trigger asChild>
             <Button w="full" variant="surface">

@@ -1,10 +1,12 @@
 'use client';
 
 import { toaster } from '@/components/ui/toaster';
-import { handleDeleteVaultItem } from '@/lib/vault/vaultActions';
+import { useVaults } from '@/hooks/use-vaults';
+import { handleDeleteVaultItem, handleGetVaults } from '@/lib/vault/vaultActions';
 
 import { Button, CloseButton, Dialog, Flex } from '@chakra-ui/react';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { startTransition } from 'react';
 import { TbTrash, TbX } from 'react-icons/tb';
 
 export default function DeleteVaultItemDialog({
@@ -18,12 +20,23 @@ export default function DeleteVaultItemDialog({
   vaultId: string;
   itemId: string;
 }) {
+  const { handleUnlock } = useVaults();
+  const router = useRouter();
+
   async function handleDelete() {
     const result = await handleDeleteVaultItem(vaultId, itemId);
     if (result.success) {
       toaster.success({ title: 'Vault item deleted successfully' });
       onOpenChange({ open: false }); // Close the dialog
-      redirect(`/vaults/${vaultId}`);
+      const freshVaults = await handleGetVaults();
+      if (freshVaults.success && freshVaults.data) {
+        await handleUnlock(freshVaults.data);
+      }
+
+      startTransition(() => {
+        router.refresh();
+        router.push(`/vaults/${vaultId}`);
+      });
     }
   }
 

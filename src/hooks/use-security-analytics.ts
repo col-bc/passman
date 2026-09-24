@@ -20,14 +20,20 @@ export interface SecurityAnalytics {
 }
 
 export function useSecurityAnalytics(vaults: DecryptedVault[]) {
-  const repeatedPasswords = React.useMemo(() => findRepeatedPasswords(vaults), [vaults]);
-  const weakPasswords = React.useMemo(() => findWeakPasswords(vaults), [vaults]);
   const [breaches, setBreaches] = React.useState<BreachedPassword[]>([]);
+
+  const vaultsToScan = React.useMemo(() => {
+    return vaults.filter((vault) => vault.enableMonitoring);
+  }, [vaults]);
+
+  const repeatedPasswords = React.useMemo(() => findRepeatedPasswords(vaultsToScan), [vaultsToScan]);
+  const weakPasswords = React.useMemo(() => findWeakPasswords(vaultsToScan), [vaultsToScan]);
 
   React.useEffect(() => {
     let cancelled = false;
-    if (vaults.length > 0)
-      checkForBreaches(vaults)
+
+    if (vaultsToScan.length > 0) {
+      checkForBreaches(vaultsToScan)
         .then((breached) => {
           if (!cancelled) setBreaches(breached);
         })
@@ -35,14 +41,21 @@ export function useSecurityAnalytics(vaults: DecryptedVault[]) {
           console.error('Error checking for breaches:', error);
           if (!cancelled) setBreaches([]);
         });
+    } else {
+      const handleClear = () => setBreaches([]);
+      handleClear();
+    }
 
     return () => {
       cancelled = true;
     };
-  }, [vaults]);
+  }, [vaultsToScan]);
 
   const hasSecurityIssues = React.useCallback(
     (vaultItem: DecryptedVaultItem) => {
+      const parentVault = vaults.find((v) => v.vaultItems.some((item) => item.itemId === vaultItem.itemId));
+      if (parentVault && !parentVault.enableMonitoring) return false;
+
       return (
         repeatedPasswords.some((item) =>
           item.occurrences.some((occurrence) => occurrence.itemId === vaultItem.itemId),
@@ -51,11 +64,21 @@ export function useSecurityAnalytics(vaults: DecryptedVault[]) {
         breaches.some((item) => item.itemId === vaultItem.itemId)
       );
     },
-    [repeatedPasswords, weakPasswords, breaches],
+    [repeatedPasswords, weakPasswords, breaches, vaults],
   );
 
   const getIssuesByItem = React.useCallback(
     (vaultItem: DecryptedVaultItem) => {
+      const parentVault = vaults.find((v) => v.vaultItems.some((item) => item.itemId === vaultItem.itemId));
+
+      if (parentVault && !parentVault.enableMonitoring) {
+        return {
+          repeatPasswords: [],
+          weakPasswords: [],
+          breaches: [],
+        };
+      }
+
       return {
         repeatPasswords: repeatedPasswords.filter((item) =>
           item.occurrences.some((occurrence) => occurrence.itemId === vaultItem.itemId),
@@ -64,7 +87,7 @@ export function useSecurityAnalytics(vaults: DecryptedVault[]) {
         breaches: breaches.filter((item) => item.itemId === vaultItem.itemId),
       };
     },
-    [repeatedPasswords, weakPasswords, breaches],
+    [repeatedPasswords, weakPasswords, breaches, vaults],
   );
 
   const totalIssues = repeatedPasswords.length + weakPasswords.length + breaches.length;

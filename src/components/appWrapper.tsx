@@ -16,6 +16,7 @@ import {
   EmptyState,
   Flex,
   Float,
+  Icon,
   IconButton,
   Input,
   InputGroup,
@@ -45,6 +46,7 @@ import {
   TbX,
 } from 'react-icons/tb';
 import SignOutButton from './forms/auth/signOut';
+import { VaultIconMap } from './forms/vault/iconPicker';
 import Logo from './logo';
 import AppCrumbs from './presentation/appCrumbs';
 import { ColorModeButton } from './ui/color-mode';
@@ -70,7 +72,7 @@ export default function AppWrapper({ children, user }: { children: React.ReactNo
           bg="bg"
           shadow="lg"
         >
-          <Flex w="full" direction="row" gap={4} align="center" pt={4} pb={2} px={[4, 6]} maxW="5xl" mx="auto">
+          <Flex w="full" direction="row" gap={4} align="center" py={4} px={[4, 6]} maxW="5xl" mx="auto">
             <IconButton onClick={() => setOpen(!open)} aria-label="Toggle Sidebar" variant="ghost" mr="auto">
               <Box display={{ base: 'flex', md: 'none' }}>
                 {open ? <TbLayoutNavbarCollapseFilled /> : <TbLayoutNavbarExpandFilled />}
@@ -80,9 +82,7 @@ export default function AppWrapper({ children, user }: { children: React.ReactNo
               </Box>
             </IconButton>
 
-            <IconButton colorPalette="yellow" aria-label="Create New Item" variant="surface" ml="auto">
-              <TbPlus />
-            </IconButton>
+            <NewItemButton />
 
             <Box>
               <SearchBar query="" onQueryChange={() => {}} />
@@ -91,8 +91,8 @@ export default function AppWrapper({ children, user }: { children: React.ReactNo
             <ColorModeButton />
             <NotificationDrawer />
           </Flex>
-          <Box mb={[0, 4, 6]} maxW="5xl" py={2} px={[4, 6]} mx="auto">
-            <AppCrumbs w="full" colorPalette="gray" bg="bg.subtle" rounded="sm" p={2} />
+          <Box maxW="5xl" py={2} px={[4, 6]} mx="auto">
+            <AppCrumbs w="full" />
           </Box>
           {children}
         </Box>
@@ -391,5 +391,33 @@ const SearchBar: React.FC<
     >
       <Input placeholder="Search..." variant="subtle" value={query} onChange={(e) => onQueryChange(e.target.value)} />
     </InputGroup>
+  );
+};
+
+const NewItemButton: React.FC = () => {
+  const { vaults } = useVaults();
+
+  return (
+    <Menu.Root>
+      <Menu.Trigger asChild>
+        <IconButton variant="surface" colorPalette="yellow" aria-label="New Item">
+          <TbPlus />
+        </IconButton>
+      </Menu.Trigger>
+      <Menu.Positioner>
+        <Menu.Content w={52}>
+          <Menu.ItemGroup>
+            <Menu.ItemGroupLabel>Add Item to Vault</Menu.ItemGroupLabel>
+            {vaults.map((vault) => (
+              <Menu.Item key={vault.id} value={vault.id} asChild>
+                <NextLink href={`/vaults/${vault.id}/new`}>
+                  <TbPlus /> <Icon as={VaultIconMap[vault.icon]} aria-label={vault.title} /> {vault.title}
+                </NextLink>
+              </Menu.Item>
+            ))}
+          </Menu.ItemGroup>
+        </Menu.Content>
+      </Menu.Positioner>
+    </Menu.Root>
   );
 };

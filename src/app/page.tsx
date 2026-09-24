@@ -72,8 +72,8 @@ export default async function HomePage() {
               <Heading
                 as="h1"
                 fontSize={{ base: '5xl', md: '6xl', lg: '7xl' }}
-                fontWeight="semibold"
-                letterSpacing="tighter"
+                fontWeight={700}
+                letterSpacing="tight"
                 maxW="4xl"
                 lineHeight="1.1"
               >

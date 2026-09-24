@@ -51,7 +51,6 @@ function SignUpForm() {
       turnstileRef.current?.reset();
       return;
     }
-
     if (passwordStrength < 3) {
       setError('Please choose a stronger password.');
       setIsLoading(false);
@@ -70,7 +69,6 @@ function SignUpForm() {
       setIsLoading(false);
       return;
     }
-
     if (!tsToken) {
       setError('Please complete the CAPTCHA challenge.');
       turnstileRef.current?.reset();

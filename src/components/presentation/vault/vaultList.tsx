@@ -40,6 +40,7 @@ import {
   TbShieldFilled,
   TbStack3Filled,
 } from 'react-icons/tb';
+import SecurityScore from '../securityScore';
 import DeleteVaultDialog from './deleteDialog';
 
 export default function VaultList({ v }: { v: VaultWithItems[]; user?: User }) {
@@ -125,7 +126,7 @@ export default function VaultList({ v }: { v: VaultWithItems[]; user?: User }) {
                 </Icon>
               </HStack>
               <Stat.ValueText fontFamily="mono">
-                {securityScore !== null ? `${securityScore.toFixed(0)}%` : 'N/A'}
+                <SecurityScore vaults={vaults} labelPosition="left" size="md" />
               </Stat.ValueText>
             </Stat.Root>
 

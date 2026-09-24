@@ -1,22 +1,28 @@
 'use client';
 
-import { handleCreateVault, handleUpdateVault } from '@/lib/vault/vaultActions';
+import { useVaults } from '@/hooks/use-vaults';
+import { handleCreateVault, handleGetVaults, handleUpdateVault } from '@/lib/vault/vaultActions';
 import { DecryptedVault } from '@/types/client';
-import { Alert, Button, Dialog, Field, Flex, Icon, Input } from '@chakra-ui/react';
+import { Alert, Button, Dialog, DialogOpenChangeDetails, Field, Flex, Input } from '@chakra-ui/react';
 import { unauthorized, useRouter } from 'next/navigation';
-import React from 'react';
-import { TbDeviceFloppy, TbLockSquareRoundedFilled, TbPlus, TbX } from 'react-icons/tb';
+import React, { startTransition } from 'react';
+import { TbDeviceFloppy, TbPlus, TbX } from 'react-icons/tb';
 import { toaster } from '../../ui/toaster';
-import { IconPickerDialog, VaultIconMap } from './iconPicker';
+import IconPicker from './iconPicker';
 
-export default function VaultForm({ vault }: { vault?: DecryptedVault | null }) {
+export default function VaultForm({
+  vault,
+  setOpen,
+}: {
+  vault?: DecryptedVault | null;
+  setOpen: (open: DialogOpenChangeDetails) => void;
+}) {
   const router = useRouter();
+  const { handleUnlock } = useVaults();
 
   const [error, setError] = React.useState('');
   const [title, setTitle] = React.useState(vault?.title || '');
-
   const [icon, setIcon] = React.useState(vault?.icon || 'default');
-  const [showIconPickerDialog, setShowIconPickerDialog] = React.useState(false);
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -33,11 +39,20 @@ export default function VaultForm({ vault }: { vault?: DecryptedVault | null }) 
       } else {
         setTitle('');
         setIcon('default');
-        setShowIconPickerDialog(false);
+
+        const freshVaults = await handleGetVaults();
+        if (freshVaults.success && freshVaults.data) {
+          await handleUnlock(freshVaults.data);
+        }
+
         toaster.success({
           title: 'Vault updated successfully.',
           description: 'Your vault has been updated.',
           action: { label: 'View Vault', onClick: () => router.push(`/vaults/${updatedVault.data.id}`) },
+        });
+        setOpen({ open: false });
+        startTransition(() => {
+          router.refresh();
         });
       }
     } else {
@@ -51,93 +66,79 @@ export default function VaultForm({ vault }: { vault?: DecryptedVault | null }) 
       } else {
         setTitle('');
         setIcon('default');
+
+        const freshVaults = await handleGetVaults();
+        if (freshVaults.success && freshVaults.data) {
+          await handleUnlock(freshVaults.data);
+        }
+
         toaster.success({
           title: 'Vault created successfully.',
           description: 'Your new vault has been created.',
           action: { label: 'View Vault', onClick: () => router.push(`/vaults/${newVault.data.id}`) },
         });
-        router.refresh();
+
+        startTransition(() => {
+          router.refresh();
+          router.push(`/vaults/${newVault.data.id}`);
+        });
       }
     }
   }
 
-  const VaultIcon = VaultIconMap[icon] || TbLockSquareRoundedFilled;
-
   return (
-    <>
-      <form onSubmit={handleSubmit}>
-        <Dialog.Header>
-          <Dialog.Title>{vault ? 'Update Vault' : 'Create New Vault'}</Dialog.Title>
-        </Dialog.Header>
-        <Dialog.Body>
-          {error && (
-            <Alert.Root>
-              <Alert.Indicator />
-              <Alert.Title>Failed to {vault ? 'update' : 'create'} Vault.</Alert.Title>
-              <Alert.Description>{error}</Alert.Description>
-            </Alert.Root>
-          )}
-          <Flex direction="column" gap={4}>
-            <Field.Root required colorPalette="yellow">
-              <Field.Label>
-                Icon <Field.RequiredIndicator />
-              </Field.Label>
-              <Icon
-                boxSize={24}
-                borderRadius="md"
-                bg="yellow.subtle"
-                p={4}
-                onClick={() => setShowIconPickerDialog(true)}
-                cursor="pointer"
-              >
-                <VaultIcon />
-              </Icon>
-              <Field.HelperText>Click the icon to change it.</Field.HelperText>
-            </Field.Root>
-            IconName: {icon}
-            <Field.Root colorPalette="yellow" required>
-              <Field.Label>
-                Title <Field.RequiredIndicator />
-              </Field.Label>
-              <Input placeholder="Enter vault title" value={title} onChange={(e) => setTitle(e.target.value)} />
-            </Field.Root>
-          </Flex>
-        </Dialog.Body>
-        <Dialog.Footer>
-          <Dialog.ActionTrigger asChild>
-            <Button variant="subtle" colorPalette="gray">
-              <TbX />
-              Cancel
-            </Button>
-          </Dialog.ActionTrigger>
-          <Dialog.ActionTrigger asChild>
-            <Button type="submit" colorPalette="yellow">
-              {vault ? (
-                <>
-                  <TbDeviceFloppy />
-                  Save Changes
-                </>
-              ) : (
-                <>
-                  <TbPlus />
-                  Create Vault
-                </>
-              )}
-            </Button>
-          </Dialog.ActionTrigger>
-        </Dialog.Footer>
-      </form>
+    <form onSubmit={handleSubmit}>
+      <Dialog.Header>
+        <Dialog.Title>{vault ? 'Update Vault' : 'Create New Vault'}</Dialog.Title>
+      </Dialog.Header>
+      <Dialog.Body>
+        {error && (
+          <Alert.Root mb={4} status="error">
+            <Alert.Indicator />
+            <Alert.Title>Failed to {vault ? 'update' : 'create'} Vault.</Alert.Title>
+            <Alert.Description>{error}</Alert.Description>
+          </Alert.Root>
+        )}
+        <Flex direction="column" gap={6}>
+          <Field.Root colorPalette="yellow" required>
+            <Field.Label>
+              Vault Title <Field.RequiredIndicator />
+            </Field.Label>
+            <Input placeholder="Enter vault title" value={title} onChange={(e) => setTitle(e.target.value)} />
+          </Field.Root>
 
-      <IconPickerDialog
-        open={showIconPickerDialog}
-        setOpen={(open) => setShowIconPickerDialog(open)}
-        selectedIcon={icon}
-        onIconChange={(iconName) => setIcon(iconName)}
-      />
-    </>
+          <Field.Root required colorPalette="yellow">
+            <Field.Label>
+              Vault Icon <Field.RequiredIndicator />
+            </Field.Label>
+            <IconPicker selectedIcon={icon} onIconChange={setIcon} />
+          </Field.Root>
+        </Flex>
+      </Dialog.Body>
+      <Dialog.Footer>
+        <Dialog.ActionTrigger asChild>
+          <Button variant="subtle" colorPalette="gray" onClick={() => setOpen({ open: false })}>
+            <TbX />
+            Cancel
+          </Button>
+        </Dialog.ActionTrigger>
+        <Button type="submit" colorPalette="yellow">
+          {vault ? (
+            <>
+              <TbDeviceFloppy />
+              Save Changes
+            </>
+          ) : (
+            <>
+              <TbPlus />
+              Create Vault
+            </>
+          )}
+        </Button>
+      </Dialog.Footer>
+    </form>
   );
 }
-
 export const VaultFormDialog: React.FC<{
   vault?: DecryptedVault | null;
   open: boolean;
@@ -148,7 +149,7 @@ export const VaultFormDialog: React.FC<{
       <Dialog.Positioner>
         <Dialog.Backdrop />
         <Dialog.Content>
-          <VaultForm vault={vault} />
+          <VaultForm vault={vault} setOpen={(open) => setOpen(open.open)} />
         </Dialog.Content>
       </Dialog.Positioner>
     </Dialog.Root>

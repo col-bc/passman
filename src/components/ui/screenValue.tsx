@@ -33,7 +33,7 @@ export default function ScreenValue({ showDefault = false, ...props }: ScreenVal
       >
         {show ? props.children : screenedValue}
         <IconButton
-          size="xs"
+          size="2xs"
           onClick={(e) => {
             e.stopPropagation();
             setShow(!show);

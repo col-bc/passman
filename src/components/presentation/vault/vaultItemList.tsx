@@ -10,49 +10,49 @@ import { templateIcon } from '@/lib/util/itemTemplates';
 import { DecryptedVaultItem } from '@/types/client';
 import { VaultWithItems } from '@/types/server';
 import {
-    Avatar,
-    Badge,
-    Button,
-    Card,
-    Checkbox,
-    EmptyState,
-    Flex,
-    Group,
-    Heading,
-    HStack,
-    Icon,
-    IconButton,
-    Link,
-    LinkBox,
-    LinkOverlay,
-    List,
-    Menu,
-    SimpleGrid,
-    Stat,
-    VStack,
+  Avatar,
+  Badge,
+  Button,
+  Card,
+  Checkbox,
+  EmptyState,
+  Flex,
+  Group,
+  Heading,
+  HStack,
+  Icon,
+  IconButton,
+  Link,
+  LinkBox,
+  LinkOverlay,
+  List,
+  Menu,
+  SimpleGrid,
+  Stat,
+  VStack,
 } from '@chakra-ui/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React from 'react';
 import {
-    TbAlertTriangle,
-    TbArrowBarUp,
-    TbDotsVertical,
-    TbDownload,
-    TbEdit,
-    TbFilter,
-    TbGaugeFilled,
-    TbLayoutListFilled,
-    TbListDetails,
-    TbLockSquareRounded,
-    TbPencil,
-    TbPlus,
-    TbShare,
-    TbShield,
-    TbShieldFilled,
-    TbStack2,
-    TbStack3Filled,
-    TbTrash,
-    TbUpload,
+  TbAlertTriangle,
+  TbArrowBarUp,
+  TbDotsVertical,
+  TbDownload,
+  TbEdit,
+  TbFilter,
+  TbGaugeFilled,
+  TbLayoutListFilled,
+  TbListDetails,
+  TbLockSquareRounded,
+  TbPencil,
+  TbPlus,
+  TbShare,
+  TbShield,
+  TbShieldFilled,
+  TbStack2,
+  TbStack3Filled,
+  TbTrash,
+  TbUpload,
 } from 'react-icons/tb';
 import DeleteVaultDialog from './deleteDialog';
 import DeleteVaultItemDialog from './deleteVaultItemDialog';
@@ -64,6 +64,7 @@ export default function VaultItemList({
   vaultId: string;
   encryptedVaults: VaultWithItems[];
 }) {
+  const searchParams = useSearchParams();
   const { currentVault, setCurrentVault, handleUnlock, mek, vaults } = useVaults();
   const router = useRouter();
   const { hasSecurityIssues } = useSecurityAnalytics(vaults);
@@ -74,7 +75,9 @@ export default function VaultItemList({
 
   const [showRenameDialog, setShowRenameDialog] = React.useState(false);
   const [showDeleteItemDialog, setShowDeleteItemDialog] = React.useState(false);
-  const [showSecurityScanDialog, setShowSecurityScanDialog] = React.useState(false);
+  const [showSecurityScanDialog, setShowSecurityScanDialog] = React.useState(
+    searchParams.get('showMonitoring') === 'true' || false,
+  );
   const [showDeleteVaultDialog, setShowDeleteVaultDialog] = React.useState(false);
 
   const aggregatedFields = React.useMemo(() => {
@@ -175,9 +178,17 @@ export default function VaultItemList({
     }
   }, [currentVault, sortOrder]);
 
+  const handleMonitoringDialogClose = (event: { open: boolean }) => {
+    if (!event.open) {
+      setShowSecurityScanDialog(false);
+      router.replace(`/vaults/${currentVault?.id}`);
+    }
+  };
+
   if (!currentVault) {
     return <div>Loading vault details...</div>;
   }
+
   const monitoringEnabled = currentVault.enableMonitoring;
 
   return (
@@ -466,7 +477,7 @@ export default function VaultItemList({
       <SecurityMonitoringDialog
         vault={currentVault}
         open={showSecurityScanDialog}
-        onOpenChange={(details) => setShowSecurityScanDialog(!!details.open)}
+        onOpenChange={handleMonitoringDialogClose}
       />
       <DeleteVaultDialog
         vaultId={currentVault.id}

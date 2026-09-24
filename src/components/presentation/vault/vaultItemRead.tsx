@@ -111,7 +111,7 @@ export default function VaultItemRead({
           }
           return (
             <React.Fragment key={`item-content-fragment-${idx}`}>
-              <DataList.Item display="flex" gap={2} _hover={{ backgroundColor: 'gray.50' }} py={2}>
+              <DataList.Item display="flex" gap={2} _hover={{ backgroundColor: 'bg.muted' }} py={2}>
                 <DataList.ItemLabel flex={1} fontWeight="bold">
                   {value.label}:
                 </DataList.ItemLabel>

@@ -4,7 +4,7 @@ import SignOutButton from '@/components/forms/auth/signOut';
 import VaultError from '@/components/presentation/vault/vaultError';
 import { PasswordInput } from '@/components/ui/password-input';
 import { decryptPayload, deriveHexKey, stringToUint8 } from '@/lib/crypto';
-import { DecryptedVault, DecryptedVaultItem } from '@/types/client';
+import { DecryptedVault, DecryptedVaultItem, ItemContent } from '@/types/client';
 import { VaultWithItems } from '@/types/server';
 import { Box, Button, Dialog, Field, Flex, Spinner, Text } from '@chakra-ui/react';
 import { usePathname } from 'next/navigation';
@@ -74,7 +74,6 @@ export function VaultProvider({ children, userEmail }: { children: React.ReactNo
               const decryptedItems: (DecryptedVaultItem | null)[] = await Promise.all(
                 vault.vaultItems.map(async (vaultItem) => {
                   try {
-                    console.log(`[handleUnlock] Starting to decrypt ${vaultItem.vaultId}-${vaultItem.itemId}`);
                     const decryptedItem = await decryptPayload(
                       {
                         ciphertext: stringToUint8(vaultItem.item.ciphertext),
@@ -83,7 +82,6 @@ export function VaultProvider({ children, userEmail }: { children: React.ReactNo
                       },
                       mek,
                     );
-                    console.log('[handleUnlock] Decrypted item:', decryptedItem);
                     const decryptedVaultItem: DecryptedVaultItem = {
                       id: vaultItem.vaultId + '-' + vaultItem.itemId,
                       vaultId: vaultItem.vaultId,
@@ -100,15 +98,14 @@ export function VaultProvider({ children, userEmail }: { children: React.ReactNo
                   }
                 }),
               );
+              console.log(`[handleUnlock] Finished decrypting ${decryptedItems.length} items in vault ${vault.id}`);
               const filteredItems = decryptedItems.filter((item) => item !== null) as DecryptedVaultItem[];
               return {
                 ...vault,
-                lockerItems: filteredItems,
                 vaultItems: filteredItems,
-              };
+              } as DecryptedVault;
             }),
           );
-          console.log('[handleUnlock] Decrypted vaults:', decryptedVaults);
           setVaults(decryptedVaults);
           return decryptedVaults;
         } catch (error) {
@@ -122,6 +119,13 @@ export function VaultProvider({ children, userEmail }: { children: React.ReactNo
       return [];
     },
     [mek, setError, setVaults, setUnlocking, error],
+  );
+
+  const handleAddItem = React.useCallback(
+    async (vaultId: string, newItem: ItemContent) => {
+      //
+    },
+    [vaults, setVaults],
   );
 
   const contextValue: VaultContext = React.useMemo(

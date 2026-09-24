@@ -2,12 +2,14 @@ import { Button, Dialog, IconButton, SimpleGrid } from '@chakra-ui/react';
 import { IconType } from 'react-icons';
 import {
   TbBadge,
+  TbBriefcase,
   TbBuildingBank,
   TbBuildingSkyscraper,
   TbCheck,
   TbCompass,
   TbHome,
-  TbLockSquareRoundedFilled,
+  TbId,
+  TbLockSquareRounded,
   TbPasswordFingerprint,
   TbPlane,
   TbSchool,
@@ -16,16 +18,18 @@ import {
 } from 'react-icons/tb';
 
 export const VaultIconMap: Record<string, IconType> = {
-  default: TbLockSquareRoundedFilled,
+  default: TbLockSquareRounded,
   home: TbHome,
   building: TbBuildingSkyscraper,
   bank: TbBuildingBank,
+  briefcase: TbBriefcase,
   badge: TbBadge,
   password: TbPasswordFingerprint,
   school: TbSchool,
   plane: TbPlane,
   wallet: TbWallet,
   compass: TbCompass,
+  id: TbId,
 };
 
 export default function IconPicker({
@@ -36,7 +40,7 @@ export default function IconPicker({
   onIconChange: (iconName: string) => void;
 }) {
   return (
-    <SimpleGrid columns={3} gap={4}>
+    <SimpleGrid columns={5} gap={2}>
       {Object.entries(VaultIconMap).map(([iconName, IconComponent]) => {
         const isSelected = selectedIcon === iconName;
 

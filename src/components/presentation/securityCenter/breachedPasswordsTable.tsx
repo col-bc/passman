@@ -28,7 +28,7 @@ export default function BreachedPasswordsTable({ breachedPasswords }: { breached
           {breachedPasswords.length === 0 ? (
             <Table.Row>
               <Table.Cell colSpan={5} textAlign="center" py={4}>
-                <EmptyState.Root>
+                <EmptyState.Root size="sm">
                   <EmptyState.Indicator>
                     <TbShieldCheckFilled size={32} />
                   </EmptyState.Indicator>
@@ -44,7 +44,7 @@ export default function BreachedPasswordsTable({ breachedPasswords }: { breached
               <Table.Row key={`${bp.vaultId}-${bp.itemId}-${bp.label}`}>
                 <Table.Cell>{vault?.title || 'Unknown Vault'}</Table.Cell>
                 <Table.Cell>
-                  <Link as={NextLink} href={`/vault/${bp.vaultId}/${bp.itemId}`} colorPalette="yellow">
+                  <Link as={NextLink} href={`/vaults/${bp.vaultId}/${bp.itemId}`} colorPalette="yellow">
                     {item?.title || 'Unknown Item'}
                   </Link>
                 </Table.Cell>
@@ -59,15 +59,10 @@ export default function BreachedPasswordsTable({ breachedPasswords }: { breached
                 </Table.Cell>
                 <Table.Cell>
                   <FixIssueDialog
-                    href={`/vault/${bp.vaultId}/${bp.itemId}?mode=edit&highlightIndex=${bp.fieldIndex}`}
+                    href={`/vaults/${bp.vaultId}/${bp.itemId}?mode=edit&highlightIndex=${bp.fieldIndex}`}
                     descriptionChildren={<BreachedPasswordDialogContent breachedPasswords={bp} />}
                   >
-                    <Button
-                      size="xs"
-                      variant="subtle"
-                      colorPalette="yellow"
-                      onClick={() => console.log('Fix Issue', bp)}
-                    >
+                    <Button size="xs" variant="subtle" colorPalette="yellow">
                       Resolve Issue <TbArrowRight />
                     </Button>
                   </FixIssueDialog>
