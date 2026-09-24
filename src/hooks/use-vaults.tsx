@@ -4,7 +4,7 @@ import SignOutButton from '@/components/forms/auth/signOut';
 import VaultError from '@/components/presentation/vault/vaultError';
 import { PasswordInput } from '@/components/ui/password-input';
 import { decryptPayload, deriveHexKey, stringToUint8 } from '@/lib/crypto';
-import { DecryptedVault, DecryptedVaultItem, ItemContent } from '@/types/client';
+import { DecryptedVault, DecryptedVaultItem } from '@/types/client';
 import { VaultWithItems } from '@/types/server';
 import { Box, Button, Dialog, Field, Flex, Spinner, Text } from '@chakra-ui/react';
 import { usePathname } from 'next/navigation';
@@ -119,13 +119,6 @@ export function VaultProvider({ children, userEmail }: { children: React.ReactNo
       return [];
     },
     [mek, setError, setVaults, setUnlocking, error],
-  );
-
-  const handleAddItem = React.useCallback(
-    async (vaultId: string, newItem: ItemContent) => {
-      //
-    },
-    [vaults, setVaults],
   );
 
   const contextValue: VaultContext = React.useMemo(

@@ -1,13 +1,13 @@
 import Provider from '@/components/ui/provider';
 import type { Metadata } from 'next';
-import { Figtree, Roboto_Mono, Source_Sans_3 } from 'next/font/google';
+import { Inter, Roboto_Mono, Space_Grotesk } from 'next/font/google';
 
-const fontHeading = Figtree({
+const fontHeading = Space_Grotesk({
   variable: '--font-heading',
   subsets: ['latin'],
 });
 
-const fontSans = Source_Sans_3({
+const fontSans = Inter({
   variable: '--font-sans',
   subsets: ['latin'],
 });

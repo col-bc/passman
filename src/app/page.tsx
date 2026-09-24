@@ -119,7 +119,7 @@ export default async function HomePage() {
             <SimpleGrid columns={{ base: 1, md: 3 }} gap={10}>
               <Card.Root
                 variant="outline"
-                p={8}
+                p={4}
                 rounded="xl"
                 bg="bg.surface"
                 _hover={{ shadow: 'md', transform: 'translateY(-2px)' }}
@@ -150,7 +150,7 @@ export default async function HomePage() {
 
               <Card.Root
                 variant="outline"
-                p={8}
+                p={4}
                 rounded="xl"
                 bg="bg.surface"
                 _hover={{ shadow: 'md', transform: 'translateY(-2px)' }}
@@ -181,7 +181,7 @@ export default async function HomePage() {
 
               <Card.Root
                 variant="outline"
-                p={8}
+                p={4}
                 rounded="xl"
                 bg="bg.surface"
                 _hover={{ shadow: 'md', transform: 'translateY(-2px)' }}

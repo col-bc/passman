@@ -29,6 +29,7 @@ import {
   Menu,
   SimpleGrid,
   Stat,
+  Text,
   VStack,
 } from '@chakra-ui/react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -204,20 +205,13 @@ export default function VaultItemList({
                 {currentVault.title}
               </Heading>
             </Flex>
-            <Flex
-              direction={{ base: 'column', md: 'row-reverse', lg: 'row' }}
-              gap={[2, 4]}
-              justify={{ base: 'flex-start', md: 'flex-end' }}
-              w="full"
-            >
+            <Flex direction="row" gap={[2, 4]} justify={{ base: 'flex-start', md: 'flex-end' }} w="full">
               <Menu.Root>
-                <Button
-                  as={Menu.Trigger}
-                  colorPalette="yellow"
-                  variant="surface"
-                  w={{ base: 'full', md: '1/2', lg: 'auto' }}
-                >
-                  <TbDotsVertical /> Options
+                <Button as={Menu.Trigger} colorPalette="yellow" variant="surface">
+                  <TbDotsVertical />
+                  <Text as="span" display={{ base: 'none', md: 'inline' }}>
+                    Options
+                  </Text>
                 </Button>
                 <Menu.Positioner>
                   <Menu.Content w={48}>
@@ -259,7 +253,7 @@ export default function VaultItemList({
                   </Menu.Content>
                 </Menu.Positioner>
               </Menu.Root>
-              <Link href={`/vaults/${currentVault.id}/new`} w={{ base: 'full', md: '1/2', lg: 'auto' }}>
+              <Link href={`/vaults/${currentVault.id}/new`}>
                 <Button colorPalette="yellow" variant="solid" w="full">
                   <TbPlus />
                   Add New Item

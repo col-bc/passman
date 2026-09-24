@@ -10,7 +10,6 @@ import {
   Button,
   Card,
   Circle,
-  CloseButton,
   Dialog,
   Drawer,
   EmptyState,
@@ -251,9 +250,11 @@ const NotificationDrawer: React.FC = () => {
       <Drawer.Backdrop />
       <Drawer.Positioner>
         <Drawer.Content>
-          <Drawer.Header>
-            <Drawer.Title>Notifications</Drawer.Title>
-            <CloseButton as={Drawer.CloseTrigger} aria-label="Close notifications" />
+          <Drawer.Header display="flex" justifyContent="space-between" alignItems="center">
+            <Drawer.Title>Security Alerts</Drawer.Title>
+            <Drawer.CloseTrigger aria-label="Close notifications" position="static">
+              <TbX />
+            </Drawer.CloseTrigger>
           </Drawer.Header>
           <Drawer.Body>
             {totalIssues === 0 ? (
@@ -280,7 +281,7 @@ const NotificationDrawer: React.FC = () => {
                       </Card.Description>
                     </Card.Body>
                     <Card.Footer>
-                      <Button size="sm" colorPalette="yellow" asChild>
+                      <Button size="xs" colorPalette="yellow" asChild>
                         <Link
                           href={`/vaults/${item.occurrences[0].vaultId}/${item.occurrences[0].itemId}?mode=edit&highlightIndex=${item.occurrences[0].fieldIndex}`}
                         >
@@ -301,7 +302,7 @@ const NotificationDrawer: React.FC = () => {
                       </Card.Description>
                     </Card.Body>
                     <Card.Footer>
-                      <Button size="sm" colorPalette="yellow" asChild>
+                      <Button size="xs" colorPalette="yellow" asChild>
                         <Link
                           href={`/vaults/${item.vaultId}/${item.itemId}?mode=edit&highlightIndex=${item.fieldIndex}`}
                         >
@@ -323,7 +324,7 @@ const NotificationDrawer: React.FC = () => {
                       </Card.Description>
                     </Card.Body>
                     <Card.Footer>
-                      <Button size="sm" colorPalette="yellow" asChild>
+                      <Button size="xs" colorPalette="yellow" asChild>
                         <Link
                           href={`/vaults/${item.vaultId}/${item.itemId}?mode=edit&highlightIndex=${item.fieldIndex}`}
                         >

@@ -55,7 +55,7 @@ export default function SharingKeysForm({ user }: { user: User }) {
               {copied ? <TbCopyCheck /> : <TbCopy />}
             </IconButton>
           </Stack>
-          <Textarea value={publicKey ?? 'Loading...'} readOnly rows={6} />
+          <Textarea value={publicKey ?? 'Loading...'} readOnly rows={10} whiteSpace="nowrap" overflowX="aitp" />
         </Field.Root>
 
         <Field.Root>

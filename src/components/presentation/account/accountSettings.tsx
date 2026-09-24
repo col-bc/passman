@@ -3,7 +3,21 @@ import ChangePasswordForm from '@/components/forms/account/changePasswordForm';
 import SharingKeysForm from '@/components/forms/account/sharingKeys';
 import TwoFactorForm from '@/components/forms/account/twoFactor';
 import { User } from '@/prisma/client';
-import { Badge, Card, Flex, Heading, Link, List, Stack } from '@chakra-ui/react';
+import {
+  Badge,
+  Box,
+  Button,
+  Card,
+  Checkbox,
+  Collapsible,
+  Flex,
+  Heading,
+  Link,
+  List,
+  Separator,
+  Stack,
+} from '@chakra-ui/react';
+import { TbExclamationCircle, TbShredder, TbTrash, TbX } from 'react-icons/tb';
 
 export default function AccountSettings({ user }: { user: User }) {
   return (
@@ -64,6 +78,79 @@ export default function AccountSettings({ user }: { user: User }) {
             <Card.Description>There are not any notifications at this time.</Card.Description>
           </Card.Body>
         </Card.Root>
+
+        <Card.Root id="export-data" variant="elevated">
+          <Card.Header>
+            <Card.Title>Export Data</Card.Title>
+          </Card.Header>
+          <Card.Body>
+            <Card.Description>You can export your data at any time.</Card.Description>
+          </Card.Body>
+        </Card.Root>
+
+        <Card.Root id="delete-account" variant="elevated">
+          <Card.Header>
+            <Card.Title>
+              Delete Account{' '}
+              <Badge colorPalette="red">
+                <TbExclamationCircle />
+                Danger
+              </Badge>
+            </Card.Title>
+          </Card.Header>
+          <Card.Body spaceY={4}>
+            <Card.Description>
+              Deleting your account is permanent and cannot be undone This will destroy all your data and associated
+              vaults. Consider exporting your data before proceeding.
+            </Card.Description>
+            <Collapsible.Root>
+              <Collapsible.Trigger asChild>
+                <Button colorPalette="red" size="sm" variant="surface">
+                  <TbTrash />
+                  Delete Account
+                </Button>
+              </Collapsible.Trigger>
+              <Collapsible.Content>
+                <Box p={4} border="1px solid" borderColor="border.error" mt={4} rounded="md">
+                  <form>
+                    <Checkbox.Root colorPalette="red">
+                      <Checkbox.HiddenInput required />
+                      <Checkbox.Control />
+                      <Checkbox.Label>
+                        I understand that I must export my data <em>before</em> deleting my account.
+                      </Checkbox.Label>
+                    </Checkbox.Root>
+                    <Checkbox.Root colorPalette="red">
+                      <Checkbox.HiddenInput required />
+                      <Checkbox.Control />
+                      <Checkbox.Label>
+                        I understand that all my data will be permanently erased from Passman&apos;s servers.
+                      </Checkbox.Label>
+                    </Checkbox.Root>
+                    <Checkbox.Root colorPalette="red">
+                      <Checkbox.HiddenInput required />
+                      <Checkbox.Control />
+                      <Checkbox.Label>I understand that this action cannot be undone.</Checkbox.Label>
+                    </Checkbox.Root>
+                    <Separator my={4} />
+                    <Box spaceX={4}>
+                      <Button colorPalette="red" type="submit">
+                        <TbShredder />
+                        Delete Account
+                      </Button>
+                      <Collapsible.Trigger asChild>
+                        <Button variant="subtle">
+                          <TbX />
+                          Cancel
+                        </Button>
+                      </Collapsible.Trigger>
+                    </Box>
+                  </form>
+                </Box>
+              </Collapsible.Content>
+            </Collapsible.Root>
+          </Card.Body>
+        </Card.Root>
       </Flex>
 
       <Flex direction="column" as="nav" maxW="2xs" w="full" color="text.muted" position="sticky" top={4}>
@@ -84,7 +171,16 @@ export default function AccountSettings({ user }: { user: User }) {
             <Link href="#billing">Billing</Link>
           </List.Item>
           <List.Item>
+            <Link href="#sharing-keys">Sharing Keys</Link>
+          </List.Item>
+          <List.Item>
             <Link href="#notifications">Notifications</Link>
+          </List.Item>
+          <List.Item>
+            <Link href="#export-data">Export Data</Link>
+          </List.Item>
+          <List.Item>
+            <Link href="#delete-account">Delete Account</Link>
           </List.Item>
         </List.Root>
       </Flex>

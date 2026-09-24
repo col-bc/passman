@@ -4,7 +4,6 @@ import { VaultIconMap } from '@/components/forms/vault/iconPicker';
 import { VaultFormDialog } from '@/components/forms/vault/vaultForm';
 import { useSecurityAnalytics } from '@/hooks/use-security-analytics';
 import { useVaults } from '@/hooks/use-vaults';
-import { calculateScore } from '@/lib/securityCenter';
 import { timeSinceDate } from '@/lib/util/formats';
 import { templateIcon } from '@/lib/util/itemTemplates';
 import { User } from '@/prisma/client';
@@ -13,6 +12,7 @@ import { VaultWithItems } from '@/types/server';
 import {
   Avatar,
   Badge,
+  Box,
   Button,
   Card,
   Flex,
@@ -48,20 +48,6 @@ export default function VaultList({ v }: { v: VaultWithItems[]; user?: User }) {
   const { handleUnlock, vaults, mek } = useVaults();
   const { totalIssues } = useSecurityAnalytics(vaults);
 
-  const [securityScore, setSecurityScore] = React.useState<number | null>(null);
-
-  React.useEffect(() => {
-    let max = 0,
-      actual = 0;
-    for (const vault of vaults) {
-      const { actualScore, maxScore } = calculateScore(vault);
-      max = (max || 0) + maxScore;
-      actual = (actual || 0) + actualScore;
-    }
-    const handleEffect = () => setSecurityScore(max > 0 ? (actual / max) * 100 : null);
-    handleEffect();
-  }, [vaults]);
-
   React.useEffect(() => {
     if (mek && v.length > 0 && vaults.length === 0) {
       handleUnlock(v).catch(console.error);
@@ -84,15 +70,19 @@ export default function VaultList({ v }: { v: VaultWithItems[]; user?: User }) {
     <Flex direction="column" as="section" gap={10}>
       <Card.Root variant="elevated">
         <Card.Header>
-          <Flex direction={{ base: 'column', lg: 'row' }} gap={4}>
+          <Flex direction="row" gap={4}>
             <Heading as="h1" fontSize="3xl" fontWeight="extrabold" letterSpacing="tight" whiteSpace="nowrap" flex={1}>
               Your Vaults
             </Heading>
 
-            <Button colorPalette="yellow" ml={{ base: 0, lg: 'auto' }} onClick={() => setShowCreateVaultDialog(true)}>
-              <TbPlus />
-              Create Vault
-            </Button>
+            <Box>
+              <Button colorPalette="yellow" ml={{ base: 0, lg: 'auto' }} onClick={() => setShowCreateVaultDialog(true)}>
+                <TbPlus />
+                <Text as="span" display={{ base: 'none', md: 'inline' }}>
+                  Create Vault
+                </Text>
+              </Button>
+            </Box>
           </Flex>
         </Card.Header>
 
