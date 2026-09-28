@@ -950,7 +950,7 @@ export const SecureItemScalarFieldEnum = {
   id: 'id',
   title: 'title',
   category: 'category',
-  isCompromised: 'isCompromised',
+  isFavorite: 'isFavorite',
   ciphertext: 'ciphertext',
   iv: 'iv',
   tag: 'tag',

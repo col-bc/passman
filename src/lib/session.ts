@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import 'server-only';
 import { prisma } from './prisma';
-import { getUserByEmail } from './user/userDAL';
+import { getUserByEmail, getUserById } from './user/userDAL';
 import { verifyTotp } from './util/twoFactor';
 
 const SESSION_SECRET_KEY = process.env.SESSION_SECRET_KEY;
@@ -18,7 +18,7 @@ const SESSION_SECRET_KEY = process.env.SESSION_SECRET_KEY;
  */
 export async function getCurrentUser(): Promise<DALResult<User | null>> {
   const cookieStore = await cookies();
-  const sessionToken = cookieStore.get('session')?.value;
+  const sessionToken = cookieStore.get('session')?.value ?? null;
   if (!sessionToken) {
     return {
       success: false,
@@ -32,10 +32,8 @@ export async function getCurrentUser(): Promise<DALResult<User | null>> {
       type: 'UNAUTHORIZED',
     };
   }
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-  });
-  if (!user) {
+  const userResult = await getUserById(userId);
+  if (!userResult.success || !userResult.data) {
     return {
       success: false,
       type: 'NOT_FOUND',
@@ -43,7 +41,7 @@ export async function getCurrentUser(): Promise<DALResult<User | null>> {
   }
   return {
     success: true,
-    data: user,
+    data: userResult.data,
   };
 }
 

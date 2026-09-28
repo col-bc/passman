@@ -58,9 +58,9 @@ export default function AccountSettings({ user }: { user: User }) {
           </Card.Body>
         </Card.Root>
 
-        <Card.Root id="sharing-keys" variant="elevated">
+        <Card.Root id="encryption-keys" variant="elevated">
           <Card.Header>
-            <Card.Title>Sharing Keys</Card.Title>
+            <Card.Title>Encryption Keys</Card.Title>
             <Card.Description>
               These keys are used to securely share information with users you trust. Your data will be encrypted with
               asymmetric encryption using your public key and can only be decrypted with your private key stored
@@ -153,11 +153,11 @@ export default function AccountSettings({ user }: { user: User }) {
         </Card.Root>
       </Flex>
 
-      <Flex direction="column" as="nav" maxW="2xs" w="full" color="text.muted" position="sticky" top={4}>
+      <Flex direction="column" as="nav" maxW="2xs" w="full" color="fg.muted" position="sticky" top={4}>
         <Heading as="h6" size="sm" mb={2} px={2} pb={1} borderBottom="1px solid" borderColor="border.muted">
           ON THIS PAGE
         </Heading>
-        <List.Root gap={1} listStyleType="none" px={2}>
+        <List.Root gap={1} listStyleType="disc" px={2} fontSize="sm">
           <List.Item>
             <Link href="#about-you">About You</Link>
           </List.Item>
@@ -171,7 +171,7 @@ export default function AccountSettings({ user }: { user: User }) {
             <Link href="#billing">Billing</Link>
           </List.Item>
           <List.Item>
-            <Link href="#sharing-keys">Sharing Keys</Link>
+            <Link href="#encryption-keys">Encryption Keys</Link>
           </List.Item>
           <List.Item>
             <Link href="#notifications">Notifications</Link>

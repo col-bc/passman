@@ -1,5 +1,5 @@
 import SignInForm from '@/components/forms/auth/signIn';
-import { Box, Card, Container, Flex, Heading, Text } from '@chakra-ui/react';
+import { Box, Container, Flex, Heading, Text } from '@chakra-ui/react';
 
 export default function AuthPage() {
   return (
@@ -10,15 +10,10 @@ export default function AuthPage() {
             Sign In
           </Heading>
           <Text fontSize="md" color="fg.muted" mb={8} textAlign="center">
-            Welcome back! Sign in to access your secure vault
+            Welcome back! Enter your credentials below to access your vaults.
           </Text>
-          <Card.Root variant="elevated">
-            <Card.Header>
-              <Card.Title>Please Sign In to Continue</Card.Title>
-            </Card.Header>
 
-            <SignInForm />
-          </Card.Root>
+          <SignInForm />
         </Box>
       </Flex>
     </Container>

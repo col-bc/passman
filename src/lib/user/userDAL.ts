@@ -7,13 +7,18 @@ import { hashPassword } from '../util/password';
 import { generateRecoveryCodes, verifyTotp } from '../util/twoFactor';
 
 export async function getUserById(userId: string): Promise<DALResult<User | null>> {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-  });
-  if (user) {
-    return { success: true, data: user };
-  } else {
-    return { success: false, type: 'NOT_FOUND' };
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (user) {
+      return { success: true, data: user };
+    } else {
+      return { success: false, type: 'NOT_FOUND' };
+    }
+  } catch (error) {
+    console.error('[userDAL] getUserById failed to fetch user by ID:', error);
+    return { success: false, type: 'SERVER_ERROR' };
   }
 }
 

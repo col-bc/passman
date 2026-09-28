@@ -55,11 +55,11 @@ model ItemAccess {
 }
 
 model SecureItem {
-  id            String  @id @default(cuid())
+  id         String  @id @default(cuid())
   // metadata
-  title         String
-  category      String
-  isCompromised Boolean @default(false)
+  title      String
+  category   String
+  isFavorite Boolean @default(false)
 
   // cryptographic fields
   ciphertext String

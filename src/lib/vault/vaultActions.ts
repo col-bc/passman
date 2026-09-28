@@ -12,7 +12,7 @@ import { SecureItem, Vault } from '@/prisma/client';
 import { ActionState, VaultWithItems } from '@/types/server';
 import { revalidatePath } from 'next/cache';
 import React from 'react';
-import { createItem, deleteItem, getItemById, updateItem } from './itemDAL';
+import { createItem, deleteItem, getFavoriteItems, getItemById, updateItem } from './itemDAL';
 import { createVault, getVaultById, getVaults, updateVault } from './vaultDAL';
 
 /**
@@ -195,7 +195,7 @@ export async function handleUpdateVaultItem(
   vaultId: string,
   itemId: string,
   encryptedData: EncryptedData,
-  data: { category: string; title: string },
+  data: { category?: string; title?: string; isFavorite?: boolean },
 ): Promise<ActionState<{ vaultId: string; itemId: string }>> {
   const currentUser = await getUser();
   if (!currentUser) {
@@ -213,6 +213,7 @@ export async function handleUpdateVaultItem(
   const result = await updateItem(itemId, {
     category: data.category,
     title: data.title,
+    isFavorite: data.isFavorite,
     encryptedData: encryptedData,
   });
 
@@ -256,4 +257,18 @@ export async function handleDeleteVaultItem(vaultId: string, itemId: string): Pr
   revalidatePath(`/vaults/${vaultId}`);
   revalidatePath(`/vaults/${vaultId}/${itemId}`);
   return { success: true, data: true };
+}
+
+export async function handleGetFavoriteItems(): Promise<ActionState<SecureItem[]>> {
+  const currentUser = await getUser();
+  if (!currentUser) {
+    return { success: false, error: 'User not authenticated', type: 'UNAUTHORIZED' };
+  }
+
+  const result = await getFavoriteItems(currentUser.id!);
+  if (!result.success) {
+    return { success: false, error: 'An unexpected error occurred. Please try again later.', type: 'SERVER_ERROR' };
+  }
+
+  return { success: true, data: result.data };
 }

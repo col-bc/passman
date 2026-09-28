@@ -52,6 +52,25 @@ export async function getItemById(
   }
 }
 
+export async function getFavoriteItems(userId: string): Promise<DALResult<SecureItem[]>> {
+  try {
+    const items = await prisma.secureItem.findMany({
+      where: {
+        isFavorite: true,
+        vaultItems: {
+          some: {
+            vault: { ownerId: userId },
+          },
+        },
+      },
+    });
+    return { success: true, data: items };
+  } catch (error) {
+    console.error(`Error fetching favorite items for user ${userId}:`, error);
+    return { success: false, type: 'SERVER_ERROR' };
+  }
+}
+
 export async function createItem({
   vaultId,
   title,
@@ -101,9 +120,10 @@ export async function createItem({
 export async function updateItem(
   itemId: string,
   updatedFields: Partial<{
-    title: string;
-    category: string;
+    title?: string;
+    category?: string;
     encryptedData: EncryptedData;
+    isFavorite?: boolean;
   }>,
 ): Promise<DALResult<SecureItem | null>> {
   try {
@@ -122,6 +142,7 @@ export async function updateItem(
         ciphertext: updateData.ciphertext,
         iv: updateData.iv,
         tag: updateData.tag,
+        isFavorite: updateData.isFavorite,
       },
     });
     return { success: true, data: item };

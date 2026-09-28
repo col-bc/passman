@@ -2,7 +2,7 @@
 
 # Replace this with your actual SSH tunnel command
 # -N prevents opening a remote shell, -L sets up the port forwarding
-SSH_CMD="ssh -N -L 5432:localhost:5432 portfolio.us-east1-c.portfolio-489202"
+SSH_CMD="ssh -o ServerAliveInterval=60 -N -L 5432:localhost:5432 portfolio.us-east1-c.portfolio-489202"
 
 echo "[⏳] Starting SSH tunnel..."
 

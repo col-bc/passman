@@ -9,54 +9,102 @@ import {
   CheckboxCard,
   CheckboxGroup,
   CloseButton,
+  createListCollection,
   Dialog,
+  Em,
+  Field,
+  Fieldset,
   Flex,
   Float,
+  HStack,
   Icon,
   IconButton,
+  Kbd,
   NumberInput,
+  SegmentGroup,
+  Select,
   SimpleGrid,
+  Slider,
   Text,
   VStack,
 } from '@chakra-ui/react';
 import { DialogOpenChangeDetails } from '@chakra-ui/react/dialog';
 import React from 'react';
 import {
+  TbBoltFilled,
   TbCheck,
   TbCopy,
-  TbHash,
+  TbCurrencyDollar,
   TbLetterCaseLower,
   TbLetterCaseUpper,
   TbNumber123,
   TbRefresh,
   TbX,
 } from 'react-icons/tb';
+import zxcvbn from 'zxcvbn';
 import { useColorModeValue } from '../ui/color-mode';
 
-const symbols = '!@#$%^&*()_+[]{}|;:,.<>?';
+const GENERATOR_DEFAULTS: {
+  password: {
+    length: number;
+    characterTypes: string[];
+  };
+  passphrase: {
+    length: number;
+    characterItems: string[];
+    separator: string;
+  };
+  pin: {
+    length: number;
+    characterItems: string[];
+  };
+} = {
+  password: {
+    length: 20,
+    characterTypes: ['lowercase', 'uppercase', 'numbers', 'symbols'],
+  },
+  passphrase: {
+    length: 4,
+    characterItems: ['lowercase'],
+    separator: 'Space',
+  },
+  pin: {
+    length: 4,
+    characterItems: ['numbers'],
+  },
+};
+
+const symbols = '\`!@#$%^&*()_+=-[]{}\'",<.>/?';
 const numbers = '0123456789';
 const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const lowercase = 'abcdefghijklmnopqrstuvwxyz';
 
-const modeOptions = [
-  { label: 'Password', value: 'password' },
-  { label: 'Passphrase', value: 'passphrase' },
-  { label: 'PIN', value: 'pin' },
-] as const;
+type ModeType = 'Password' | 'Passphrase' | 'PIN';
+const modeOptions = ['Password', 'Passphrase', 'PIN'] as ModeType[];
 
-const separatorOptions = [
-  { label: 'Space', value: ' ' },
-  { label: 'Hyphen', value: '-' },
-  { label: 'Underscore', value: '_' },
-  { label: 'Dot', value: '.' },
-] as const;
+const separatorCollection = createListCollection({
+  items: [
+    { value: ' ', label: 'Space' },
+    { value: '-', label: 'Hyphen' },
+    { value: '_', label: 'Underscore' },
+    { value: '.', label: 'Period' },
+    { value: '', label: 'None' },
+    { value: '#', label: 'Random Special Character' },
+  ],
+});
 
 const characterItems = [
   { value: 'lowercase', icon: <TbLetterCaseLower />, label: 'Lowercase', description: 'Include lowercase letters' },
   { value: 'uppercase', icon: <TbLetterCaseUpper />, label: 'Uppercase', description: 'Include uppercase letters' },
   { value: 'numbers', icon: <TbNumber123 />, label: 'Numbers', description: 'Include numbers' },
-  { value: 'symbols', icon: <TbHash />, label: 'Symbols', description: 'Include symbols' },
+  {
+    value: 'symbols',
+    icon: <TbCurrencyDollar />,
+    label: 'Symbols',
+    description: 'Include symbols',
+  },
 ];
+
 export default function PasswordGenerator({ onSecretChange }: { onSecretChange?: (secret: string) => void }) {
   const lowerCaseColor = useColorModeValue('gray.600', 'gray.400');
   const upperCaseColor = useColorModeValue('green.600', 'green.400');
@@ -70,23 +118,17 @@ export default function PasswordGenerator({ onSecretChange }: { onSecretChange?:
     'symbols',
   ]);
 
-  const [mode, setMode] = React.useState<'password' | 'passphrase' | 'pin'>('password');
+  const [mode, setMode] = React.useState<ModeType>('Password');
   const [value, setValue] = React.useState('');
   const [length, setLength] = React.useState(12);
-  const [separator, setSeparator] = React.useState<(typeof separatorOptions)[number]['value']>(
-    separatorOptions[0].value,
-  );
-  const [error, setError] = React.useState('');
+  const [separator, setSeparator] = React.useState(separatorCollection.items[0].value);
+  const [timeToBreak, setTimeToBreak] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<{ title: string; message?: string } | null>(null);
 
   const handleGeneratePassword = React.useCallback(() => {
-    setError('');
-    if (
-      !selectedCharacterTypes.includes('symbols') &&
-      !selectedCharacterTypes.includes('numbers') &&
-      !selectedCharacterTypes.includes('uppercase') &&
-      !selectedCharacterTypes.includes('lowercase')
-    ) {
-      setError('At least one character type must be selected.');
+    setError(null);
+    if (selectedCharacterTypes.length === 0) {
+      setError({ title: 'Cannot Generate', message: 'At least one character type must be selected.' });
       return;
     }
 
@@ -109,11 +151,12 @@ export default function PasswordGenerator({ onSecretChange }: { onSecretChange?:
 
   const handleGeneratePassphrase = React.useCallback(() => {
     const getWords = async () => {
+      setError(null);
       try {
         const response = await fetch(`/api/wordlist?count=${length}`, { method: 'GET' });
 
         if (!response.ok) {
-          throw new Error('Failed to fetch word list');
+          throw new Error('An error occurred while communicating with the server. Please try again.');
         }
         const { words }: { words: string[] } = await response.json();
 
@@ -137,15 +180,41 @@ export default function PasswordGenerator({ onSecretChange }: { onSecretChange?:
 
         return words;
       } catch (error) {
-        console.error(error);
+        setError({
+          title: 'Failed to Generate Passphrase',
+          message:
+            (error as Error).message ||
+            'An unknown error occurred. If you continue to get this error. Please contact support.',
+        });
         return [];
       }
     };
-    getWords().then((words) => {
-      const generatedPassphrase = words.join(separator);
-      setValue(generatedPassphrase);
-      onSecretChange?.(generatedPassphrase);
-    });
+    getWords()
+      .then((words) => {
+        let generatedPassphrase = '';
+
+        if (separator === '#') {
+          const validSeparators = symbols.split('').map((s) => ({ value: s }));
+          generatedPassphrase = words.reduce((passphrase, word, index) => {
+            if (index === 0) return word;
+            const randomSep = validSeparators[Math.floor(Math.random() * validSeparators.length)].value;
+            return passphrase + randomSep + word;
+          }, '');
+        } else {
+          generatedPassphrase = words.join(separator);
+        }
+
+        setValue(generatedPassphrase);
+        onSecretChange?.(generatedPassphrase);
+      })
+      .catch((err0r) =>
+        setError({
+          title: 'Failed to Generate Passphrase',
+          message:
+            (err0r as Error).message ||
+            'An unknown error occurred. If you continue to get this error. Please contact support.',
+        }),
+      );
   }, [selectedCharacterTypes, length, separator, onSecretChange]);
 
   const handleGeneratePin = React.useCallback(() => {
@@ -155,42 +224,56 @@ export default function PasswordGenerator({ onSecretChange }: { onSecretChange?:
   }, [length, onSecretChange]);
 
   const handleGenerate = React.useCallback(() => {
-    if (mode === 'password') {
+    if (mode === 'Password') {
       handleGeneratePassword();
-    } else if (mode === 'passphrase') {
+    } else if (mode === 'Passphrase') {
       handleGeneratePassphrase();
-    } else if (mode === 'pin') {
+    } else if (mode === 'PIN') {
       handleGeneratePin();
     }
   }, [mode, handleGeneratePassword, handleGeneratePassphrase, handleGeneratePin]);
 
+  // Set default values by GENERATOR_DEFAULTS
   React.useEffect(() => {
-    if (mode === 'password') {
+    if (mode === 'Password') {
       const setPasswordDefaults = () => {
-        setLength(12);
-        setSelectedCharacterTypes(['symbols', 'numbers', 'uppercase', 'lowercase']);
+        setLength(GENERATOR_DEFAULTS.password.length);
+        setSelectedCharacterTypes(GENERATOR_DEFAULTS.password.characterTypes);
       };
       setPasswordDefaults();
-    } else if (mode === 'passphrase') {
+    } else if (mode === 'Passphrase') {
       const setPassphraseDefaults = () => {
-        setLength(6);
-        setSelectedCharacterTypes(['lowercase']);
+        setLength(GENERATOR_DEFAULTS.passphrase.length);
+        setSelectedCharacterTypes(GENERATOR_DEFAULTS.passphrase.characterItems);
       };
       setPassphraseDefaults();
-    } else if (mode === 'pin') {
+    } else if (mode === 'PIN') {
       const setPinDefaults = () => {
-        setLength(4);
-        setSelectedCharacterTypes(['numbers']);
+        setLength(GENERATOR_DEFAULTS.pin.length);
+        setSelectedCharacterTypes(GENERATOR_DEFAULTS.pin.characterItems);
       };
       setPinDefaults();
     }
   }, [mode]);
 
+  // Generate a new secret
   React.useEffect(() => {
     const doEffect = () => handleGenerate();
     doEffect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, length, selectedCharacterTypes, separator]);
+
+  // Calculate time to break for the current value using zxcvbn
+  React.useEffect(() => {
+    const calculateTimeToBreak = () => {
+      if (value) {
+        const result = zxcvbn(value);
+
+        setTimeToBreak(result.crack_times_display.offline_fast_hashing_1e10_per_second.toString());
+      }
+    };
+    calculateTimeToBreak();
+  }, [value, mode]);
 
   const charColor = (char: string) => {
     if (symbols.includes(char)) return symbolColor;
@@ -203,173 +286,204 @@ export default function PasswordGenerator({ onSecretChange }: { onSecretChange?:
   return (
     <Flex direction="column" gap={8} w="full">
       {error && (
-        <Alert.Root size="sm" status="error">
+        <Alert.Root status="error">
           <Alert.Indicator />
           <Alert.Content>
-            <Alert.Title>Failed to Generate Password</Alert.Title>
-            <Alert.Description>{error}</Alert.Description>
+            <Alert.Title>{error?.title}</Alert.Title>
+            <Alert.Description>{error?.message}</Alert.Description>
           </Alert.Content>
         </Alert.Root>
       )}
 
-      {/* Modernized Output Display */}
-      <Flex
-        align="center"
-        justify="space-between"
-        bg="bg.subtle"
-        borderWidth="1px"
-        borderColor="border.muted"
-        rounded="xl"
-        p={4}
-        minH="5rem"
-      >
-        <Box
-          flex="1"
-          display="flex"
-          overflowX="auto"
-          userSelect="all"
-          fontSize="2xl"
-          letterSpacing="widest"
-          fontWeight="medium"
+      <VStack gap={1} w="full">
+        <HStack
+          align="center"
+          justify="space-between"
+          bg="bg.subtle"
+          borderWidth="1px"
+          borderColor="border.muted"
+          rounded="xl"
+          p={4}
+          minH="5rem"
+          w="full"
         >
-          {value.split('').map((char, index) => (
-            <Box as="span" key={index} color={charColor(char)} fontFamily="monospace" whiteSpace="pre">
-              {char}
-            </Box>
-          ))}
-        </Box>
-        <ButtonGroup attached ml={4}>
-          <IconButton
-            variant="surface"
-            colorPalette="gray"
-            aria-label="Copy password"
-            onClick={() => {
-              navigator.clipboard.writeText(value);
-              toaster.success({
-                title: 'Copied to Clipboard',
-                description: 'The password has been copied to your clipboard.',
-                duration: 2000,
-                closable: true,
-              });
-            }}
+          <Box
+            flex="1"
+            display="flex"
+            overflowX="auto"
+            userSelect="all"
+            fontSize="2xl"
+            letterSpacing="widest"
+            fontWeight="medium"
           >
-            <TbCopy />
-          </IconButton>
-          <IconButton variant="surface" colorPalette="gray" aria-label="Refresh password" onClick={handleGenerate}>
-            <TbRefresh />
-          </IconButton>
-        </ButtonGroup>
-      </Flex>
+            {value.split('').map((char, index) => (
+              <Box as="span" key={index} color={charColor(char)} fontFamily="monospace" whiteSpace="pre">
+                {char}
+              </Box>
+            ))}
+          </Box>
+          <ButtonGroup attached ml={4}>
+            <IconButton
+              variant="surface"
+              colorPalette="gray"
+              aria-label="Copy password"
+              onClick={() => {
+                navigator.clipboard.writeText(value);
+                toaster.success({
+                  title: 'Copied to Clipboard',
+                  description: 'The password has been copied to your clipboard.',
+                  duration: 2000,
+                  closable: true,
+                });
+              }}
+            >
+              <TbCopy />
+            </IconButton>
+            <IconButton variant="surface" colorPalette="gray" aria-label="Refresh password" onClick={handleGenerate}>
+              <TbRefresh />
+            </IconButton>
+          </ButtonGroup>
+        </HStack>
+        {timeToBreak !== null && (
+          <HStack gap={2} color="fg.muted" w="full">
+            <TbBoltFilled size={18} />
+            <Text fontSize="sm">
+              It would take <strong>{timeToBreak}</strong> to break this password with <Em>ten billion</Em> attempts per
+              second.
+            </Text>
+          </HStack>
+        )}
+      </VStack>
 
       <VStack gap={6} align="stretch">
-        {/* Mode & Separator Segmented Controls */}
-        <Flex justify="space-between" align="flex-start" flexWrap="wrap" gap={4}>
-          <VStack align="start" gap={1.5}>
-            <Text fontSize="sm" fontWeight="medium" color="fg.muted">
-              Type
-            </Text>
-            <Flex bg="bg.muted" p={1} rounded="lg">
-              {modeOptions.map((m) => (
-                <Button
-                  key={m.value}
-                  variant={mode === m.value ? 'solid' : 'ghost'}
-                  colorPalette={mode === m.value ? 'yellow' : 'gray'}
-                  size="sm"
-                  onClick={() => setMode(m.value)}
-                >
-                  {m.label}
-                </Button>
-              ))}
-            </Flex>
-          </VStack>
-
-          {mode === 'passphrase' && (
+        {/* Type and Separator */}
+        <HStack justify="space-between" align="flex-start" gap={4}>
+          <Field.Root flex={1} required>
             <VStack align="start" gap={1.5}>
-              <Text fontSize="sm" fontWeight="medium" color="fg.muted">
-                Separator
-              </Text>
-              <Flex bg="bg.muted" p={1} rounded="lg">
-                {separatorOptions.map((s) => (
-                  <Button
-                    key={s.value}
-                    variant={separator === s.value ? 'solid' : 'ghost'}
-                    colorPalette={separator === s.value ? 'yellow' : 'gray'}
-                    size="sm"
-                    onClick={() => setSeparator(s.value)}
-                  >
-                    {s.label}
-                  </Button>
-                ))}
-              </Flex>
+              <Field.Label>
+                Type <Field.RequiredIndicator />
+              </Field.Label>
+              <SegmentGroup.Root
+                value={mode}
+                onValueChange={(e) => setMode(e.value as ModeType)}
+                colorPalette="yellow"
+                required
+              >
+                <SegmentGroup.Indicator
+                  _checked={{ color: 'colorPalette.fg', bg: 'colorPalette.subtle', fontWeight: 'medium' }}
+                />
+                <SegmentGroup.Items items={modeOptions} />
+              </SegmentGroup.Root>
             </VStack>
-          )}
-        </Flex>
+          </Field.Root>
 
-        {/* Interactive Length Slider */}
-        <VStack align="start" gap={1.5} w="full">
-          <Flex justify="space-between" w="full">
-            <Text fontSize="sm" fontWeight="medium" color="fg.muted">
-              {mode === 'passphrase' ? 'Word Count' : 'Character Length'}
-            </Text>
-            <Text fontSize="sm" fontWeight="bold" color="yellow.500">
-              {length}
-            </Text>
-          </Flex>
-          <Flex gap={4} w="full" align="center">
-            <input
-              type="range"
-              min={1}
-              max={mode === 'passphrase' ? 20 : 100}
-              value={length}
-              onChange={(e) => setLength(Number(e.target.value))}
-              style={{ flex: 1, accentColor: 'var(--chakra-colors-yellow-500)', cursor: 'pointer' }}
-            />
-            <NumberInput.Root
-              value={length.toString()}
-              onValueChange={(val) => setLength(val.valueAsNumber)}
-              min={1}
-              max={mode === 'passphrase' ? 20 : 100}
-              w="20"
-              size="sm"
+          {mode === 'Passphrase' && (
+            <Select.Root
+              collection={separatorCollection}
+              value={[separator]}
+              onValueChange={(val) => setSeparator(val.value[0])}
+              colorPalette="yellow"
+              maxW="xs"
+              flex={1}
+              required
             >
-              <NumberInput.Control />
-              <NumberInput.Input textAlign="center" />
-            </NumberInput.Root>
-          </Flex>
+              <Select.Label>Separator</Select.Label>
+              <Select.Trigger>
+                <Select.ValueText placeholder="Select member">
+                  {separatorCollection.items.find((item) => item.value === separator)?.label}{' '}
+                  <Kbd size="sm">&quot;{separator}&quot;</Kbd>
+                </Select.ValueText>
+                <Select.Indicator />
+              </Select.Trigger>
+              <Select.Positioner>
+                <Select.Content>
+                  {separatorCollection.items.map((item) => (
+                    <Select.Item key={`separator-item-${item.label}`} item={item}>
+                      <Select.ItemText>
+                        {item.label} <Kbd size="sm">&quot;{item.value}&quot;</Kbd>
+                      </Select.ItemText>
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Positioner>
+            </Select.Root>
+          )}
+        </HStack>
+
+        {/* Length Slider */}
+        <VStack align="start" gap={1.5} w="full">
+          <Field.Root>
+            <Field.Label>{mode === 'Passphrase' ? 'Word Count' : 'Character Length'}</Field.Label>
+            <Flex gap={4} w="full" align="center">
+              <Slider.Root
+                value={[length]}
+                onValueChange={(e) => setLength(e.value[0])}
+                min={1}
+                max={mode === 'Passphrase' ? 20 : 100}
+                w="full"
+                colorPalette="yellow"
+              >
+                <Slider.Control>
+                  <Slider.Track>
+                    <Slider.Range />
+                  </Slider.Track>
+                  <Slider.Thumbs />
+                </Slider.Control>
+              </Slider.Root>
+              <NumberInput.Root
+                value={length.toString()}
+                onValueChange={(val) => setLength(val.valueAsNumber)}
+                min={1}
+                max={mode === 'Passphrase' ? 20 : 100}
+                w="20"
+                size="sm"
+              >
+                <NumberInput.Control />
+                <NumberInput.Input textAlign="center" />
+              </NumberInput.Root>
+            </Flex>
+          </Field.Root>
         </VStack>
 
-        {/* Visual Toggle Cards for Characters */}
-        {['password', 'passphrase'].includes(mode) && (
-          <VStack align="start" gap={1.5} w="full">
-            <Text fontSize="sm" fontWeight="medium" color="fg.muted">
-              Characters
-            </Text>
-            <CheckboxGroup
-              value={selectedCharacterTypes}
-              onValueChange={(value) => setSelectedCharacterTypes(value)}
-              colorPalette="yellow"
-            >
-              <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap="2" w="full">
-                {characterItems.map((item) => (
-                  <CheckboxCard.Root value={item.value} align="center" key={item.value}>
-                    <CheckboxCard.HiddenInput />
-                    <CheckboxCard.Control>
-                      <CheckboxCard.Content>
-                        <Icon fontSize="2xl" mb="2">
-                          {item.icon}
-                        </Icon>
-                        <CheckboxCard.Label>{item.label}</CheckboxCard.Label>
-                        <CheckboxCard.Description>{item.description}</CheckboxCard.Description>
-                      </CheckboxCard.Content>
-                      <Float placement="top-end" offset="6">
-                        <CheckboxCard.Indicator />
-                      </Float>
-                    </CheckboxCard.Control>
-                  </CheckboxCard.Root>
-                ))}
-              </SimpleGrid>
-            </CheckboxGroup>
-          </VStack>
+        {/* Character Toggle Cards  */}
+        {['Password', 'Passphrase'].includes(mode) && (
+          <Fieldset.Root>
+            <VStack align="start" gap={1.5} w="full">
+              <Text textStyle="sm" fontWeight="medium">
+                Character Set
+              </Text>
+              <CheckboxGroup
+                value={selectedCharacterTypes}
+                onValueChange={(e) => setSelectedCharacterTypes(e)}
+                colorPalette="yellow"
+              >
+                <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap="2" w="full">
+                  {characterItems.map((item) => (
+                    <CheckboxCard.Root
+                      value={item.value}
+                      align="center"
+                      variant="surface"
+                      key={`characters-checkCard-${item.value}`}
+                    >
+                      <CheckboxCard.HiddenInput />
+                      <CheckboxCard.Control>
+                        <CheckboxCard.Content>
+                          <Icon fontSize="2xl" mb="2">
+                            {item.icon}
+                          </Icon>
+                          <CheckboxCard.Label>{item.label}</CheckboxCard.Label>
+                          <CheckboxCard.Description>{item.description}</CheckboxCard.Description>
+                        </CheckboxCard.Content>
+                        <Float placement="top-end" offset="6">
+                          <CheckboxCard.Indicator />
+                        </Float>
+                      </CheckboxCard.Control>
+                    </CheckboxCard.Root>
+                  ))}
+                </SimpleGrid>
+              </CheckboxGroup>
+            </VStack>
+          </Fieldset.Root>
         )}
       </VStack>
     </Flex>

@@ -34,6 +34,7 @@ import {
   Collapsible,
   createListCollection,
   DataList,
+  Dialog,
   Editable,
   EmptyState,
   Field,
@@ -59,6 +60,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import React, { startTransition } from 'react';
 import {
   TbAlignJustified,
+  TbArrowLeft,
   TbAsterisk,
   TbAsteriskSimple,
   TbAt,
@@ -85,6 +87,9 @@ import {
   TbRefresh,
   TbRosetteDiscountCheck,
   TbShare,
+  TbShredder,
+  TbStar,
+  TbStarFilled,
   TbTrash,
   TbTypography,
   TbX,
@@ -148,6 +153,8 @@ function VaultItemForm({
   const { vaults, handleUnlock, mek } = useVaults();
   const { getIssuesByItem } = useSecurityAnalytics(vaults);
 
+  const initialValue = React.useMemo(() => vaultItem?.item.decryptedData || [], [vaultItem?.item.decryptedData]);
+
   const highlightIndex = searchParams.get('highlightIndex')
     ? parseInt(searchParams.get('highlightIndex') as string, 10)
     : null;
@@ -159,12 +166,15 @@ function VaultItemForm({
   const [template, setTemplate] = React.useState(vaultItem?.item.category || '');
   const [vault, setVault] = React.useState(vaultId || vaultItem?.vaultId || '');
   const [itemContent, setItemContent] = React.useState<ItemContent[]>([]);
+  const [isFavorite, setIsFavorite] = React.useState(vaultItem?.item.isFavorite || false);
   const [mode, setMode] = React.useState<'read' | 'edit'>(defaultMode);
   const [hideSecurityIssues, setHideSecurityIssues] = React.useState(false);
+  const [changesMade, setChangesMade] = React.useState(false);
 
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
   const [showPasswordGeneratorDialog, setShowPasswordGeneratorDialog] = React.useState(false);
   const [passwordFieldIndex, setPasswordFieldIndex] = React.useState<number | null>(null);
+  const [showCancelDialog, setShowCancelDialog] = React.useState(false);
 
   React.useEffect(() => {
     if (mek) {
@@ -195,6 +205,22 @@ function VaultItemForm({
     };
     load();
   }, [initializeVaultItemContent]);
+
+  React.useEffect(() => {
+    if (!vaultItem) {
+      const handleInit = () => setChangesMade(itemContent.length > 0 || title !== '');
+      handleInit();
+      return;
+    }
+
+    const originalContentJSON = JSON.stringify(vaultItem.item.decryptedData || []);
+    const currentContentJSON = JSON.stringify(itemContent);
+    const hasContentChanged = originalContentJSON !== currentContentJSON;
+    const hasMetadataChanged = title !== vaultItem.item.title || template !== vaultItem.item.category;
+
+    const handleChanges = () => setChangesMade(hasContentChanged || hasMetadataChanged);
+    handleChanges();
+  }, [itemContent, title, template, vaultItem]);
 
   const handleValueChange = React.useCallback((index: number, value: string) => {
     setItemContent((prev) => prev.map((item, i) => (i === index ? { ...item, value } : item)));
@@ -343,6 +369,7 @@ function VaultItemForm({
       const status = await handleUpdateVaultItem(vault, vaultItem.item.id, encryptedData, {
         category: template,
         title,
+        isFavorite,
       });
       if (!status.success) {
         setError(status.error || 'Failed to update vault item.');
@@ -397,12 +424,33 @@ function VaultItemForm({
     }
   }
 
+  const handleCancel = () => {
+    if (changesMade) {
+      setShowCancelDialog(true);
+    } else {
+      if (vaultItem) {
+        setMode('read');
+        return;
+      } else {
+        router.push(`/vaults/${vault}`);
+      }
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit}>
       <Card.Root variant="elevated" border="none" w="full" mx="auto" mb={8} position="relative">
         <Card.Header>
           <Flex gap={4} align="center">
-            <Avatar.Root variant="subtle" rounded="sm" colorPalette="yellow" size="lg">
+            <Avatar.Root
+              size="lg"
+              rounded="sm"
+              variant="outline"
+              border="1px solid"
+              borderColor="yellow.muted"
+              bg="yellow.subtle"
+              color="yellow.fg"
+            >
               <Avatar.Image
                 src={`https://logos.hunter.io/${vaultItem?.item.decryptedData.find((data) => data.type === 'URL')?.value || undefined}`}
               />
@@ -419,6 +467,17 @@ function VaultItemForm({
                     Edit
                   </Button>
                 )}
+                {mode === 'read' && vaultItem?.item.isFavorite && (
+                  <IconButton
+                    as="button"
+                    variant="ghost"
+                    aria-label="Favorite"
+                    size="xs"
+                    onClick={() => setIsFavorite(!isFavorite)}
+                  >
+                    {vaultItem?.item.isFavorite ? <TbStarFilled /> : <TbStar />}
+                  </IconButton>
+                )}
                 <Menu.Root>
                   <Menu.Trigger asChild>
                     <IconButton as="button" variant="ghost" aria-label="Menu" size="xs">
@@ -431,16 +490,28 @@ function VaultItemForm({
                         {mode === 'read' ? (
                           <>
                             <TbPencil />
-                            Enable Edits
+                            Edit Item
                           </>
                         ) : (
                           <>
                             <TbPencilOff />
-                            Disable Edits
+                            Done Editing
                           </>
                         )}
                       </Menu.Item>
-
+                      <Menu.Item value="favorite" onClick={() => setIsFavorite(!isFavorite)}>
+                        {isFavorite ? (
+                          <>
+                            <TbStarFilled />
+                            Unfavorite
+                          </>
+                        ) : (
+                          <>
+                            <TbStar />
+                            Favorite
+                          </>
+                        )}
+                      </Menu.Item>
                       <Menu.Item value="share">
                         <TbShare />
                         Share
@@ -808,7 +879,7 @@ function VaultItemForm({
         {mode === 'edit' && (
           <Card.Footer pt={4} zIndex={10}>
             <SimpleGrid w="full" columns={{ base: 1, md: 2 }} gap={{ base: 2, md: 4 }}>
-              <Button type="button" variant="subtle" mr={2} onClick={() => router.back()}>
+              <Button type="button" variant="subtle" mr={2} onClick={handleCancel}>
                 <TbX />
                 Cancel
               </Button>
@@ -840,6 +911,54 @@ function VaultItemForm({
             }}
           />
         )}
+
+        <Dialog.Root
+          role="alertdialog"
+          open={showCancelDialog}
+          onOpenChange={(e) => setShowCancelDialog(e.open ?? false)}
+        >
+          <Portal>
+            <Dialog.Backdrop />
+            <Dialog.Positioner>
+              <Dialog.Content>
+                <Dialog.Header>
+                  <Flex
+                    w={16}
+                    h={16}
+                    align="center"
+                    justify="center"
+                    rounded="lg"
+                    bg="red.subtle"
+                    color="red.fg"
+                    fontSize="5xl"
+                  >
+                    <TbDeviceFloppy />
+                  </Flex>
+                </Dialog.Header>
+                <Dialog.Body>
+                  <Dialog.Title mb={4}>Discard Unsaved Changes?</Dialog.Title>
+                  <Dialog.Description>
+                    You have made changes that have not been saved. Are you sure you want to discard them?
+                  </Dialog.Description>
+                </Dialog.Body>
+                <Dialog.Footer>
+                  <Dialog.ActionTrigger asChild>
+                    <Button variant="subtle">
+                      <TbArrowLeft /> Go Back
+                    </Button>
+                  </Dialog.ActionTrigger>
+                  <Button colorPalette="red" onClick={() => router.back()}>
+                    <TbShredder />
+                    Discard Changes
+                  </Button>
+                </Dialog.Footer>
+                <Dialog.CloseTrigger asChild>
+                  <CloseButton size="sm" />
+                </Dialog.CloseTrigger>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Portal>
+        </Dialog.Root>
       </Card.Root>
     </form>
   );

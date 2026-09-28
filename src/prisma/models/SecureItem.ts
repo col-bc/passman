@@ -28,7 +28,7 @@ export type SecureItemMinAggregateOutputType = {
   id: string | null
   title: string | null
   category: string | null
-  isCompromised: boolean | null
+  isFavorite: boolean | null
   ciphertext: string | null
   iv: string | null
   tag: string | null
@@ -41,7 +41,7 @@ export type SecureItemMaxAggregateOutputType = {
   id: string | null
   title: string | null
   category: string | null
-  isCompromised: boolean | null
+  isFavorite: boolean | null
   ciphertext: string | null
   iv: string | null
   tag: string | null
@@ -54,7 +54,7 @@ export type SecureItemCountAggregateOutputType = {
   id: number
   title: number
   category: number
-  isCompromised: number
+  isFavorite: number
   ciphertext: number
   iv: number
   tag: number
@@ -69,7 +69,7 @@ export type SecureItemMinAggregateInputType = {
   id?: true
   title?: true
   category?: true
-  isCompromised?: true
+  isFavorite?: true
   ciphertext?: true
   iv?: true
   tag?: true
@@ -82,7 +82,7 @@ export type SecureItemMaxAggregateInputType = {
   id?: true
   title?: true
   category?: true
-  isCompromised?: true
+  isFavorite?: true
   ciphertext?: true
   iv?: true
   tag?: true
@@ -95,7 +95,7 @@ export type SecureItemCountAggregateInputType = {
   id?: true
   title?: true
   category?: true
-  isCompromised?: true
+  isFavorite?: true
   ciphertext?: true
   iv?: true
   tag?: true
@@ -181,7 +181,7 @@ export type SecureItemGroupByOutputType = {
   id: string
   title: string
   category: string
-  isCompromised: boolean
+  isFavorite: boolean
   ciphertext: string
   iv: string
   tag: string
@@ -215,7 +215,7 @@ export type SecureItemWhereInput = {
   id?: Prisma.StringFilter<"SecureItem"> | string
   title?: Prisma.StringFilter<"SecureItem"> | string
   category?: Prisma.StringFilter<"SecureItem"> | string
-  isCompromised?: Prisma.BoolFilter<"SecureItem"> | boolean
+  isFavorite?: Prisma.BoolFilter<"SecureItem"> | boolean
   ciphertext?: Prisma.StringFilter<"SecureItem"> | string
   iv?: Prisma.StringFilter<"SecureItem"> | string
   tag?: Prisma.StringFilter<"SecureItem"> | string
@@ -230,7 +230,7 @@ export type SecureItemOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   category?: Prisma.SortOrder
-  isCompromised?: Prisma.SortOrder
+  isFavorite?: Prisma.SortOrder
   ciphertext?: Prisma.SortOrder
   iv?: Prisma.SortOrder
   tag?: Prisma.SortOrder
@@ -248,7 +248,7 @@ export type SecureItemWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.SecureItemWhereInput | Prisma.SecureItemWhereInput[]
   title?: Prisma.StringFilter<"SecureItem"> | string
   category?: Prisma.StringFilter<"SecureItem"> | string
-  isCompromised?: Prisma.BoolFilter<"SecureItem"> | boolean
+  isFavorite?: Prisma.BoolFilter<"SecureItem"> | boolean
   ciphertext?: Prisma.StringFilter<"SecureItem"> | string
   iv?: Prisma.StringFilter<"SecureItem"> | string
   tag?: Prisma.StringFilter<"SecureItem"> | string
@@ -263,7 +263,7 @@ export type SecureItemOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   category?: Prisma.SortOrder
-  isCompromised?: Prisma.SortOrder
+  isFavorite?: Prisma.SortOrder
   ciphertext?: Prisma.SortOrder
   iv?: Prisma.SortOrder
   tag?: Prisma.SortOrder
@@ -282,7 +282,7 @@ export type SecureItemScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"SecureItem"> | string
   title?: Prisma.StringWithAggregatesFilter<"SecureItem"> | string
   category?: Prisma.StringWithAggregatesFilter<"SecureItem"> | string
-  isCompromised?: Prisma.BoolWithAggregatesFilter<"SecureItem"> | boolean
+  isFavorite?: Prisma.BoolWithAggregatesFilter<"SecureItem"> | boolean
   ciphertext?: Prisma.StringWithAggregatesFilter<"SecureItem"> | string
   iv?: Prisma.StringWithAggregatesFilter<"SecureItem"> | string
   tag?: Prisma.StringWithAggregatesFilter<"SecureItem"> | string
@@ -295,7 +295,7 @@ export type SecureItemCreateInput = {
   id?: string
   title: string
   category: string
-  isCompromised?: boolean
+  isFavorite?: boolean
   ciphertext: string
   iv: string
   tag: string
@@ -310,7 +310,7 @@ export type SecureItemUncheckedCreateInput = {
   id?: string
   title: string
   category: string
-  isCompromised?: boolean
+  isFavorite?: boolean
   ciphertext: string
   iv: string
   tag: string
@@ -325,7 +325,7 @@ export type SecureItemUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  isCompromised?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFavorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ciphertext?: Prisma.StringFieldUpdateOperationsInput | string
   iv?: Prisma.StringFieldUpdateOperationsInput | string
   tag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -340,7 +340,7 @@ export type SecureItemUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  isCompromised?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFavorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ciphertext?: Prisma.StringFieldUpdateOperationsInput | string
   iv?: Prisma.StringFieldUpdateOperationsInput | string
   tag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -355,7 +355,7 @@ export type SecureItemCreateManyInput = {
   id?: string
   title: string
   category: string
-  isCompromised?: boolean
+  isFavorite?: boolean
   ciphertext: string
   iv: string
   tag: string
@@ -368,7 +368,7 @@ export type SecureItemUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  isCompromised?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFavorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ciphertext?: Prisma.StringFieldUpdateOperationsInput | string
   iv?: Prisma.StringFieldUpdateOperationsInput | string
   tag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -381,7 +381,7 @@ export type SecureItemUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  isCompromised?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFavorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ciphertext?: Prisma.StringFieldUpdateOperationsInput | string
   iv?: Prisma.StringFieldUpdateOperationsInput | string
   tag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -399,7 +399,7 @@ export type SecureItemCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   category?: Prisma.SortOrder
-  isCompromised?: Prisma.SortOrder
+  isFavorite?: Prisma.SortOrder
   ciphertext?: Prisma.SortOrder
   iv?: Prisma.SortOrder
   tag?: Prisma.SortOrder
@@ -412,7 +412,7 @@ export type SecureItemMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   category?: Prisma.SortOrder
-  isCompromised?: Prisma.SortOrder
+  isFavorite?: Prisma.SortOrder
   ciphertext?: Prisma.SortOrder
   iv?: Prisma.SortOrder
   tag?: Prisma.SortOrder
@@ -425,7 +425,7 @@ export type SecureItemMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   category?: Prisma.SortOrder
-  isCompromised?: Prisma.SortOrder
+  isFavorite?: Prisma.SortOrder
   ciphertext?: Prisma.SortOrder
   iv?: Prisma.SortOrder
   tag?: Prisma.SortOrder
@@ -470,7 +470,7 @@ export type SecureItemCreateWithoutAccessorsInput = {
   id?: string
   title: string
   category: string
-  isCompromised?: boolean
+  isFavorite?: boolean
   ciphertext: string
   iv: string
   tag: string
@@ -484,7 +484,7 @@ export type SecureItemUncheckedCreateWithoutAccessorsInput = {
   id?: string
   title: string
   category: string
-  isCompromised?: boolean
+  isFavorite?: boolean
   ciphertext: string
   iv: string
   tag: string
@@ -514,7 +514,7 @@ export type SecureItemUpdateWithoutAccessorsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  isCompromised?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFavorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ciphertext?: Prisma.StringFieldUpdateOperationsInput | string
   iv?: Prisma.StringFieldUpdateOperationsInput | string
   tag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -528,7 +528,7 @@ export type SecureItemUncheckedUpdateWithoutAccessorsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  isCompromised?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFavorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ciphertext?: Prisma.StringFieldUpdateOperationsInput | string
   iv?: Prisma.StringFieldUpdateOperationsInput | string
   tag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -542,7 +542,7 @@ export type SecureItemCreateWithoutVaultItemsInput = {
   id?: string
   title: string
   category: string
-  isCompromised?: boolean
+  isFavorite?: boolean
   ciphertext: string
   iv: string
   tag: string
@@ -556,7 +556,7 @@ export type SecureItemUncheckedCreateWithoutVaultItemsInput = {
   id?: string
   title: string
   category: string
-  isCompromised?: boolean
+  isFavorite?: boolean
   ciphertext: string
   iv: string
   tag: string
@@ -586,7 +586,7 @@ export type SecureItemUpdateWithoutVaultItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  isCompromised?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFavorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ciphertext?: Prisma.StringFieldUpdateOperationsInput | string
   iv?: Prisma.StringFieldUpdateOperationsInput | string
   tag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -600,7 +600,7 @@ export type SecureItemUncheckedUpdateWithoutVaultItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  isCompromised?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isFavorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ciphertext?: Prisma.StringFieldUpdateOperationsInput | string
   iv?: Prisma.StringFieldUpdateOperationsInput | string
   tag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -654,7 +654,7 @@ export type SecureItemSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   id?: boolean
   title?: boolean
   category?: boolean
-  isCompromised?: boolean
+  isFavorite?: boolean
   ciphertext?: boolean
   iv?: boolean
   tag?: boolean
@@ -670,7 +670,7 @@ export type SecureItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   id?: boolean
   title?: boolean
   category?: boolean
-  isCompromised?: boolean
+  isFavorite?: boolean
   ciphertext?: boolean
   iv?: boolean
   tag?: boolean
@@ -683,7 +683,7 @@ export type SecureItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   id?: boolean
   title?: boolean
   category?: boolean
-  isCompromised?: boolean
+  isFavorite?: boolean
   ciphertext?: boolean
   iv?: boolean
   tag?: boolean
@@ -696,7 +696,7 @@ export type SecureItemSelectScalar = {
   id?: boolean
   title?: boolean
   category?: boolean
-  isCompromised?: boolean
+  isFavorite?: boolean
   ciphertext?: boolean
   iv?: boolean
   tag?: boolean
@@ -705,7 +705,7 @@ export type SecureItemSelectScalar = {
   lastScan?: boolean
 }
 
-export type SecureItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "category" | "isCompromised" | "ciphertext" | "iv" | "tag" | "createdAt" | "updatedAt" | "lastScan", ExtArgs["result"]["secureItem"]>
+export type SecureItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "category" | "isFavorite" | "ciphertext" | "iv" | "tag" | "createdAt" | "updatedAt" | "lastScan", ExtArgs["result"]["secureItem"]>
 export type SecureItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vaultItems?: boolean | Prisma.SecureItem$vaultItemsArgs<ExtArgs>
   accessors?: boolean | Prisma.SecureItem$accessorsArgs<ExtArgs>
@@ -724,7 +724,7 @@ export type $SecureItemPayload<ExtArgs extends runtime.Types.Extensions.Internal
     id: string
     title: string
     category: string
-    isCompromised: boolean
+    isFavorite: boolean
     ciphertext: string
     iv: string
     tag: string
@@ -1159,7 +1159,7 @@ export interface SecureItemFieldRefs {
   readonly id: Prisma.FieldRef<"SecureItem", 'String'>
   readonly title: Prisma.FieldRef<"SecureItem", 'String'>
   readonly category: Prisma.FieldRef<"SecureItem", 'String'>
-  readonly isCompromised: Prisma.FieldRef<"SecureItem", 'Boolean'>
+  readonly isFavorite: Prisma.FieldRef<"SecureItem", 'Boolean'>
   readonly ciphertext: Prisma.FieldRef<"SecureItem", 'String'>
   readonly iv: Prisma.FieldRef<"SecureItem", 'String'>
   readonly tag: Prisma.FieldRef<"SecureItem", 'String'>

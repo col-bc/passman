@@ -43,7 +43,7 @@ export function VaultProvider({ children, userEmail }: { children: React.ReactNo
   const [passwordInput, setPasswordInput] = React.useState('');
   const [unlockError, setUnlockError] = React.useState<string | null>(null);
   const isLockedRoute = !DISABLE_UNLOCK_ON_PATHS.some((path) => pathName.startsWith(path));
-  const [dialogOpen, setDialogOpen] = React.useState<boolean>(!mek && isLockedRoute);
+  const [dialogOpen, setDialogOpen] = React.useState<boolean>(false);
 
   const handleManualUnlock = async (e: React.SyntheticEvent<HTMLButtonElement>) => {
     e.preventDefault();

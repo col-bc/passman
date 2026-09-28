@@ -41,7 +41,7 @@ export default function DeleteVaultItemDialog({
   }
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+    <Dialog.Root open={open} onOpenChange={onOpenChange} role="alertdialog">
       <Dialog.Backdrop />
       <Dialog.Positioner>
         <Dialog.Content>

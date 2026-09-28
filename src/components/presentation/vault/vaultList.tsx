@@ -4,9 +4,10 @@ import { VaultIconMap } from '@/components/forms/vault/iconPicker';
 import { VaultFormDialog } from '@/components/forms/vault/vaultForm';
 import { useSecurityAnalytics } from '@/hooks/use-security-analytics';
 import { useVaults } from '@/hooks/use-vaults';
+import { calculateScore } from '@/lib/securityCenter';
 import { timeSinceDate } from '@/lib/util/formats';
 import { templateIcon } from '@/lib/util/itemTemplates';
-import { User } from '@/prisma/client';
+import { SecureItem, User } from '@/prisma/client';
 import { DecryptedVault } from '@/types/client';
 import { VaultWithItems } from '@/types/server';
 import {
@@ -20,9 +21,9 @@ import {
   Heading,
   HStack,
   Icon,
-  Link,
   LinkBox,
   LinkOverlay,
+  List,
   SimpleGrid,
   Stat,
   Text,
@@ -40,12 +41,12 @@ import {
   TbShieldFilled,
   TbStack3Filled,
 } from 'react-icons/tb';
-import SecurityScore from '../securityScore';
 import DeleteVaultDialog from './deleteDialog';
+import VaultItemLineItem from './vaultItemLineItem';
 
-export default function VaultList({ v }: { v: VaultWithItems[]; user?: User }) {
+export default function VaultList({ v, favs }: { v: VaultWithItems[]; favs: SecureItem[]; user?: User }) {
   const [showCreateVaultDialog, setShowCreateVaultDialog] = React.useState(false);
-  const { handleUnlock, vaults, mek } = useVaults();
+  const { handleUnlock, vaults, mek, currentVault } = useVaults();
   const { totalIssues } = useSecurityAnalytics(vaults);
 
   React.useEffect(() => {
@@ -64,6 +65,17 @@ export default function VaultList({ v }: { v: VaultWithItems[]; user?: User }) {
       return acc + fieldsInVault;
     }, 0);
     return { itemCount, fieldCount };
+  }, [vaults]);
+
+  const securityScore = React.useMemo(() => {
+    let max = 0,
+      actual = 0;
+    vaults.forEach((vault) => {
+      const { maxScore, actualScore } = calculateScore(vault);
+      max += maxScore;
+      actual += actualScore;
+    });
+    return max > 0 ? (actual / max) * 100 : null;
   }, [vaults]);
 
   return (
@@ -116,7 +128,7 @@ export default function VaultList({ v }: { v: VaultWithItems[]; user?: User }) {
                 </Icon>
               </HStack>
               <Stat.ValueText fontFamily="mono">
-                <SecurityScore vaults={vaults} labelPosition="left" size="md" />
+                {securityScore !== null ? securityScore.toFixed(0) + '%' : 'N/A'}
               </Stat.ValueText>
             </Stat.Root>
 
@@ -155,6 +167,26 @@ export default function VaultList({ v }: { v: VaultWithItems[]; user?: User }) {
           </VStack>
         </Button>
       </SimpleGrid>
+
+      <Heading size="lg" mb="4">
+        Favorite Items
+      </Heading>
+      <List.Root>
+        {favs.map((vaultItem, index) => (
+          <VaultItemLineItem
+            key={`vault-item-${vaultItem.itemId}-${index}`}
+            vaultItem={vaultItem}
+            vaultId={vaults.find((v) => v.id === vaultItem.vaultId)?.id ?? ''}
+            currentVault={currentVault!}
+            index={index}
+            sortedVaultItems={vaults.find((v) => v.id === vaultItem.vaultId)?.vaultItems ?? []}
+            selectedItems={new Set()}
+            toggleSelectItem={() => {}}
+            monitoringEnabled={false}
+            hasSecurityIssues={() => false}
+          />
+        ))}
+      </List.Root>
     </Flex>
   );
 }
@@ -277,10 +309,10 @@ function VaultItem({ vault }: { vault: DecryptedVault }) {
                 </Badge>
               )}
             </Flex>
-            <LinkOverlay asChild>
-              <Link as={NextLink} href={`/vaults/${vault.id}`} colorPalette="yellow">
+            <LinkOverlay asChild colorPalette="yellow">
+              <NextLink href={`/vaults/${vault.id}`}>
                 Open Vault <TbArrowRight />
-              </Link>
+              </NextLink>
             </LinkOverlay>
           </Flex>
         </LinkBox>

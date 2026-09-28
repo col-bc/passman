@@ -4,7 +4,7 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { useVaults } from '@/hooks/use-vaults';
 import { deriveAuthHash, deriveHexKey } from '@/lib/crypto';
 import { handleLoginUser } from '@/lib/user/userActions';
-import { Alert, Button, Card, CloseButton, Field, Flex, Input, Link, Spinner, VStack } from '@chakra-ui/react';
+import { Alert, Button, Card, CloseButton, Field, Flex, Input, Link, Spinner, Strong, VStack } from '@chakra-ui/react';
 import { Turnstile, TurnstileInstance } from '@marsidev/react-turnstile';
 import NextLink from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -23,6 +23,7 @@ export default function SignInForm() {
   const [password, setPassword] = React.useState<string>('');
   const [error, setError] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [showEnroll2FA, setShowEnroll2FA] = React.useState<boolean>(false);
 
   const nextUrl = searchParams.get('next') || '/vaults';
 
@@ -69,7 +70,7 @@ export default function SignInForm() {
       setMek(mek);
       localStorage.removeItem('mekAttempt');
       setIsLoading(false);
-      router.push(nextUrl);
+      setShowEnroll2FA(true);
     }
     if (status.data?.twoFactor) {
       // login requires two-factor authentication
@@ -78,118 +79,160 @@ export default function SignInForm() {
     }
   };
 
+  if (showEnroll2FA) {
+    return (
+      <Card.Root variant="elevated">
+        <Card.Header>
+          <Flex
+            w={16}
+            h={16}
+            align="center"
+            justify="center"
+            rounded="lg"
+            bg="green.subtle"
+            color="green.fg"
+            fontSize="5xl"
+          >
+            <TbCircleCheckFilled size={24} />
+          </Flex>
+        </Card.Header>
+        <Card.Body>
+          <Card.Title mb={4}>Sign In Successful</Card.Title>
+          <Strong mb={2}>You are not enrolled in two-factor authentication.</Strong>
+          <Card.Description>
+            You are not enrolled in two-factor authentication. 2FA adds an extra layer of security to your account by
+            requiring a a temporary code in addition to your password during sign-in.
+          </Card.Description>
+        </Card.Body>
+        <Card.Footer>
+          <Button colorPalette="yellow" asChild>
+            <NextLink href="/account/enroll-2fa">Enroll in 2FA</NextLink>
+          </Button>
+          <Button colorPalette="yellow" variant="subtle" onClick={() => router.push(nextUrl)}>
+            Remind Me Later
+          </Button>
+        </Card.Footer>
+      </Card.Root>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit}>
-      <Card.Body>
-        <Flex direction="column" gap={4}>
-          {searchParams.get('registered') && (
-            <Alert.Root status="success" size="sm" variant="subtle">
-              <Alert.Indicator>
-                <TbCircleCheckFilled size={24} />
-              </Alert.Indicator>
-              <Alert.Content>
-                <Alert.Title>Registration Successful</Alert.Title>
-                <Alert.Description>Your account has been created. Please sign in to continue.</Alert.Description>
-              </Alert.Content>
-              <CloseButton onClick={() => clearSearchParams()} />
-            </Alert.Root>
-          )}
-
-          {error && (
-            <Alert.Root status="error">
-              <Alert.Indicator>
-                <TbExclamationCircle size={24} />
-              </Alert.Indicator>
-              <Alert.Content>
-                <Alert.Description>{error}</Alert.Description>
-              </Alert.Content>
-              <CloseButton onClick={() => setError(null)} />
-            </Alert.Root>
-          )}
-
-          <Field.Root required colorPalette="yellow">
-            <Field.Label>
-              Email Address <Field.RequiredIndicator />
-            </Field.Label>
-            <Input
-              type="text"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email address"
-              autoComplete="email"
-              autoCapitalize="none"
-              autoCorrect="off"
-              tabIndex={1}
-              required
-            />
-          </Field.Root>
-
-          <Field.Root required colorPalette="yellow">
-            <Flex justify="space-between" align="center" mb={2} w="full">
-              <Field.Label>
-                Password <Field.RequiredIndicator />
-              </Field.Label>
-              <Link as={NextLink} href="/auth/forgot-password" fontSize="xs" tabIndex={5}>
-                Forgot Password?
-              </Link>
-            </Flex>
-            <PasswordInput
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              autoComplete="current-password"
-              tabIndex={2}
-              required
-            />
-          </Field.Root>
-
-          <Turnstile
-            ref={turnstileRef}
-            siteKey="0x4AAAAAAD9otpku29Q-MK7g"
-            options={{
-              appearance: 'interaction-only',
-              theme: 'auto',
-              feedbackEnabled: true,
-              size: 'flexible',
-            }}
-            onSuccess={(token) => setTsToken(token)}
-            onError={() => {
-              setError('Turnstile verification failed. Please try again.');
-              turnstileRef.current?.reset();
-            }}
-            style={{
-              marginTop: '1rem',
-              width: '100%',
-            }}
-          />
-        </Flex>
-      </Card.Body>
-      <Card.Footer>
-        <VStack gap={4} w="full">
-          <Button
-            size="lg"
-            type="submit"
-            w="full"
-            loading={isLoading}
-            disabled={!tsToken}
-            colorPalette="yellow"
-            tabIndex={3}
-          >
-            {tsToken ? (
-              <>
-                Sign In <TbArrowRight />
-              </>
-            ) : (
-              <>
-                <Spinner size="sm" /> Getting ready...
-              </>
+      <Card.Root variant="elevated">
+        <Card.Header>
+          <Card.Title>Please Sign In to Continue</Card.Title>
+        </Card.Header>
+        <Card.Body>
+          <Flex direction="column" gap={4}>
+            {searchParams.get('registered') && (
+              <Alert.Root status="success" size="sm" variant="subtle">
+                <Alert.Indicator>
+                  <TbCircleCheckFilled size={24} />
+                </Alert.Indicator>
+                <Alert.Content>
+                  <Alert.Title>Registration Successful</Alert.Title>
+                  <Alert.Description>Your account has been created. Please sign in to continue.</Alert.Description>
+                </Alert.Content>
+                <CloseButton onClick={() => clearSearchParams()} />
+              </Alert.Root>
             )}
-          </Button>
-          <Link as={NextLink} href="/auth/sign-up" colorPalette="yellow">
-            Don&apos;t have an account? Sign Up
-          </Link>
-        </VStack>
-      </Card.Footer>
+
+            {error && (
+              <Alert.Root status="error">
+                <Alert.Indicator>
+                  <TbExclamationCircle size={24} />
+                </Alert.Indicator>
+                <Alert.Content>
+                  <Alert.Description>{error}</Alert.Description>
+                </Alert.Content>
+                <CloseButton onClick={() => setError(null)} />
+              </Alert.Root>
+            )}
+
+            <Field.Root required colorPalette="yellow">
+              <Field.Label>
+                Email Address <Field.RequiredIndicator />
+              </Field.Label>
+              <Input
+                type="text"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email address"
+                autoComplete="email"
+                autoCapitalize="none"
+                autoCorrect="off"
+                tabIndex={1}
+                required
+              />
+            </Field.Root>
+
+            <Field.Root required colorPalette="yellow">
+              <Flex justify="space-between" align="center" mb={2} w="full">
+                <Field.Label>
+                  Password <Field.RequiredIndicator />
+                </Field.Label>
+                <Link as={NextLink} href="/auth/forgot-password" fontSize="xs" tabIndex={5}>
+                  Forgot Password?
+                </Link>
+              </Flex>
+              <PasswordInput
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                autoComplete="current-password"
+                tabIndex={2}
+                required
+              />
+            </Field.Root>
+
+            <Turnstile
+              ref={turnstileRef}
+              siteKey="0x4AAAAAAD9otpku29Q-MK7g"
+              options={{
+                appearance: 'interaction-only',
+                theme: 'auto',
+                feedbackEnabled: true,
+                size: 'flexible',
+              }}
+              onSuccess={(token) => setTsToken(token)}
+              onError={() => {
+                setError('Turnstile verification failed. Please try again.');
+                turnstileRef.current?.reset();
+              }}
+              style={{
+                marginTop: '1rem',
+                width: '100%',
+              }}
+            />
+          </Flex>
+        </Card.Body>
+        <Card.Footer>
+          <VStack gap={4} w="full">
+            <Button
+              size="lg"
+              type="submit"
+              w="full"
+              loading={isLoading}
+              disabled={!tsToken}
+              colorPalette="yellow"
+              tabIndex={3}
+            >
+              {tsToken ? (
+                <>
+                  Sign In <TbArrowRight />
+                </>
+              ) : (
+                <>
+                  <Spinner size="sm" /> Getting ready...
+                </>
+              )}
+            </Button>
+            <Link as={NextLink} href="/auth/sign-up" colorPalette="yellow">
+              Don&apos;t have an account? Sign Up
+            </Link>
+          </VStack>
+        </Card.Footer>
+      </Card.Root>
     </form>
   );
 }

@@ -40,6 +40,7 @@ import {
   TbLockSquareRounded,
   TbPlus,
   TbSearch,
+  TbShare,
   TbShieldLock,
   TbUserCircle,
   TbX,
@@ -53,6 +54,13 @@ import { Toaster } from './ui/toaster';
 
 export default function AppWrapper({ children, user }: { children: React.ReactNode; user: User }) {
   const [open, setOpen] = React.useState(true);
+  const [isMobile] = useMediaQuery(['(max-width: 767px)']); // Add the mobile query here
+
+  const handleMainContentInteraction = () => {
+    if (isMobile && open) {
+      setOpen(false);
+    }
+  };
 
   return (
     <Flex direction="column" h="100vh" overflowX="hidden" w="full" bg="bg">
@@ -70,6 +78,8 @@ export default function AppWrapper({ children, user }: { children: React.ReactNo
           transition="border-radius 0.2s ease-in-out"
           bg="bg"
           shadow="lg"
+          onClick={handleMainContentInteraction}
+          onTouchStart={handleMainContentInteraction}
         >
           <Flex w="full" direction="row" gap={4} align="center" py={4} px={[4, 6]} maxW="5xl" mx="auto">
             <IconButton onClick={() => setOpen(!open)} aria-label="Toggle Sidebar" variant="ghost" mr="auto">
@@ -140,7 +150,17 @@ const SidebarLinks: React.FC<{ user: User }> = ({ user }) => {
   const { vaults } = useVaults();
   const { totalIssues } = useSecurityAnalytics(vaults);
 
-  const isCurrentPath = (path: string) => pathName.startsWith(path);
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleEffect = () => setMounted(true);
+    handleEffect();
+  }, []);
+
+  const isCurrentPath = (path: string) => {
+    if (!mounted) return false;
+    return pathName.startsWith(path);
+  };
 
   return (
     <Flex direction="column" as="ul" flex={1} overflowY="auto" gap={1} w="full" h="full" p="1px">
@@ -173,6 +193,19 @@ const SidebarLinks: React.FC<{ user: User }> = ({ user }) => {
               {totalIssues}
             </Badge>
           )}
+        </NextLink>
+      </Button>
+      <Button
+        variant={isCurrentPath('/sharing') ? 'plain' : 'subtle'}
+        colorPalette={isCurrentPath('/sharing') ? 'yellow' : 'transparent'}
+        justifyContent="flex-start"
+        gap={2}
+        w="full"
+        asChild
+      >
+        <NextLink href="/sharing">
+          <TbShare />
+          Sharing Center
         </NextLink>
       </Button>
       <Button

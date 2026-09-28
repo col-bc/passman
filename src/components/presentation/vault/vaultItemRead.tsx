@@ -2,9 +2,10 @@ import ScreenValue from '@/components/ui/screenValue';
 import { toaster } from '@/components/ui/toaster';
 import { camelCaseToTitleCase } from '@/lib/util/formats';
 import { DecryptedVaultItem, ItemContent } from '@/types/client';
-import { Badge, Box, DataList, Flex, Heading, Separator } from '@chakra-ui/react';
+import { Badge, Box, DataList, Flex, Heading, ProgressCircle, Separator } from '@chakra-ui/react';
 import React from 'react';
 import { TbLock, TbRosetteDiscountCheck } from 'react-icons/tb';
+import zxcvbn from 'zxcvbn';
 
 const copyToClipboard = (text: string) => {
   navigator.clipboard
@@ -37,6 +38,16 @@ export default function VaultItemRead({
   vaultName?: string;
   itemContent: ItemContent[];
 }) {
+  const getScore = (value: string) => {
+    return zxcvbn(value).score;
+  };
+
+  const getColor = (score: number) => {
+    if (score >= 85) return 'green';
+    if (score >= 50) return 'orange';
+    return 'red';
+  };
+
   return (
     <DataList.Root orientation="horizontal" size="sm" gap={0}>
       <DataList.Item display="flex" gap={2} py={2}>
@@ -116,13 +127,34 @@ export default function VaultItemRead({
                   {value.label}:
                 </DataList.ItemLabel>
                 <DataList.ItemValue flex={2} display="flex" alignItems="center" position="relative">
-                  <Box
-                    flex={1}
-                    _hover={{ textDecoration: 'underline' }}
-                    cursor="pointer"
-                    onClick={() => copyToClipboard(value.value)}
-                  >
-                    {value.type === 'password' ? <ScreenValue>{value.value}</ScreenValue> : value.value}
+                  <Box flex={1} cursor="pointer" onClick={() => copyToClipboard(value.value)}>
+                    {value.type === 'password' ? (
+                      <Flex alignItems="center" justify="space-between" gap={2} pr={2}>
+                        <ScreenValue>{value.value}</ScreenValue>
+                        <ProgressCircle.Root
+                          value={getScore(value.value) * 25}
+                          size="xs"
+                          colorPalette={getColor(getScore(value.value) * 25)}
+                          display="flex"
+                          alignItems="center"
+                          gap={2}
+                        >
+                          <ProgressCircle.Label fontSize="2xs">
+                            {getScore(value.value) * 25 < 50
+                              ? 'WEAK'
+                              : getScore(value.value) * 25 < 75
+                                ? 'MODERATE'
+                                : 'STRONG'}
+                          </ProgressCircle.Label>
+                          <ProgressCircle.Circle>
+                            <ProgressCircle.Track />
+                            <ProgressCircle.Range />
+                          </ProgressCircle.Circle>
+                        </ProgressCircle.Root>
+                      </Flex>
+                    ) : (
+                      value.value
+                    )}
                   </Box>
                 </DataList.ItemValue>
               </DataList.Item>
