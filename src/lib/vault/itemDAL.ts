@@ -1,4 +1,5 @@
 import { SecureItem } from '@/prisma/client';
+import { SecureItemUpdateInput } from '@/prisma/models/SecureItem';
 import { DALResult } from '@/types/server';
 import 'server-only';
 import { EncryptedData } from '../crypto';
@@ -119,32 +120,23 @@ export async function createItem({
 
 export async function updateItem(
   itemId: string,
-  updatedFields: Partial<{
-    title?: string;
-    category?: string;
-    encryptedData: EncryptedData;
-    isFavorite?: boolean;
-  }>,
+  metadata: Partial<{ category?: string; title?: string; isFavorite?: boolean }>,
+  encryptedData?: EncryptedData,
 ): Promise<DALResult<SecureItem | null>> {
   try {
-    const updateData: Partial<SecureItem> = { ...updatedFields };
-    if (updatedFields.encryptedData) {
-      const { ciphertext, iv, tag } = updatedFields.encryptedData;
-      updateData.ciphertext = Buffer.from(ciphertext).toString('base64');
-      updateData.iv = Buffer.from(iv).toString('base64');
-      updateData.tag = Buffer.from(tag).toString('base64');
+    const updateData: SecureItemUpdateInput = { ...metadata };
+
+    if (encryptedData) {
+      updateData.ciphertext = Buffer.from(encryptedData.ciphertext).toString('base64');
+      updateData.iv = Buffer.from(encryptedData.iv).toString('base64');
+      updateData.tag = Buffer.from(encryptedData.tag).toString('base64');
     }
+
     const item = await prisma.secureItem.update({
       where: { id: itemId },
-      data: {
-        title: updateData.title,
-        category: updateData.category,
-        ciphertext: updateData.ciphertext,
-        iv: updateData.iv,
-        tag: updateData.tag,
-        isFavorite: updateData.isFavorite,
-      },
+      data: updateData,
     });
+
     return { success: true, data: item };
   } catch (error) {
     console.error(`Error updating item ${itemId}:`, error);

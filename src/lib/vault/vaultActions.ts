@@ -194,8 +194,8 @@ export async function handleGetVaultItem(vaultId: string, itemId: string): Promi
 export async function handleUpdateVaultItem(
   vaultId: string,
   itemId: string,
-  encryptedData: EncryptedData,
-  data: { category?: string; title?: string; isFavorite?: boolean },
+  meta: { category?: string; title?: string; isFavorite?: boolean },
+  encryptedData?: EncryptedData,
 ): Promise<ActionState<{ vaultId: string; itemId: string }>> {
   const currentUser = await getUser();
   if (!currentUser) {
@@ -210,12 +210,15 @@ export async function handleUpdateVaultItem(
       return { success: false, error: 'An unexpected error occurred. Please try again later.', type: 'SERVER_ERROR' };
     }
   }
-  const result = await updateItem(itemId, {
-    category: data.category,
-    title: data.title,
-    isFavorite: data.isFavorite,
-    encryptedData: encryptedData,
-  });
+  const result = await updateItem(
+    itemId,
+    {
+      category: meta.category,
+      title: meta.title,
+      isFavorite: meta.isFavorite,
+    },
+    encryptedData,
+  );
 
   if (!result.success) {
     if (result.type === 'NOT_FOUND') {

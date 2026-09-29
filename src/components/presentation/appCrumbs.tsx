@@ -6,6 +6,7 @@ import { BreadcrumbRootProps } from '@chakra-ui/react/breadcrumb';
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
+import { TbHome2Filled } from 'react-icons/tb';
 
 type PathSegment = {
   depth: number;
@@ -68,7 +69,8 @@ export default function AppCrumbs(props: BreadcrumbRootProps) {
       <Breadcrumb.List>
         {pathSegments.map(({ depth, segmentValue, href, isCurrentPage }) => (
           <React.Fragment key={depth}>
-            <Breadcrumb.Item>
+            <Breadcrumb.Item alignItems="center" gap={1.5}>
+              {depth === 0 && <TbHome2Filled />}
               {isCurrentPage ? (
                 <Breadcrumb.CurrentLink>{segmentValue}</Breadcrumb.CurrentLink>
               ) : (

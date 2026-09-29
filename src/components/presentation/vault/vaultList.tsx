@@ -16,6 +16,7 @@ import {
   Box,
   Button,
   Card,
+  EmptyState,
   Flex,
   GridItem,
   Heading,
@@ -27,13 +28,11 @@ import {
   SimpleGrid,
   Stat,
   Text,
-  VStack,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import React from 'react';
 import {
   TbArrowRight,
-  TbCirclePlus,
   TbGaugeFilled,
   TbLayoutListFilled,
   TbLockSquareRounded,
@@ -44,10 +43,10 @@ import {
 import DeleteVaultDialog from './deleteDialog';
 import VaultItemLineItem from './vaultItemLineItem';
 
-export default function VaultList({ v, favs }: { v: VaultWithItems[]; favs: SecureItem[]; user?: User }) {
+export default function VaultList({ v, favs: favorites }: { v: VaultWithItems[]; favs: SecureItem[]; user?: User }) {
   const [showCreateVaultDialog, setShowCreateVaultDialog] = React.useState(false);
-  const { handleUnlock, vaults, mek, currentVault } = useVaults();
-  const { totalIssues } = useSecurityAnalytics(vaults);
+  const { handleUnlock, vaults, mek } = useVaults();
+  const { totalIssues, hasSecurityIssues } = useSecurityAnalytics(vaults);
 
   React.useEffect(() => {
     if (mek && v.length > 0 && vaults.length === 0) {
@@ -153,39 +152,58 @@ export default function VaultList({ v, favs }: { v: VaultWithItems[]; favs: Secu
           .map((decryptedVaults) => (
             <VaultItem key={decryptedVaults.id} vault={decryptedVaults} />
           ))}
-        <Button
-          variant="outline"
-          h="full"
-          minH={24}
-          colorPalette="yellow"
-          onClick={() => setShowCreateVaultDialog(true)}
-          borderStyle="dashed"
-        >
-          <VStack justify="center" align="center" h="full" w="full">
-            <TbCirclePlus size={24} />
-            <Text>Create Vault</Text>
-          </VStack>
-        </Button>
       </SimpleGrid>
 
-      <Heading size="lg" mb="4">
-        Favorite Items
-      </Heading>
-      <List.Root>
-        {favs.map((vaultItem, index) => (
-          <VaultItemLineItem
-            key={`vault-item-${vaultItem.itemId}-${index}`}
-            vaultItem={vaultItem}
-            vaultId={vaults.find((v) => v.id === vaultItem.vaultId)?.id ?? ''}
-            currentVault={currentVault!}
-            index={index}
-            sortedVaultItems={vaults.find((v) => v.id === vaultItem.vaultId)?.vaultItems ?? []}
-            selectedItems={new Set()}
-            toggleSelectItem={() => {}}
-            monitoringEnabled={false}
-            hasSecurityIssues={() => false}
-          />
-        ))}
+      <HStack>
+        <Heading
+          as="h2"
+          size="2xl"
+          fontFamily="heading"
+          fontWeight="bolder"
+          letterSpacing="tighter"
+          borderBottom="2px solid"
+          borderColor="yellow.muted"
+        >
+          Favorite Items
+        </Heading>
+        <Box flex="1" />
+      </HStack>
+
+      <List.Root
+        listStyleType="none"
+        rounded="md"
+        border="1px solid"
+        borderColor="border"
+        divideY="1px"
+        divideStyle="solid"
+        divideColor="border"
+      >
+        {favorites.length === 0 ? (
+          <List.Item>
+            <EmptyState.Root>
+              <EmptyState.Title>No favorite items</EmptyState.Title>
+              <EmptyState.Description>
+                You have not marked any items as favorite yet. They will appear here once you do.
+              </EmptyState.Description>
+            </EmptyState.Root>
+          </List.Item>
+        ) : (
+          favorites.map((secureItem, index) => {
+            const vault = vaults.find((v) => v.vaultItems.some((vi) => vi.item.id === secureItem.id));
+            const vaultItem = vault?.vaultItems.find((vi) => vi.item.id === secureItem.id);
+            if (!vault || !vaultItem) {
+              return null;
+            }
+            return (
+              <VaultItemLineItem
+                key={`favorite-item-${secureItem.id}-${index}`}
+                vaultItem={vaultItem}
+                hasSecurityIssues={() => hasSecurityIssues(vaultItem)}
+                vaultId={vault.id}
+              />
+            );
+          })
+        )}
       </List.Root>
     </Flex>
   );
@@ -309,7 +327,7 @@ function VaultItem({ vault }: { vault: DecryptedVault }) {
                 </Badge>
               )}
             </Flex>
-            <LinkOverlay asChild colorPalette="yellow">
+            <LinkOverlay colorPalette="yellow" asChild display="flex" alignItems="center" color="yellow.fg" gap={4}>
               <NextLink href={`/vaults/${vault.id}`}>
                 Open Vault <TbArrowRight />
               </NextLink>

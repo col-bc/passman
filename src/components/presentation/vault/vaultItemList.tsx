@@ -14,7 +14,6 @@ import {
   Card,
   EmptyState,
   Flex,
-  Group,
   Heading,
   HStack,
   Icon,
@@ -60,11 +59,10 @@ export default function VaultItemList({
   const router = useRouter();
   const { hasSecurityIssues } = useSecurityAnalytics(vaults);
 
-  const [selectedItems, setSelectedItems] = React.useState<Set<string>>(new Set());
+  const [selectedItems, setSelectedItems] = React.useState<string[]>([]);
   const [sortOrder, setSortOrder] = React.useState<string>('date-desc');
 
   const [showRenameDialog, setShowRenameDialog] = React.useState(false);
-  const [showDeleteItemDialog, setShowDeleteItemDialog] = React.useState(false);
   const [showSecurityScanDialog, setShowSecurityScanDialog] = React.useState(
     searchParams.get('showMonitoring') === 'true' || false,
   );
@@ -123,23 +121,17 @@ export default function VaultItemList({
   }, [vaults, vaultId, currentVault?.id, setCurrentVault]);
 
   const toggleSelectItem = (itemId: string) => {
-    setSelectedItems((prevSelected) => {
-      const newSelected = new Set(prevSelected);
-      if (newSelected.has(itemId)) {
-        newSelected.delete(itemId);
-      } else {
-        newSelected.add(itemId);
-      }
-      return newSelected;
-    });
+    setSelectedItems((prevSelected) =>
+      prevSelected.includes(itemId) ? prevSelected.filter((id) => id !== itemId) : [...prevSelected, itemId],
+    );
   };
 
   const toggleSelectAll = () => {
     if (!currentVault) return;
-    if (selectedItems.size === currentVault.vaultItems.length) {
-      setSelectedItems(new Set());
+    if (selectedItems.length === currentVault.vaultItems.length) {
+      setSelectedItems([]);
     } else {
-      setSelectedItems(new Set(currentVault.vaultItems.map((item) => item.itemId)));
+      setSelectedItems(currentVault.vaultItems.map((item) => item.itemId));
     }
   };
 
@@ -174,8 +166,6 @@ export default function VaultItemList({
   if (!currentVault) {
     return <div>Loading vault details...</div>;
   }
-
-  const monitoringEnabled = currentVault.enableMonitoring;
 
   return (
     <Flex direction="column" as="section" gap={10}>
@@ -306,21 +296,28 @@ export default function VaultItemList({
 
         <Box flex={1} />
 
-        {selectedItems.size > 0 && (
-          <Group attached>
-            <Button colorPalette="gray" variant="surface" size="xs" onClick={toggleSelectAll}>
-              {selectedItems.size === currentVault.vaultItems.length ? 'Deselect All' : 'Select All'}
+        {selectedItems.length > 0 && (
+          <Menu.Root>
+            <Button as={Menu.Trigger} colorPalette="gray" variant="surface" size="xs">
+              Bulk Actions
             </Button>
-            <Button colorPalette="gray" variant="surface" size="xs" onClick={() => {}}>
-              Move {selectedItems.size} {selectedItems.size > 1 ? 'Items' : 'Item'}
-            </Button>
-            <Button colorPalette="gray" variant="surface" size="xs" onClick={() => {}}>
-              Share {selectedItems.size} {selectedItems.size > 1 ? 'Items' : 'Item'}
-            </Button>
-            <Button colorPalette="red" variant="surface" size="xs" onClick={() => {}}>
-              Delete {selectedItems.size} {selectedItems.size > 1 ? 'Items' : 'Item'}
-            </Button>
-          </Group>
+            <Menu.Positioner>
+              <Menu.Content>
+                <Menu.Item value="select-all" onSelect={toggleSelectAll}>
+                  {selectedItems.length === currentVault.vaultItems.length ? 'Deselect All' : 'Select All'}
+                </Menu.Item>
+                <Menu.Item value="move" onSelect={() => {}}>
+                  Move {selectedItems.length} {selectedItems.length > 1 ? 'Items' : 'Item'}
+                </Menu.Item>
+                <Menu.Item value="share" onSelect={() => {}}>
+                  Share {selectedItems.length} {selectedItems.length > 1 ? 'Items' : 'Item'}
+                </Menu.Item>
+                <Menu.Item value="delete" onSelect={() => {}} color="red.fg" _hover={{ bg: 'red.subtle' }}>
+                  Delete {selectedItems.length} {selectedItems.length > 1 ? 'Items' : 'Item'}
+                </Menu.Item>
+              </Menu.Content>
+            </Menu.Positioner>
+          </Menu.Root>
         )}
         <Menu.Root>
           <IconButton as={Menu.Trigger} variant="surface" colorPalette="gray" size="sm">
@@ -358,19 +355,29 @@ export default function VaultItemList({
           </VStack>
         </EmptyState.Root>
       ) : (
-        <List.Root>
+        <List.Root
+          listStyleType="none"
+          rounded="md"
+          border="1px solid"
+          borderColor="border"
+          divideY="1px"
+          divideStyle="solid"
+          divideColor="border"
+        >
           {sortedVaultItems.map((vaultItem, index) => (
             <VaultItemLineItem
               key={`vault-item-${vaultItem.itemId}-${index}`}
-              vaultItem={vaultItem}
+              vaultItem={vaultItem!}
               vaultId={currentVault.id}
-              index={index}
-              sortedVaultItems={sortedVaultItems}
-              selectedItems={selectedItems}
-              toggleSelectItem={toggleSelectItem}
-              currentVault={currentVault}
-              monitoringEnabled={monitoringEnabled}
               hasSecurityIssues={hasSecurityIssues}
+              selectedItemIds={selectedItems}
+              toggleSelectItem={(itemId: string) => {
+                if (selectedItems.includes(itemId)) {
+                  setSelectedItems(selectedItems.filter((id) => id !== itemId));
+                } else {
+                  setSelectedItems([...selectedItems, itemId]);
+                }
+              }}
             />
           ))}
         </List.Root>
