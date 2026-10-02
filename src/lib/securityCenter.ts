@@ -147,6 +147,11 @@ export function findWeakPasswords(vaults: DecryptedVault[]): WeakPassword[] {
   return weakPasswordsList;
 }
 
+/**
+ * Calculates the security score for a given vault based on the strength of its passwords.
+ * @param vault - A decrypted vault containing items with passwords to evaluate.
+ * @returns { maxScore: number, actualScore: number } - The maximum possible score and the actual score based on password strength.
+ */
 export function calculateScore(vault: DecryptedVault) {
   // max score is 4 points per password field
   const maxScore = vault.vaultItems.reduce((acc, item) => {

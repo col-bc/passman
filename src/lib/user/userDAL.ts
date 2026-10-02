@@ -23,24 +23,34 @@ export async function getUserById(userId: string): Promise<DALResult<User | null
 }
 
 export async function getUserByEmail(email: string): Promise<DALResult<User | null>> {
-  const user = await prisma.user.findUnique({
-    where: { email },
-  });
-  if (user) {
-    return { success: true, data: user };
-  } else {
-    return { success: false, type: 'NOT_FOUND' };
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+    if (user) {
+      return { success: true, data: user };
+    } else {
+      return { success: false, type: 'NOT_FOUND' };
+    }
+  } catch (error) {
+    console.error('[userDAL] getUserByEmail failed to fetch user by email:', error);
+    return { success: false, type: 'SERVER_ERROR' };
   }
 }
 
 const createDefaultVault = (userId: string) => {
-  // Create a default vault for the user
-  return prisma.vault.create({
-    data: {
-      title: 'Default Vault',
-      ownerId: userId,
-    },
-  });
+  try {
+    // Create a default vault for the user
+    return prisma.vault.create({
+      data: {
+        title: 'Default Vault',
+        ownerId: userId,
+      },
+    });
+  } catch (error) {
+    console.error('[userDAL] createDefaultVault failed to create default vault:', error);
+    throw error;
+  }
 };
 
 export async function createUser(
@@ -66,27 +76,32 @@ export async function createUser(
 
   const passwordToken = await hashPassword(crypto.authHash, email);
 
-  const newUser = await prisma.user.create({
-    data: {
-      authHash: passwordToken,
-      email,
-      publicKey: crypto.publicKey,
-      encryptedPrivateKey: crypto.encryptedPrivateKey,
-      name: data.name,
-      phone: data.phone,
-    },
-  });
+  try {
+    const newUser = await prisma.user.create({
+      data: {
+        authHash: passwordToken,
+        email,
+        publicKey: crypto.publicKey,
+        encryptedPrivateKey: crypto.encryptedPrivateKey,
+        name: data.name,
+        phone: data.phone,
+      },
+    });
 
-  if (!newUser) {
+    if (!newUser) {
+      return { success: false, type: 'SERVER_ERROR' };
+    }
+
+    await createDefaultVault(newUser.id);
+
+    return {
+      success: true,
+      data: { success: true, message: 'User created successfully' },
+    };
+  } catch (error) {
+    console.error('[userDAL] createUser failed to create user:', error);
     return { success: false, type: 'SERVER_ERROR' };
   }
-
-  await createDefaultVault(newUser.id);
-
-  return {
-    success: true,
-    data: { success: true, message: 'User created successfully' },
-  };
 }
 
 export async function updateUserPassword(
@@ -101,13 +116,17 @@ export async function updateUserPassword(
   if (user.data.securityToken !== securityToken) {
     return { success: false, type: 'VALIDATION' };
   }
+  try {
+    await prisma.user.update({
+      where: { id: user.data.id },
+      data: { authHash: newHashedPassword, securityToken: null },
+    });
 
-  await prisma.user.update({
-    where: { id: user.data.id },
-    data: { authHash: newHashedPassword, securityToken: null },
-  });
-
-  return { success: true, data: user.data };
+    return { success: true, data: user.data };
+  } catch (error) {
+    console.error('[userDAL] updateUserPassword failed to update password:', error);
+    return { success: false, type: 'SERVER_ERROR' };
+  }
 }
 
 const generateRandomToken = (length: number = 64): string => {
@@ -138,20 +157,24 @@ export async function updateUser(
   id: string,
   updates: { name?: string; phone?: string },
 ): Promise<DALResult<{ success: boolean; message: string }>> {
-  const user = await getUserById(id);
-  if (!user.success || !user.data) {
-    return { success: false, type: 'NOT_FOUND' };
+  try {
+    const user = await getUserById(id);
+    if (!user.success || !user.data) {
+      return { success: false, type: 'NOT_FOUND' };
+    }
+    await prisma.user.update({
+      where: { id: user.data.id },
+      data: updates,
+    });
+
+    return {
+      success: true,
+      data: { success: true, message: 'User updated successfully' },
+    };
+  } catch (error) {
+    console.error('[userDAL] updateUser failed to update user:', error);
+    return { success: false, type: 'SERVER_ERROR' };
   }
-
-  await prisma.user.update({
-    where: { id: user.data.id },
-    data: updates,
-  });
-
-  return {
-    success: true,
-    data: { success: true, message: 'User updated successfully' },
-  };
 }
 
 export async function deleteUser(userId: string): Promise<DALResult<{ success: boolean; message: string }>> {
@@ -159,17 +182,22 @@ export async function deleteUser(userId: string): Promise<DALResult<{ success: b
   if (!user.success || !user.data) {
     return { success: false, type: 'NOT_FOUND' };
   }
+  try {
+    await prisma.user.delete({
+      where: { id: user.data.id },
+    });
 
-  await prisma.user.delete({
-    where: { id: user.data.id },
-  });
-
-  return {
-    success: true,
-    data: { success: true, message: 'User deleted successfully' },
-  };
+    return {
+      success: true,
+      data: { success: true, message: 'User deleted successfully' },
+    };
+  } catch (error) {
+    console.error('[userDAL] deleteUser failed to delete user:', error);
+    return { success: false, type: 'SERVER_ERROR' };
+  }
 }
 
+// TODO: Implement actual email sending logic for password reset
 export async function sendChangePasswordEmail(
   email: string,
 ): Promise<DALResult<{ success: boolean; message: string }>> {
@@ -186,8 +214,8 @@ export async function sendChangePasswordEmail(
   console.log(`[userDAL] Password reset link for ${email}: ${resetLink}`);
 
   return {
-    success: true,
-    data: { success: true, message: 'Password reset email sent successfully' },
+    success: false,
+    type: 'SERVER_ERROR',
   };
 }
 
@@ -211,13 +239,18 @@ export async function enableTwoFactor(
 
   const recoveryCodes = await generateRecoveryCodes();
 
-  await prisma.user.update({
-    where: { id: user.data.id },
-    data: { enable2FA: true, twoFactorSecret: secret, recoveryCodes: recoveryCodes.join(',') },
-  });
+  try {
+    await prisma.user.update({
+      where: { id: user.data.id },
+      data: { enable2FA: true, twoFactorSecret: secret, recoveryCodes: recoveryCodes.join(',') },
+    });
 
-  return {
-    success: true,
-    data: { success: true, message: 'Two-factor authentication enabled successfully' },
-  };
+    return {
+      success: true,
+      data: { success: true, message: 'Two-factor authentication enabled successfully' },
+    };
+  } catch (error) {
+    console.error('[userDAL] enableTwoFactor failed to enable 2FA:', error);
+    return { success: false, type: 'SERVER_ERROR' };
+  }
 }

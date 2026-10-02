@@ -29,7 +29,7 @@ export default async function HomePage() {
       <Navbar user={user} />
       <Box as="main" flex={1} bg="bg.surface" color="fg.primary" overflow="hidden">
         {/* HERO SECTION */}
-        <Box position="relative" w="full">
+        <Box position="relative" w="full" minH="100vh">
           <Box
             position="absolute"
             inset={0}
@@ -84,10 +84,9 @@ export default async function HomePage() {
                 protected.
               </Heading>
 
-              <Text fontSize={{ base: 'lg', md: 'xl' }} color="fg" maxW="full" lineHeight="tall">
-                Passman uses military-grade AES-256 client-side encryption. Your master key never leaves your
-                device,ensuring you retain absolute control over your data. Enable sharing securely with others without
-                compromising your privacy.
+              <Text fontSize={{ base: 'xg', md: '2xl' }} color="fg" maxW="full" lineHeight="tall">
+                Passman uses end-to-end military-grade encryption to ensure your data is protected and your secrets
+                remain private.
               </Text>
 
               <Flex direction={{ base: 'column', sm: 'row' }} gap={[4, 4, 6]} mt={4} w="full" justify="center">

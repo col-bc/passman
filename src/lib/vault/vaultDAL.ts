@@ -46,34 +46,49 @@ export async function getVaults(ownerId: string): Promise<DALResult<VaultWithIte
 }
 
 export async function createVault(ownerId: string, title: string, icon: string = 'default'): Promise<DALResult<Vault>> {
-  const vault = await prisma.vault.create({
-    data: { ownerId, title, icon },
-  });
-  return { success: true, data: vault };
+  try {
+    const vault = await prisma.vault.create({
+      data: { ownerId, title, icon },
+    });
+    return { success: true, data: vault };
+  } catch (error) {
+    console.error('[vaultDAL] createVault failed to create vault:', error);
+    return { success: false, type: 'SERVER_ERROR' };
+  }
 }
 
 export async function updateVault(
   vaultId: string,
   data: { newTitle?: string; newIcon?: string; enableMonitoring?: boolean },
 ): Promise<DALResult<Vault | null>> {
-  const updatedVault = await prisma.vault.update({
-    where: { id: vaultId },
-    data: { title: data.newTitle, icon: data.newIcon, enableMonitoring: data.enableMonitoring },
-  });
-  console.log(`Updated vault with ID ${vaultId}:`, updatedVault);
-  if (!updatedVault) {
-    return { success: false, type: 'NOT_FOUND' };
+  try {
+    const updatedVault = await prisma.vault.update({
+      where: { id: vaultId },
+      data: { title: data.newTitle, icon: data.newIcon, enableMonitoring: data.enableMonitoring },
+    });
+    console.log(`Updated vault with ID ${vaultId}:`, updatedVault);
+    if (!updatedVault) {
+      return { success: false, type: 'NOT_FOUND' };
+    }
+    return { success: true, data: updatedVault };
+  } catch (error) {
+    console.error('[vaultDAL] updateVault failed to update vault:', error);
+    return { success: false, type: 'SERVER_ERROR' };
   }
-  return { success: true, data: updatedVault };
 }
 
 export async function deleteVault(vaultId: string): Promise<DALResult<boolean>> {
-  const deletedVault = await prisma.vault.deleteMany({
-    where: { id: vaultId },
-  });
-  if (deletedVault.count === 0) {
-    console.error(`Failed to delete vault ${vaultId}`);
-    return { success: false, type: 'NOT_FOUND' };
+  try {
+    const deletedVault = await prisma.vault.deleteMany({
+      where: { id: vaultId },
+    });
+    if (deletedVault.count === 0) {
+      console.error(`Failed to delete vault ${vaultId}`);
+      return { success: false, type: 'NOT_FOUND' };
+    }
+    return { success: true, data: true };
+  } catch (error) {
+    console.error('[vaultDAL] deleteVault failed to delete vault:', error);
+    return { success: false, type: 'SERVER_ERROR' };
   }
-  return { success: true, data: true };
 }

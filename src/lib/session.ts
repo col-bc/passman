@@ -70,19 +70,40 @@ export async function setSessionToken(userId: string): Promise<void> {
  * @param password The password of the user attempting to log in.
  * @returns {Promise<User | null>} A promise that resolves to the authenticated user or `null` if authentication fails.
  */
-export async function loginUser(email: string, password: string): Promise<User | null> {
-  const user = await getUserByEmail(email);
-  if (!user.success || !user.data) {
-    return null;
+export async function loginUser(email: string, password: string): Promise<DALResult<User | null>> {
+  const userStatus = await getUserByEmail(email);
+  if (!userStatus.success) {
+    if (userStatus.type === 'SERVER_ERROR') {
+      return {
+        success: false,
+        type: 'SERVER_ERROR',
+      };
+    }
+    return {
+      success: false,
+      type: 'UNAUTHORIZED',
+    };
   }
-  const isPasswordValid = await verifyPassword(password, email, user.data.authHash);
+  if (!userStatus.data) {
+    return {
+      success: false,
+      type: 'UNAUTHORIZED',
+    };
+  }
+  const isPasswordValid = await verifyPassword(password, email, userStatus.data.authHash);
   if (!isPasswordValid) {
-    return null;
+    return {
+      success: false,
+      type: 'UNAUTHORIZED',
+    };
   }
-  if (!user.data.enable2FA) {
-    await setSessionToken(user.data.id);
+  if (!userStatus.data.enable2FA) {
+    await setSessionToken(userStatus.data.id);
   }
-  return user.data;
+  return {
+    success: true,
+    data: userStatus.data,
+  };
 }
 
 /**

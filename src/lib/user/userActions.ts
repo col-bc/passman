@@ -101,16 +101,26 @@ export async function handleLoginUser({
     };
   }
 
-  const currentUser = await loginUser(email, password);
-  if (!currentUser) {
+  const userStatus = await loginUser(email, password);
+  if (!userStatus.success) {
     return {
       success: false,
-      error: 'Invalid email or password.',
-      type: 'VALIDATION',
+      error:
+        userStatus.type === 'UNAUTHORIZED'
+          ? 'Invalid email or password.'
+          : 'An unexpected error occurred. Please refresh the page and try again.',
+      type: userStatus.type,
+    };
+  }
+  if (!userStatus.data) {
+    return {
+      success: false,
+      error: 'An unexpected error occurred. Please refresh the page and try again.',
+      type: 'SERVER_ERROR',
     };
   }
 
-  cookieJar.set('pre-auth-id', currentUser.id, {
+  cookieJar.set('pre-auth-id', userStatus.data.id, {
     path: '/',
     httpOnly: true,
     sameSite: 'strict',
@@ -119,7 +129,7 @@ export async function handleLoginUser({
   return {
     success: true,
     data: {
-      twoFactor: currentUser.enable2FA,
+      twoFactor: userStatus.data.enable2FA,
     },
   };
 }

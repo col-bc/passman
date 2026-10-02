@@ -6,7 +6,7 @@ import { DecryptedVault } from '@/types/client';
 import { Button, CheckboxCard, Dialog, DialogOpenChangeDetails, Flex, Float, Link } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import React from 'react';
-import { TbDeviceFloppy, TbShieldSearch } from 'react-icons/tb';
+import { TbDeviceFloppy, TbShieldSearch, TbX } from 'react-icons/tb';
 
 export default function SecurityMonitoringForm({ vault, onClose }: { vault: DecryptedVault; onClose: () => void }) {
   const [enrolled, setEnrolled] = React.useState(vault.enableMonitoring);
@@ -73,6 +73,10 @@ export default function SecurityMonitoringForm({ vault, onClose }: { vault: Decr
         </Dialog.Description>
       </Dialog.Body>
       <Dialog.Footer>
+        <Button colorPalette="gray" variant="subtle" onClick={() => onClose()}>
+          <TbX />
+          Cancel
+        </Button>
         <Button colorPalette="yellow" type="submit">
           <TbDeviceFloppy />
           Save Changes

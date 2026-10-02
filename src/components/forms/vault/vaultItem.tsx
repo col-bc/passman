@@ -36,6 +36,7 @@ import {
   DataList,
   Dialog,
   Editable,
+  Em,
   EmptyState,
   Field,
   Flex,
@@ -51,6 +52,7 @@ import {
   Select,
   SimpleGrid,
   Skeleton,
+  Strong,
   Text,
   Textarea,
   VStack,
@@ -366,13 +368,18 @@ function VaultItemForm({
 
     if (vaultItem) {
       // Update existing vault item
-      const status = await handleUpdateVaultItem(vault, vaultItem.item.id, encryptedData, {
-        category: template,
-        title,
-        isFavorite,
-      });
-      if (!status.success) {
-        setError(status.error || 'Failed to update vault item.');
+      const updateResult = await handleUpdateVaultItem(
+        vault,
+        vaultItem.item.id,
+        {
+          category: template,
+          title,
+          isFavorite,
+        },
+        encryptedData,
+      );
+      if (!updateResult.success) {
+        setError(updateResult.error || 'Failed to update vault item.');
         return;
       }
 
@@ -391,13 +398,13 @@ function VaultItemForm({
 
       startTransition(() => {
         router.refresh();
-        router.push(`/vaults/${vault}/${status.data.itemId}`);
+        router.push(`/vaults/${vault}/${updateResult.data.itemId}`);
       });
     } else {
       // Create a new vault item
-      const status = await handleCreateSecureVaultItem(vault, encryptedData, { category: template, title });
-      if (!status.success) {
-        setError(status.error || 'Failed to create vault item.');
+      const createStatus = await handleCreateSecureVaultItem(vault, encryptedData, { category: template, title });
+      if (!createStatus.success) {
+        setError(createStatus.error || 'Failed to create vault item.');
         return;
       }
 
@@ -412,14 +419,14 @@ function VaultItemForm({
         description: `The item "${title}" has been successfully created in the vault.`,
         action: {
           label: 'View Item',
-          onClick: () => router.push(`/vaults/${vault}/${status.data.itemId}`),
+          onClick: () => router.push(`/vaults/${vault}/${createStatus.data.itemId}`),
         },
         type: 'success',
       });
 
       startTransition(() => {
         router.refresh();
-        router.push(`/vaults/${vault}/${status.data.itemId}`);
+        router.push(`/vaults/${vault}/${createStatus.data.itemId}`);
       });
     }
   }
@@ -551,8 +558,8 @@ function VaultItemForm({
           {renderItemIssues()}
 
           {mode === 'edit' ? (
-            // Metadata
             <>
+              {/* Metadata */}
               <Field.Root required colorPalette="yellow">
                 <Field.Label>
                   Title
@@ -566,7 +573,6 @@ function VaultItemForm({
                   onChange={(e) => setTitle(e.target.value)}
                 />{' '}
               </Field.Root>
-
               <Field.Root required colorPalette="yellow">
                 <Field.Label>
                   Vault
@@ -609,7 +615,6 @@ function VaultItemForm({
                   <Skeleton h="40px" />
                 )}
               </Field.Root>
-
               <Field.Root required colorPalette="yellow">
                 <Field.Label>
                   Template
@@ -647,7 +652,6 @@ function VaultItemForm({
                   </Select.Positioner>
                 </Select.Root>
               </Field.Root>
-
               {/* Item Content */}
               <Box my={2}>
                 <Flex align="center" justify="space-between" my={2}>
@@ -752,7 +756,6 @@ function VaultItemForm({
                   the options menus.
                 </Text>
               </Box>
-
               {/* Empty State */}
               {itemContent.length === 0 && (
                 <EmptyState.Root border="1px dashed" borderColor="border" rounded="sm">
@@ -767,7 +770,6 @@ function VaultItemForm({
                   </VStack>
                 </EmptyState.Root>
               )}
-
               {itemContent.map((content, index) => (
                 <Box
                   key={index}
@@ -840,7 +842,6 @@ function VaultItemForm({
                   </Field.Root>
                 </Box>
               ))}
-
               {vaultItem && (
                 <DataList.Root orientation="horizontal" size="sm" mt={4}>
                   <DataList.Item display="flex" gap={2}>
@@ -1086,7 +1087,11 @@ const PasswordField: React.FC<{
   onGeneratePassword: () => void;
 }> = ({ content, index, setItemContent, onChange, onGeneratePassword }) => {
   const [show, setShow] = React.useState(false);
-  const { score: strength, feedback } = React.useMemo(() => {
+  const {
+    score: strength,
+    feedback,
+    crack_times_display,
+  } = React.useMemo(() => {
     return zxcvbn(content.value || '');
   }, [content.value]);
 
@@ -1140,7 +1145,8 @@ const PasswordField: React.FC<{
               </List.Root>
             ) : (
               <Text textStyle="xs" color="fg.muted">
-                This is a strong password.
+                It would take <Strong>{crack_times_display.offline_slow_hashing_1e4_per_second}</Strong> to break this
+                password with <Em>ten billion</Em> attempts per second.
               </Text>
             )}
           </Card.Body>

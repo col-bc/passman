@@ -39,13 +39,13 @@ export default function SignInForm() {
     setError(null);
 
     if (!email || !password) {
-      setError('Please fill in all required fields.');
+      setError('Please complete all required fields');
       setIsLoading(false);
       return;
     }
 
     if (!tsToken) {
-      setError('Please complete the challenge to verify you are human.');
+      setError('Security challenge failed. Refresh the page to try again.');
       setIsLoading(false);
       return;
     }
@@ -55,24 +55,24 @@ export default function SignInForm() {
     const authHash = await deriveAuthHash(password, email);
 
     localStorage.setItem('mekAttempt', mek);
-    const status = await handleLoginUser({ email, password: authHash, turnstileToken });
-    if (!status.success) {
+    const authStatus = await handleLoginUser({ email, password: authHash, turnstileToken });
+    if (!authStatus.success) {
       // Login failed.
       localStorage.removeItem('mekAttempt');
-      setError(status.error || 'An unknown error occurred.');
+      setError(authStatus.error || 'An unknown error occurred.');
       turnstileRef.current?.reset();
       setPassword('');
       setIsLoading(false);
       return;
     }
-    if (!status.data?.twoFactor) {
+    if (!authStatus.data?.twoFactor) {
       // login successful without two-factor authentication
       setMek(mek);
       localStorage.removeItem('mekAttempt');
       setIsLoading(false);
       setShowEnroll2FA(true);
     }
-    if (status.data?.twoFactor) {
+    if (authStatus.data?.twoFactor) {
       // login requires two-factor authentication
       setIsLoading(false);
       router.push(`/auth/sign-in/verify?next=${encodeURIComponent(nextUrl)}`);
